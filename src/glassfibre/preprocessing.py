@@ -227,13 +227,23 @@ class ProcessRegions:
     def process_sub_region_boundaries(self):
 
         region_path = os.path.join('results', 'processed', self.country_iso3, 'regions', 'regions_{}_{}.shp'.format(2, self.country_iso3)) 
-        countries = gpd.read_file(region_path)
+        region_path_2 = os.path.join('results', 'processed', self.country_iso3, 'regions', 'regions_{}_{}.shp'.format(1, self.country_iso3))
+        
+        if os.path.exists(region_path):
+
+            countries = gpd.read_file(region_path)
+            gid = 'GID_2'
+
+        else:
+
+            countries = gpd.read_file(region_path_2)
+            gid = 'GID_1'
 
         for index, row in tqdm(countries.iterrows(), desc = 'Processing sub-region boundaries'):
 
             sub_region_shapefile = gpd.GeoDataFrame([row], crs = countries.crs)
 
-            filename = '{}.shp'.format(row['GID_2'])    
+            filename = '{}.shp'.format(row[gid])    
 
             folder_out = os.path.join('results', 'processed', self.country_iso3, 'boundaries')
 
@@ -383,8 +393,7 @@ class ProcessPopulation:
                 output.append({
                     'iso3':boundary['GID_0'],
                     'region':boundary['NAME_1'],
-                    'name': boundary['NAME_2'],
-                    'GID_1': boundary[gid_region],
+                    'GID_1': boundary['GID_1'],
                     'population': population,
                     'latitude': boundary['latitude'],
                     'longitude': boundary['longitude'],
