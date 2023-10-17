@@ -56,7 +56,6 @@ class PointsGenerator:
 
                     if myitem['GID_1'] == myitem2['GID_1']:
 
-
                         my_points.append({
                             'geometry': {
                                 'type':'Point',
