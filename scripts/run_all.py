@@ -25,7 +25,7 @@ for idx, country in countries.iterrows():
         
     #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    if not country['iso3'] == 'KEN':
+    if not country['iso3'] == 'BWA':
         
         continue 
 
