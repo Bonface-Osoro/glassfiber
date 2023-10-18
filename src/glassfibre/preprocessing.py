@@ -231,17 +231,6 @@ class ProcessRegions:
         region_path_2 = os.path.join('results', 'processed', self.country_iso3, 'regions', 'regions_{}_{}.shp'.format(1, self.country_iso3))
         
         if os.path.exists(region_path):
-<<<<<<< HEAD
-=======
-
-            countries = gpd.read_file(region_path)
-            gid = 'GID_2'
-
-        else:
-
-            countries = gpd.read_file(region_path_2)
-            gid = 'GID_1'
->>>>>>> main
 
             countries = gpd.read_file(region_path)
             gid = 'GID_2'
@@ -251,21 +240,26 @@ class ProcessRegions:
             countries = gpd.read_file(region_path_2)
             gid = 'GID_1'
 
-        for index, row in tqdm(countries.iterrows(), desc = 'Processing sub-region boundaries for {}'.format(self.country_iso3)):
+            countries = gpd.read_file(region_path)
+            gid = 'GID_2'
+            countries = gpd.read_file(region_path_2)
+            gid = 'GID_1'
 
-            sub_region_shapefile = gpd.GeoDataFrame([row], crs = countries.crs)
+            for index, row in tqdm(countries.iterrows(), desc = 'Processing sub-region boundaries for {}'.format(self.country_iso3)):
 
-            filename = '{}.shp'.format(row[gid])    
+                sub_region_shapefile = gpd.GeoDataFrame([row], crs = countries.crs)
 
-            folder_out = os.path.join('results', 'processed', self.country_iso3, 'boundaries')
+                filename = '{}.shp'.format(row[gid])    
 
-            if not os.path.exists(folder_out):
+                folder_out = os.path.join('results', 'processed', self.country_iso3, 'boundaries')
 
-                os.makedirs(folder_out)
+                if not os.path.exists(folder_out):
 
-            path_out = os.path.join(folder_out, filename)
+                    os.makedirs(folder_out)
 
-            sub_region_shapefile.to_file(path_out, driver = 'ESRI Shapefile')
+                path_out = os.path.join(folder_out, filename)
+
+                sub_region_shapefile.to_file(path_out, driver = 'ESRI Shapefile')
 
         return None
 
