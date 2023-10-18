@@ -240,26 +240,21 @@ class ProcessRegions:
             countries = gpd.read_file(region_path_2)
             gid = 'GID_1'
 
-            countries = gpd.read_file(region_path)
-            gid = 'GID_2'
-            countries = gpd.read_file(region_path_2)
-            gid = 'GID_1'
+        for index, row in tqdm(countries.iterrows(), desc = 'Processing sub-region boundaries for {}'.format(self.country_iso3)):
 
-            for index, row in tqdm(countries.iterrows(), desc = 'Processing sub-region boundaries for {}'.format(self.country_iso3)):
+            sub_region_shapefile = gpd.GeoDataFrame([row], crs = countries.crs)
 
-                sub_region_shapefile = gpd.GeoDataFrame([row], crs = countries.crs)
+            filename = '{}.shp'.format(row[gid])    
 
-                filename = '{}.shp'.format(row[gid])    
+            folder_out = os.path.join('results', 'processed', self.country_iso3, 'boundaries')
 
-                folder_out = os.path.join('results', 'processed', self.country_iso3, 'boundaries')
+            if not os.path.exists(folder_out):
 
-                if not os.path.exists(folder_out):
+                os.makedirs(folder_out)
 
-                    os.makedirs(folder_out)
+            path_out = os.path.join(folder_out, filename)
 
-                path_out = os.path.join(folder_out, filename)
-
-                sub_region_shapefile.to_file(path_out, driver = 'ESRI Shapefile')
+            sub_region_shapefile.to_file(path_out, driver = 'ESRI Shapefile')
 
         return None
 
@@ -421,4 +416,3 @@ class ProcessPopulation:
         df.to_csv(path_out, index = False)
 
         return output
-    
