@@ -3,7 +3,6 @@ import os
 import warnings
 import pandas as pd
 from glassfibre.preprocessing import ProcessCountry, ProcessRegions, ProcessPopulation
-from glassfibre.generator import PointsGenerator
 from glassfibre.country_groups import sub_saharan_africa
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
@@ -37,8 +36,5 @@ for idx, country in countries.iterrows():
     #regions.process_sub_region_boundaries()
 
     populations = ProcessPopulation(path, countries['iso3'].loc[idx], countries['lowest'].loc[idx], pop_tif_loc)
-    #populations.process_national_population()
-    #populations.process_population_tif()
-
-    points_generator = PointsGenerator(countries['iso3'].loc[idx])
-    points_generator.generate_points()
+    populations.process_national_population()
+    populations.process_population_tif()
