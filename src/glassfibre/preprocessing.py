@@ -231,6 +231,17 @@ class ProcessRegions:
         region_path_2 = os.path.join('results', 'processed', self.country_iso3, 'regions', 'regions_{}_{}.shp'.format(1, self.country_iso3))
         
         if os.path.exists(region_path):
+<<<<<<< HEAD
+=======
+
+            countries = gpd.read_file(region_path)
+            gid = 'GID_2'
+
+        else:
+
+            countries = gpd.read_file(region_path_2)
+            gid = 'GID_1'
+>>>>>>> main
 
             countries = gpd.read_file(region_path)
             gid = 'GID_2'
