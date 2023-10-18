@@ -121,7 +121,7 @@ class ProcessCountry:
 
             print('Completed national outline processing')
             
-        print('Processing country shapes')
+        print('Processing country shapes for {}'.format(self.country_iso3))
 
         if not os.path.exists(path):
 
@@ -194,7 +194,7 @@ class ProcessRegions:
 
                 continue
 
-            print('Processing GID_{} region shapes'.format(regional_level))
+            print('Processing GID_{} region shapes for {}'.format(regional_level, self.country_iso3))
 
             if not os.path.exists(folder):
 
@@ -222,8 +222,9 @@ class ProcessRegions:
 
                 pass
 
-        return print('Regional shapefiles processing completed for {}'.format(self.country_iso3))
+        return None
     
+
     def process_sub_region_boundaries(self):
 
         region_path = os.path.join('results', 'processed', self.country_iso3, 'regions', 'regions_{}_{}.shp'.format(2, self.country_iso3)) 
@@ -239,7 +240,7 @@ class ProcessRegions:
             countries = gpd.read_file(region_path_2)
             gid = 'GID_1'
 
-        for index, row in tqdm(countries.iterrows(), desc = 'Processing sub-region boundaries'):
+        for index, row in tqdm(countries.iterrows(), desc = 'Processing sub-region boundaries for {}'.format(self.country_iso3)):
 
             sub_region_shapefile = gpd.GeoDataFrame([row], crs = countries.crs)
 
@@ -255,7 +256,7 @@ class ProcessRegions:
 
             sub_region_shapefile.to_file(path_out, driver = 'ESRI Shapefile')
 
-        return print('Sub-region boundary processed')
+        return None
 
 
 class ProcessPopulation:
