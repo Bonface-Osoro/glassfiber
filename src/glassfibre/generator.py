@@ -314,6 +314,7 @@ class EdgeGenerator:
                                 'type': 'Feature',
                                 'geometry': mapping(line),
                                 'properties':{
+                                    'GID_1': node2['GID_1'],
                                     'from': node1_id,
                                     'to':  node2_id,
                                     'length': line.length,
