@@ -398,7 +398,8 @@ class ProcessPopulation:
                     'population': population,
                     'latitude': boundary['latitude'],
                     'longitude': boundary['longitude'],
-                    'geometry': boundary['geometry']
+                    'geometry': boundary['geometry'],
+                    'area': (boundary['geometry'].area) * 12309
                 })
 
         df = pd.DataFrame(output)

@@ -23,9 +23,9 @@ countries = pd.read_csv(path, encoding = 'latin-1')
 
 for idx, country in countries.iterrows():
         
-    #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
+    if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    if not country['iso3'] == 'KEN':
+    #if not country['iso3'] == 'KEN':
         
         continue 
 
@@ -37,13 +37,13 @@ for idx, country in countries.iterrows():
     #regions.process_sub_region_boundaries()
 
     populations = ProcessPopulation(path, countries['iso3'].loc[idx], countries['lowest'].loc[idx], pop_tif_loc)
-    #populations.process_national_population()
-    #populations.process_population_tif()
+    populations.process_national_population()
+    populations.process_population_tif()
 
     points_generator = PointsGenerator(countries['iso3'].loc[idx])
-    #points_generator.generate_gid_points()
-    #points_generator.generate_country_points()
+    points_generator.generate_gid_points()
+    points_generator.generate_country_points()
 
     edges_generator = EdgeGenerator(countries['iso3'].loc[idx])
-    #edges_generator.fit_regional_node_edges()
+    edges_generator.fit_regional_node_edges()
     edges_generator.fit_country_node_edges()
