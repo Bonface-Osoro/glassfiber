@@ -13,6 +13,7 @@ BASE_PATH = CONFIG['file_locations']['base_path']
 DATA_RAW = os.path.join(BASE_PATH, 'raw')
 DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
 path = os.path.join(DATA_RAW, 'countries.csv')
+countries = pd.read_csv(path, encoding = 'latin-1')
 
 def generate_fiber_line_csv(iso3):
     """
@@ -78,68 +79,97 @@ def fiber_users(iso3):
     merged_dataframe = pd.DataFrame()
     line_folder = os.path.join(DATA_RESULTS, iso3, 'demand')
 
-    for file_name in os.listdir(line_folder):
+    for idx, country in countries.iterrows():
+            
+        if not country['iso3'] == iso3:
 
-        if file_name.endswith('_mst_results.csv'):
+            continue
 
-            file_path = os.path.join(line_folder, file_name)
-            df = pd.read_csv(file_path)
-            df[['low', 'baseline', 'high']] = ''
-            df['low_adoption'] = 'low'
-            df['baseline_adoption'] = 'baseline'
-            df['high_adoption'] = 'high'
-            df = pd.melt(df, id_vars = ['iso3', 'GID_1', 'from', 'to', 'length', 
-                      'population', 'source', 'area', 'geometry'], var_name = 
-                      'adoption_scenario', value_vars = ['low', 
-                      'baseline', 'high'])
-            df = df.drop(columns = ['value'])
-            df[['adoption_value', 'pop_density', 'users_area_sqkm']] = ''
-            for i in range(len(df)):
+        arpu = countries['arpu'].loc[idx]
+        adoption_low = round(countries['adoption_low'].loc[idx], 0)
+        
+        for file_name in os.listdir(line_folder):
 
-                if df['adoption_scenario'].loc[i] == 'low':
+            if file_name.endswith('_mst_results.csv'):
+
+                file_path = os.path.join(line_folder, file_name)
+                df = pd.read_csv(file_path)
+                df[['low', 'baseline', 'high']] = ''
+                df['low_adoption'] = 'low'
+                df['baseline_adoption'] = 'baseline'
+                df['high_adoption'] = 'high'
+                df = pd.melt(df, id_vars = ['iso3', 'GID_1', 'from', 'to', 'length', 
+                        'population', 'source', 'area', 'geometry'], var_name = 
+                        'adoption_scenario', value_vars = ['low', 
+                        'baseline', 'high'])
+                df = df.drop(columns = ['value'])
+                df[['adoption_value', 'pop_density', 'users_area_sqkm', 'revenue_per_area', 'geotype']] = ''
+                for i in range(len(df)):
+
+                    if df['adoption_scenario'].loc[i] == 'low':
+                        
+                        df['adoption_value'].loc[i] = adoption_low
+                        df['pop_density'].loc[i] = round((df['population'].loc[i])
+                                                        / (df['area'].loc[i]), 4)
+                        df['users_area_sqkm'].loc[i] = round((df['adoption_value'].loc[i] 
+                                                        * df['pop_density'].loc[i]), 0)
+                        df['revenue_per_area'].loc[i] = ((df['users_area_sqkm'].loc[i]) * (arpu)) / df['area'].loc[i]
+                        
+                    elif df['adoption_scenario'].loc[i] == 'baseline':
+
+                        df['adoption_value'].loc[i] = adoption_low + (0.1 * (adoption_low))
+                        df['pop_density'].loc[i] = round((df['population'].loc[i])
+                                                        / (df['area'].loc[i]), 4)
+                        df['users_area_sqkm'].loc[i] = round((df['adoption_value'].loc[i] 
+                                                        * df['pop_density'].loc[i]), 0)
+                        df['revenue_per_area'].loc[i] = ((df['users_area_sqkm'].loc[i]) * (arpu)) / df['area'].loc[i]
+                        
+                    else:
+
+                        df['adoption_value'].loc[i] = adoption_low + (0.2 * (adoption_low))
+                        df['pop_density'].loc[i] = round((df['population'].loc[i])
+                                                        / (df['area'].loc[i]), 4)
+                        df['users_area_sqkm'].loc[i] = round((df['adoption_value'].loc[i] 
+                                                        * df['pop_density'].loc[i]), 0) 
+                        df['revenue_per_area'].loc[i] = ((df['users_area_sqkm'].loc[i]) * (arpu)) / df['area'].loc[i]
+
+                    if df['pop_density'].loc[i] >= 1000:
+
+                        df['geotype'].loc[i] = 'urban'
                     
-                    df['adoption_value'].loc[i] = 0.01
-                    df['pop_density'].loc[i] = round((df['population'].loc[i])
-                                                      / (df['area'].loc[i]), 4)
-                    df['users_area_sqkm'].loc[i] = round((df['adoption_value'].loc[i] 
-                                                     * df['pop_density'].loc[i]), 4)
-                    
-                elif df['adoption_scenario'].loc[i] == 'baseline':
+                    elif df['pop_density'].loc[i] >= 500 and df['pop_density'].loc[i] <= 1000:
+                        
+                        df['geotype'].loc[i] = 'suburban'
 
-                    df['adoption_value'].loc[i] = 0.1
-                    df['pop_density'].loc[i] = round((df['population'].loc[i])
-                                                      / (df['area'].loc[i]), 4)
-                    df['users_area_sqkm'].loc[i] = round((df['adoption_value'].loc[i] 
-                                                     * df['pop_density'].loc[i]), 4)
-                    
-                else:
+                    elif df['pop_density'].loc[i] >= 50 and df['pop_density'].loc[i] <= 500:
 
-                    df['adoption_value'].loc[i] = 0.5
-                    df['pop_density'].loc[i] = round((df['population'].loc[i])
-                                                      / (df['area'].loc[i]), 4)
-                    df['users_area_sqkm'].loc[i] = round((df['adoption_value'].loc[i] 
-                                                     * df['pop_density'].loc[i]), 4) 
-            df = df[['iso3', 'GID_1', 'from', 'to', 'length', 'population', 
-                     'area', 'adoption_scenario', 'adoption_value', 'pop_density', 
-                     'users_area_sqkm', 'geometry']]
+                        df['geotype'].loc[i] = 'rural'
 
-            merged_dataframe = pd.concat([merged_dataframe, df], ignore_index = True)
+                    else:
 
-    fileout = '{}_users_results.csv'.format(iso3)
-    folder_out = os.path.join(DATA_RESULTS, iso3, 'demand')
+                        df['geotype'].loc[i] = 'remote'
+                        
+                df = df[['iso3', 'GID_1', 'from', 'to', 'length', 'population', 
+                        'area', 'adoption_scenario', 'adoption_value', 'pop_density', 
+                        'geotype', 'users_area_sqkm', 'revenue_per_area', 'geometry']]
 
-    if not os.path.exists(folder_out):
+                merged_dataframe = pd.concat([merged_dataframe, df], ignore_index = True)
 
-        os.makedirs(folder_out)
+        fileout = '{}_users_results.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'demand')
 
-    path_out = os.path.join(folder_out, fileout)
+        if not os.path.exists(folder_out):
 
-    merged_dataframe.to_csv(path_out, index = False)
+            os.makedirs(folder_out)
+
+        path_out = os.path.join(folder_out, fileout)
+
+        merged_dataframe.to_csv(path_out, index = False)
     
+
     return None
 
 
-countries = pd.read_csv(path, encoding = 'latin-1')
 for idx, country in countries.iterrows():
         
     if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
@@ -148,5 +178,5 @@ for idx, country in countries.iterrows():
         
         continue 
 
-    generate_fiber_line_csv(countries['iso3'].loc[idx])
+    #generate_fiber_line_csv(countries['iso3'].loc[idx])
     fiber_users(countries['iso3'].loc[idx])
