@@ -2,7 +2,9 @@ import configparser
 import os
 import warnings
 import pandas as pd
+import numpy as np
 import geopandas as gpd
+from glassfibre.inputs import parameters
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
 
@@ -14,6 +16,47 @@ DATA_RAW = os.path.join(BASE_PATH, 'raw')
 DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
 path = os.path.join(DATA_RAW, 'countries.csv')
 countries = pd.read_csv(path, encoding = 'latin-1')
+
+def cost_model(length, unit):
+    """
+    Calculate the total cost of ownership(TCO)
+    in US$.
+
+    Parameters
+    ----------
+    length : float.
+        Length of fiber between two nodes.
+    unit : int.
+        Number of fiber nodes.
+
+    Returns
+    -------
+    total_cost_ownership : float
+            The total cost of ownership.
+    """
+    for key, item in parameters.items():
+
+        capex = (item['dslam'] + item['civil'] 
+                 + (item['transportation'] * length) 
+                 + item['installation'] 
+                 + (item['rpu'] * unit) 
+                 + (item['mdf_unit'] * unit))
+        
+        opex = (item['rent'] + item['staff'] 
+                + item['power'] + item['regulatory'] 
+                + item['customer'] + item['other_costs'])
+        year_costs = []
+
+        for time in np.arange(1, item['assessment_period']):  
+
+            yearly_opex = opex / (((item['discount_rate'] / 100) + 1) ** time)
+            year_costs.append(yearly_opex)
+
+        total_cost_ownership = capex + sum(year_costs) + opex
+
+
+        return total_cost_ownership
+
 
 def generate_fiber_line_csv(iso3):
     """
@@ -64,7 +107,7 @@ def generate_fiber_line_csv(iso3):
     return None            
 
 
-def fiber_users(iso3):
+def fiber_demand(iso3):
     """
     This function quantifies 
     the number of projected 
@@ -170,13 +213,78 @@ def fiber_users(iso3):
     return None
 
 
-for idx, country in countries.iterrows():
-        
-    if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
-        
-    #if not country['iso3'] == 'KEN':
-        
-        continue 
+def fiber_supply(iso3):
+    """
+    This function quantifies 
+    the number of projected 
+    fiber broadband users
 
-    #generate_fiber_line_csv(countries['iso3'].loc[idx])
-    fiber_users(countries['iso3'].loc[idx])
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('processing fiber broadband users {}'.format(iso3))
+    merged_dataframe = pd.DataFrame()
+    line_folder = os.path.join(DATA_RESULTS, iso3, 'demand')
+
+    for idx, country in countries.iterrows():
+            
+        if not country['iso3'] == 'KEN':
+
+            continue
+
+        for file_name in os.listdir(line_folder):
+
+            if file_name.endswith('_users_results.csv'):
+
+                file_path = os.path.join(line_folder, file_name)
+                df = pd.read_csv(file_path)
+                df[['tco', 'tco_per_user']] = ''
+                unit = df['to'].nunique()
+                df_length = df.groupby(['GID_1'])['length'].mean().reset_index()
+                total_length = (df_length['length'].sum()) / 1000
+                
+                tco = cost_model(total_length, unit)
+
+                for i in range(len(df)):
+
+                    df['tco'].loc[i] = tco
+                    df['tco_per_user'].loc[i] = ((df['tco'].loc[i]) / 
+                                    (df['users_area_sqkm'].loc[i]))
+
+                df = df[['iso3', 'GID_1', 'from', 'to', 'length', 'population', 
+                        'area', 'adoption_scenario', 'adoption_value', 'pop_density', 
+                        'geotype', 'users_area_sqkm', 'revenue_per_area', 'tco', 
+                        'tco_per_user', 'geometry']]
+                
+                merged_dataframe = pd.concat([merged_dataframe, df], ignore_index = True)
+
+        fileout = '{}_supply_results.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'supply')
+
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out = os.path.join(folder_out, fileout)
+
+        merged_dataframe.to_csv(path_out, index = False)
+    
+
+    return None
+
+
+if __name__ == '__main__':
+
+    for idx, country in countries.iterrows():
+            
+        if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
+            
+        #if not country['iso3'] == 'KEN':
+            
+            continue 
+
+        #generate_fiber_line_csv(countries['iso3'].loc[idx])
+        #fiber_demand(countries['iso3'].loc[idx])
+        fiber_supply(countries['iso3'].loc[idx])

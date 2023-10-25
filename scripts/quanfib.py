@@ -29,7 +29,7 @@ west = ['BEN', 'BFA', 'CPV', 'CIV', 'GMB', 'GHA', 'GIN',
         'GNB', 'LBR', 'MLI', 'MRT', 'NER', 'NGA', 'SEN', 
         'SLE', 'TGO']
 
-def csv_merger(csv_name):
+def csv_merger(csv_name, source_folder):
     """
     This funcion read and merge 
     multiple CSV files located 
@@ -41,8 +41,9 @@ def csv_merger(csv_name):
         Name of the file to process. it can be
         '_customers.csv', '_ev_centers.csv' or
         '_optimized_ev_centers.csv'
-    iso3 : string
-        Country iso3 to be processed. 
+    source_folder : string
+        Name of the folder containing the files.
+        It can be  
     """
 
     isos = os.listdir(DATA_RESULTS)
@@ -51,7 +52,7 @@ def csv_merger(csv_name):
     for iso3 in isos:
 
         print('Merging {} csv files'. format(iso3))
-        base_directory = os.path.join(DATA_RESULTS, iso3, 'demand') 
+        base_directory = os.path.join(DATA_RESULTS, iso3, source_folder) 
 
         for root, _, files in os.walk(base_directory):
 
@@ -98,11 +99,5 @@ def csv_merger(csv_name):
 
 if __name__ == '__main__':
 
-    for idx, country in countries.iterrows():
-
-        if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        #if not country['iso3'] == 'KEN':
-            
-            continue 
-
-csv_merger('_users_results.csv')
+    #csv_merger('_users_results.csv', 'demand')
+    csv_merger('_supply_results.csv', 'supply')
