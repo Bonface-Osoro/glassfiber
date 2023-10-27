@@ -51,6 +51,40 @@ def ssa_pop_density():
     plt.savefig(fig_path, dpi = 720)
 
 
+def pop_density(iso3):
+    """
+    This function plots the population 
+    distribution of a country
+    """
+    map_path = os.path.join(DATA_RESULTS, 'processed', iso3, 'regions', 'regions_1_{}.shp'.format(iso3))
+    path = os.path.join(DATA_RESULTS, 'final', iso3, 'demand', '{}_users_results.csv'.format(iso3))
+
+    map_df = gpd.read_file(map_path)
+    df = pd.read_csv(path)
+
+    df_merged  = map_df.merge(df, left_on = 'GID_1', right_on = 'GID_1')
+    gdf = gpd.GeoDataFrame(df_merged)
+
+    gdf.drop(columns = ['geometry_x'], inplace = True)
+    gdf.rename(columns = {'geometry_y': 'geometry'}, inplace = True)
+    gdf['geometry'] = gdf['geometry'].apply(wkt.loads)
+    gdf.set_geometry(col = 'geometry', inplace = True)
+
+    gdf.plot(column = 'population')
+    plt.show()
+    '''fig, ax = plt.subplots(1, figsize = (10, 10))
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes('bottom', size = '5%', pad = 0.3)
+    gdf.plot(column = 'users_area_sqkm', legend = True,
+            cax = cax, 
+            legend_kwds = {'label': 'Population', 'orientation': 'horizontal'})
+    ax.set_title('Population Distribution')
+    plt.show()
+
+    fig_path = os.path.join(DATA_VIS, 'figures', '{}_demand.png'.format(iso3))
+    plt.savefig(fig_path, dpi = 720)'''
+
+
     return None
 
 if __name__ == '__main__':
@@ -59,9 +93,9 @@ if __name__ == '__main__':
     for idx, country in countries.iterrows():
 
         #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        if not country['iso3'] == 'MWI':
+        if not country['iso3'] == 'KEN':
             
             continue 
 
-        #pop_density(countries['iso3'].loc[idx]) 
-    ssa_pop_density() 
+        pop_density(countries['iso3'].loc[idx]) 
+    #ssa_pop_density() 
