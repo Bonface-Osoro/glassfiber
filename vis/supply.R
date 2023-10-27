@@ -5,24 +5,22 @@ library(cowplot)
 
 suppressMessages(library(tidyverse))
 folder <- dirname(rstudioapi::getSourceEditorContext()$path)
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_users_results.csv'))
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_supply_results.csv'))
 
 
-############################
-##Total REVNUE PER AREA ####
-############################
+#########################
+##TOTAL TCO PER USER ####
+#########################
 
 #############
 ##Remote ####
 #############
 
-# Filter data for the desired geotype (e.g., "urban")
 df <- data %>%
   filter(geotype == "remote") %>%
   group_by(region, adoption_scenario, geotype) %>%
-  summarize(total = (sum(revenue_per_area)) / 1e4)
+  summarize(total = (sum(tco_per_user)) / 1e6)
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -35,7 +33,8 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-remote_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
+remote_total_tco <- 
+  ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
   geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(total, 3))),
@@ -48,9 +47,9 @@ remote_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adopti
   labs(
     colour = NULL,
     x = NULL,
-    y = "Total Revenue per Area",
-  ) + ylab(expression("Total Revenue per Area ($US '0000')")) +
-  scale_fill_brewer(palette = "Set1") +
+    y = "Total TCO per Area",
+  ) + ylab(expression("Total TCO per User ($US Millions)")) +
+  scale_fill_brewer(palette = "YlGnBu") +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 6),
@@ -69,21 +68,19 @@ remote_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adopti
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 0.35)
+      format(y, scientific = FALSE), limit = c(0, 31)
   ) + facet_wrap(~ geotype, ncol = 2)
 
 
-#############
-##Rural ####
-#############
 
-# Filter data for the desired geotype (e.g., "urban")
+############
+##Rural ####
+############
 df <- data %>%
   filter(geotype == "rural") %>%
   group_by(region, adoption_scenario, geotype) %>%
-  summarize(total = (sum(revenue_per_area)) / 1e5)
+  summarize(total = (sum(tco_per_user)) / 1e6)
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -96,7 +93,8 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-rural_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
+rural_total_tco <- 
+  ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
   geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(total, 3))),
@@ -109,9 +107,9 @@ rural_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoptio
   labs(
     colour = NULL,
     x = NULL,
-    y = "Total Revenue per Area",
-  ) + ylab(expression("Total Revenue per Area ($US '00000')")) +
-  scale_fill_brewer(palette = "Set1") +
+    y = "Total TCO per Area",
+  ) + ylab(expression("Total TCO per User ($US Millions)")) +
+  scale_fill_brewer(palette = "YlGnBu") +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 6),
@@ -130,21 +128,19 @@ rural_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoptio
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 2.2)
+      format(y, scientific = FALSE), limit = c(0, 1.2)
   ) + facet_wrap(~ geotype, ncol = 2)
 
 
 ###############
-##suburban ####
+##Suburban ####
 ###############
 
-# Filter data for the desired geotype (e.g., "urban")
 df <- data %>%
-  filter(geotype == 'suburban') %>%
+  filter(geotype == "suburban") %>%
   group_by(region, adoption_scenario, geotype) %>%
-  summarize(total = (sum(revenue_per_area)) / 1e6)
+  summarize(total = (sum(tco_per_user)) / 1e3)
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -157,7 +153,8 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-suburban_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
+suburban_total_tco <- 
+  ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
   geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(total, 3))),
@@ -170,9 +167,9 @@ suburban_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adop
   labs(
     colour = NULL,
     x = NULL,
-    y = "Total Revenue per Area",
-  ) + ylab(expression('Total Revenue per Area ($US Millions)')) +
-  scale_fill_brewer(palette = "Set1") +
+    y = "Total TCO per Area",
+  ) + ylab(expression("Total TCO per User ($US '000')")) +
+  scale_fill_brewer(palette = "YlGnBu") +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 6),
@@ -191,7 +188,7 @@ suburban_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adop
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 0.3)
+      format(y, scientific = FALSE), limit = c(0, 53)
   ) + facet_wrap(~ geotype, ncol = 2)
 
 
@@ -199,13 +196,11 @@ suburban_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adop
 ##Urban ####
 ############
 
-# Filter data for the desired geotype (e.g., "urban")
 df <- data %>%
-  filter(geotype == 'urban') %>%
+  filter(geotype == "urban") %>%
   group_by(region, adoption_scenario, geotype) %>%
-  summarize(total = (sum(revenue_per_area)) / 1e6)
+  summarize(total = (sum(tco_per_user)) / 1e3)
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -218,7 +213,8 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-urban_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
+urban_total_tco <- 
+  ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
   geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(total, 3))),
@@ -231,8 +227,9 @@ urban_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoptio
   labs(
     colour = NULL,
     x = NULL,
-  ) + ylab(expression('Total Revenue per Area ($US Millions)')) +
-  scale_fill_brewer(palette = "Set1") +
+    y = "Total TCO per Area",
+  ) + ylab(expression("Total TCO per User ($US '000')")) +
+  scale_fill_brewer(palette = "YlGnBu") +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 6),
@@ -251,21 +248,19 @@ urban_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoptio
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 45)
+      format(y, scientific = FALSE), limit = c(0, 14.6)
   ) + facet_wrap(~ geotype, ncol = 2)
 
 
-
-##############################
-## Total Revenue Aggregates ##
-##############################
-
-revenues <-
+###################################
+## Total TCO per User Aggregates ##
+###################################
+total_tco <-
   ggarrange(
-    remote_total_area_revenue,
-    rural_total_area_revenue,
-    suburban_total_area_revenue,
-    urban_total_area_revenue,
+    remote_total_tco,
+    rural_total_tco,
+    suburban_total_tco,
+    urban_total_tco,
     ncol = 2,
     nrow = 2,
     common.legend = TRUE,
@@ -274,7 +269,7 @@ revenues <-
   ) 
 
 
-path = file.path(folder, 'figures', 'total_revenue.png')
+path = file.path(folder, 'figures', 'total_tco.png')
 dir.create(file.path(folder, 'figures'), showWarnings = FALSE)
 png(
   path,
@@ -283,26 +278,24 @@ png(
   height = 6.5,
   res = 480
 )
-print(revenues)
+print(total_tco)
 dev.off()
 
 
-###############################
-##AVERAGE REVENUE PER AREA ####
-###############################
+
+###########################
+##AVERAGE TCO PER USER ####
+###########################
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_supply_results.csv'))
 
 #############
 ##Remote ####
 #############
-
-# Filter data for the desired geotype (e.g., "urban")
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_users_results.csv'))
 df <- data %>%
   filter(geotype == "remote") %>%
   group_by(region, adoption_scenario, geotype) %>%
-  summarize(average = mean(revenue_per_area))
+  summarize(average = mean(tco_per_user))
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -315,7 +308,7 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-remote_mean_area_revenue <- 
+remote_mean_tco <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
   geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
   geom_text(
@@ -329,9 +322,9 @@ remote_mean_area_revenue <-
   labs(
     colour = NULL,
     x = NULL,
-    y = "Average Revenue per Area",
-  ) + ylab(expression("Average Revenue per Area ($US)")) +
-  scale_fill_brewer(palette = "Set1") +
+    y = "Average TCO per Area",
+  ) + ylab(expression("Average TCO per User ($US)")) +
+  scale_fill_brewer(palette = "YlGnBu") +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 6),
@@ -350,21 +343,18 @@ remote_mean_area_revenue <-
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 11)
+      format(y, scientific = FALSE), limit = c(0, 120000)
   ) + facet_wrap(~ geotype, ncol = 2)
 
 
-#############
+############
 ##Rural ####
-#############
-
-# Filter data for the desired geotype (e.g., "urban")
+############
 df <- data %>%
   filter(geotype == "rural") %>%
   group_by(region, adoption_scenario, geotype) %>%
-  summarize(average = mean(revenue_per_area))
+  summarize(average = mean(tco_per_user))
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -377,7 +367,7 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-rural_mean_area_revenue <- 
+rural_mean_tco <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
   geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
   geom_text(
@@ -391,9 +381,9 @@ rural_mean_area_revenue <-
   labs(
     colour = NULL,
     x = NULL,
-    y = "Average Revenue per Area",
-  ) + ylab(expression("Average Revenue per Area ($US)")) +
-  scale_fill_brewer(palette = "Set1") +
+    y = "Average TCO per Area",
+  ) + ylab(expression("Average TCO per User ($US)")) +
+  scale_fill_brewer(palette = "YlGnBu") +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 6),
@@ -412,21 +402,18 @@ rural_mean_area_revenue <-
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 1600)
+      format(y, scientific = FALSE), limit = c(0, 2200)
   ) + facet_wrap(~ geotype, ncol = 2)
 
 
 ###############
-##suburban ####
+##Suburban ####
 ###############
-
-# Filter data for the desired geotype (e.g., "urban")
 df <- data %>%
-  filter(geotype == 'suburban') %>%
+  filter(geotype == "suburban") %>%
   group_by(region, adoption_scenario, geotype) %>%
-  summarize(average = mean(revenue_per_area))
+  summarize(average = mean(tco_per_user))
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -439,7 +426,7 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-suburban_mean_area_revenue <- 
+suburban_mean_tco <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
   geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
   geom_text(
@@ -453,9 +440,9 @@ suburban_mean_area_revenue <-
   labs(
     colour = NULL,
     x = NULL,
-    y = "Average Revenue per Area",
-  ) + ylab(expression('Average Revenue per Area ($US)')) +
-  scale_fill_brewer(palette = "Set1") +
+    y = "Average TCO per Area",
+  ) + ylab(expression("Average TCO per User ($US)")) +
+  scale_fill_brewer(palette = "YlGnBu") +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 6),
@@ -474,21 +461,18 @@ suburban_mean_area_revenue <-
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 9100)
+      format(y, scientific = FALSE), limit = c(0, 380)
   ) + facet_wrap(~ geotype, ncol = 2)
 
 
 ############
 ##Urban ####
 ############
-
-# Filter data for the desired geotype (e.g., "urban")
 df <- data %>%
-  filter(geotype == 'urban') %>%
+  filter(geotype == "urban") %>%
   group_by(region, adoption_scenario, geotype) %>%
-  summarize(average = (mean(revenue_per_area)) / 1e6)
+  summarize(average = mean(tco_per_user))
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -501,7 +485,7 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-urban_mean_area_revenue <- 
+urban_mean_tco <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
   geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
   geom_text(
@@ -515,8 +499,9 @@ urban_mean_area_revenue <-
   labs(
     colour = NULL,
     x = NULL,
-  ) + ylab(expression('Average Revenue per Area ($US Millions)')) +
-  scale_fill_brewer(palette = "Set1") +
+    y = "Average TCO per Area",
+  ) + ylab(expression("Average TCO per User ($US)")) +
+  scale_fill_brewer(palette = "YlGnBu") +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 6),
@@ -535,19 +520,19 @@ urban_mean_area_revenue <-
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 0.55)
+      format(y, scientific = FALSE), limit = c(0, 120)
   ) + facet_wrap(~ geotype, ncol = 2)
 
 
-##############################
-## Total Revenue Aggregates ##
-##############################
-avg_revenues <-
+#####################################
+## Average TCO per User Aggregates ##
+#####################################
+average_tco <-
   ggarrange(
-    remote_mean_area_revenue,
-    rural_mean_area_revenue,
-    suburban_mean_area_revenue,
-    urban_mean_area_revenue,
+    remote_mean_tco,
+    rural_mean_tco,
+    suburban_mean_tco,
+    urban_mean_tco,
     ncol = 2,
     nrow = 2,
     common.legend = TRUE,
@@ -556,7 +541,7 @@ avg_revenues <-
   ) 
 
 
-path = file.path(folder, 'figures', 'average_revenue.png')
+path = file.path(folder, 'figures', 'average_tco.png')
 dir.create(file.path(folder, 'figures'), showWarnings = FALSE)
 png(
   path,
@@ -565,7 +550,8 @@ png(
   height = 6.5,
   res = 480
 )
-print(avg_revenues)
+print(average_tco)
 dev.off()
+
 
 
