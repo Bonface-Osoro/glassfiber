@@ -23,13 +23,13 @@ Results
 `Figure 2` shows the estimated revenue per local area for the 3932 local areas.
 #### Figure 2 Demand Results.
 <p align="center">
-  <img src="region_by_revenue_per_area.png" />
+  <img src="/docs/region_by_revenue_per_area.png" />
 </p>
 
 In `Figure 3`, the quantitative Total Cost of Ownership (TCO) per user results are presented.
 #### Figure 3 Supply Results.
 <p align="center">
-  <img src="average_tco.png" />
+  <img src="/docs/average_tco.png" />
 </p>
 
 ## Required Data
