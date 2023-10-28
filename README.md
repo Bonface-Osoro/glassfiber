@@ -26,6 +26,12 @@ Results
   <img src="region_by_revenue_per_area.png" />
 </p>
 
+In `Figure 3`, the quantitative Total Cost of Ownership (TCO) per user results are presented.
+#### Figure 3 Supply Results.
+<p align="center">
+  <img src="average_tco.png" />
+</p>
+
 ## Required Data
 [1]	“Open Spatial Demographic Data and Research,” WorldPop. https://www.worldpop.org/ (accessed May 08, 2023).
 

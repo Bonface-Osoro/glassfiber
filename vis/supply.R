@@ -310,10 +310,10 @@ df$geotype = factor(
 
 remote_mean_tco <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(average, 3))),
-    size = 2,
+    size = 1.5,
     position = position_dodge(0.9),
     vjust = 0.5,
     hjust = -0.1,
@@ -369,10 +369,10 @@ df$geotype = factor(
 
 rural_mean_tco <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(average, 3))),
-    size = 2,
+    size = 1.5,
     position = position_dodge(0.9),
     vjust = 0.5,
     hjust = -0.1,
@@ -428,10 +428,10 @@ df$geotype = factor(
 
 suburban_mean_tco <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(average, 3))),
-    size = 2,
+    size = 1.5,
     position = position_dodge(0.9),
     vjust = 0.5,
     hjust = -0.1,
@@ -487,10 +487,10 @@ df$geotype = factor(
 
 urban_mean_tco <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(average, 3))),
-    size = 2,
+    size = 1.5,
     position = position_dodge(0.9),
     vjust = 0.5,
     hjust = -0.1,
@@ -529,25 +529,24 @@ urban_mean_tco <-
 #####################################
 average_tco <-
   ggarrange(
-    remote_mean_tco,
-    rural_mean_tco,
-    suburban_mean_tco,
     urban_mean_tco,
-    ncol = 2,
-    nrow = 2,
+    suburban_mean_tco,
+    rural_mean_tco,
+    remote_mean_tco,
+    ncol = 4,
+    nrow = 1,
     common.legend = TRUE,
     labels = c('A', 'B', 'C', 'D'),
     legend = 'bottom'
   ) 
-
 
 path = file.path(folder, 'figures', 'average_tco.png')
 dir.create(file.path(folder, 'figures'), showWarnings = FALSE)
 png(
   path,
   units = "in",
-  width = 7,
-  height = 6.5,
+  width = 8,
+  height = 3,
   res = 480
 )
 print(average_tco)
