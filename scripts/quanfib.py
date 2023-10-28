@@ -83,6 +83,9 @@ def csv_merger(csv_name, source_folder):
                             df['region'].loc[i] = 'West'
 
                     merged_data = pd.concat([merged_data, df], ignore_index = True)
+                    merged_data[['revenue_per_area']] = merged_data[
+                                ['revenue_per_area']].round(4)
+                    merged_data = merged_data.drop(columns = ['geometry'])
 
                     fileout = 'SSA{}'.format(csv_name)
                     folder_out = os.path.join(DATA_RESULTS, '..', 'SSA')
@@ -99,5 +102,6 @@ def csv_merger(csv_name, source_folder):
 
 if __name__ == '__main__':
 
+    csv_merger('_demand_results.csv', 'demand')
     #csv_merger('_users_results.csv', 'demand')
-    csv_merger('_supply_results.csv', 'supply')
+    #csv_merger('_supply_results.csv', 'supply')

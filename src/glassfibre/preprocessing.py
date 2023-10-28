@@ -390,17 +390,29 @@ class ProcessPopulation:
                 boundary['centroid'] = boundary['geometry'].centroid
                 boundary['longitude'] = boundary['centroid'].x
                 boundary['latitude'] = boundary['centroid'].y
-
-                output.append({
-                    'iso3':boundary['GID_0'],
-                    'region':boundary['NAME_1'],
-                    'GID_1': boundary['GID_1'],
-                    'population': population,
-                    'latitude': boundary['latitude'],
-                    'longitude': boundary['longitude'],
-                    'geometry': boundary['geometry'],
-                    'area': (boundary['geometry'].area) * 12309
-                })
+                try:
+                    output.append({
+                        'iso3':boundary['GID_0'],
+                        'region':boundary['NAME_1'],
+                        'GID_1': boundary['GID_2'],
+                        'population': population,
+                        'latitude': boundary['latitude'],
+                        'longitude': boundary['longitude'],
+                        'geometry': boundary['geometry'],
+                        'area': (boundary['geometry'].area) * 12309
+                    })
+                    
+                except:
+                    output.append({
+                        'iso3':boundary['GID_0'],
+                        'region':boundary['NAME_1'],
+                        'GID_1': boundary['GID_1'],
+                        'population': population,
+                        'latitude': boundary['latitude'],
+                        'longitude': boundary['longitude'],
+                        'geometry': boundary['geometry'],
+                        'area': (boundary['geometry'].area) * 12309
+                    })
 
         df = pd.DataFrame(output)
         df.dropna(subset = ['population'], inplace = True)

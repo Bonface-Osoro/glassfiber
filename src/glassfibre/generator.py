@@ -137,7 +137,7 @@ class PointsGenerator:
         gdf1 = gpd.read_file(region_1)
         gdf1 = gdf1.to_dict('records')
         region_2 = os.path.join(DATA_PROCESSED, self.country_iso3, 'national_outline.shp')  
-        gdf2 = gpd.read_file(region_2)   
+        gdf2 = gpd.read_file(region_2)  
         gdf2 = gdf2.to_dict('records')
 
         for myitem in tqdm(gdf2, desc = 'Generating geospatial country points for {}'. format(self.country_iso3)):
@@ -145,7 +145,7 @@ class PointsGenerator:
             my_points = []
 
             for myitem2 in gdf1:
-
+                
                 if myitem['GID_0'] == myitem2['GID_0']:
 
                     my_points.append({
@@ -219,25 +219,49 @@ class EdgeGenerator:
                     nodes = nodes.to_crs('epsg:3857')
 
                     all_possible_edges = []
-                    for node1_id, node1 in nodes.iterrows():
+                    try:
+                        for node1_id, node1 in nodes.iterrows():
 
-                        for node2_id, node2 in nodes.iterrows():
+                            for node2_id, node2 in nodes.iterrows():
 
-                            if node1_id != node2_id:
+                                if node1_id != node2_id:
 
-                                geom1 = shape(node1['geometry'])
-                                geom2 = shape(node2['geometry'])
-                                line = LineString([geom1, geom2])
-                                all_possible_edges.append({
-                                    'type': 'Feature',
-                                    'geometry': mapping(line),
-                                    'properties':{
-                                        'from': node1_id,
-                                        'to':  node2_id,
-                                        'length': line.length,
-                                        'source': 'new',
-                                    }
-                                })
+                                    geom1 = shape(node1['geometry'])
+                                    geom2 = shape(node2['geometry'])
+                                    line = LineString([geom1, geom2])
+                                    all_possible_edges.append({
+                                        'type': 'Feature',
+                                        'geometry': mapping(line),
+                                        'properties':{
+                                            'GID_1': node2['GID_2'],
+                                            'from': node1_id,
+                                            'to':  node2_id,
+                                            'length': line.length,
+                                            'source': 'new',
+                                        }
+                                    })
+                    except:
+                        for node1_id, node1 in nodes.iterrows():
+
+                            for node2_id, node2 in nodes.iterrows():
+
+                                if node1_id != node2_id:
+
+                                    geom1 = shape(node1['geometry'])
+                                    geom2 = shape(node2['geometry'])
+                                    line = LineString([geom1, geom2])
+                                    all_possible_edges.append({
+                                        'type': 'Feature',
+                                        'geometry': mapping(line),
+                                        'properties':{
+                                            'GID_1': node2['GID_1'],
+                                            'from': node1_id,
+                                            'to':  node2_id,
+                                            'length': line.length,
+                                            'source': 'new',
+                                        }
+                                    })
+
                     if len(all_possible_edges) == 0:
 
                         return

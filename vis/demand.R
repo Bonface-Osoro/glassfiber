@@ -22,7 +22,6 @@ df <- data %>%
   group_by(region, adoption_scenario, geotype) %>%
   summarize(total = (sum(revenue_per_area)) / 1e4)
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -35,8 +34,9 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-remote_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+remote_total_area_revenue <- 
+  ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(total, 3))),
     size = 2,
@@ -76,14 +76,11 @@ remote_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adopti
 #############
 ##Rural ####
 #############
-
-# Filter data for the desired geotype (e.g., "urban")
 df <- data %>%
   filter(geotype == "rural") %>%
   group_by(region, adoption_scenario, geotype) %>%
   summarize(total = (sum(revenue_per_area)) / 1e5)
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -96,8 +93,9 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-rural_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+rural_total_area_revenue <- 
+  ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(total, 3))),
     size = 2,
@@ -137,14 +135,11 @@ rural_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoptio
 ###############
 ##suburban ####
 ###############
-
-# Filter data for the desired geotype (e.g., "urban")
 df <- data %>%
   filter(geotype == 'suburban') %>%
   group_by(region, adoption_scenario, geotype) %>%
   summarize(total = (sum(revenue_per_area)) / 1e6)
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -157,8 +152,9 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-suburban_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+suburban_total_area_revenue <- 
+  ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(total, 3))),
     size = 2,
@@ -199,13 +195,11 @@ suburban_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adop
 ##Urban ####
 ############
 
-# Filter data for the desired geotype (e.g., "urban")
 df <- data %>%
   filter(geotype == 'urban') %>%
   group_by(region, adoption_scenario, geotype) %>%
   summarize(total = (sum(revenue_per_area)) / 1e6)
 
-# Rest of your plotting code
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -218,8 +212,9 @@ df$geotype = factor(
   labels = c('Remote', 'Rural', 'Suburban', 'Urban')
 )
 
-urban_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+urban_total_area_revenue <- 
+  ggplot(df, aes(x = region, y = total, fill = adoption_scenario)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(total, 3))),
     size = 2,
@@ -259,15 +254,14 @@ urban_total_area_revenue <- ggplot(df, aes(x = region, y = total, fill = adoptio
 ##############################
 ## Total Revenue Aggregates ##
 ##############################
-
 revenues <-
   ggarrange(
-    remote_total_area_revenue,
-    rural_total_area_revenue,
-    suburban_total_area_revenue,
     urban_total_area_revenue,
-    ncol = 2,
-    nrow = 2,
+    suburban_total_area_revenue,
+    rural_total_area_revenue,
+    remote_total_area_revenue,
+    ncol = 4,
+    nrow = 1,
     common.legend = TRUE,
     labels = c('A', 'B', 'C', 'D'),
     legend = 'bottom'
@@ -279,8 +273,8 @@ dir.create(file.path(folder, 'figures'), showWarnings = FALSE)
 png(
   path,
   units = "in",
-  width = 7,
-  height = 6.5,
+  width = 8,
+  height = 3,
   res = 480
 )
 print(revenues)
@@ -295,14 +289,14 @@ dev.off()
 ##Remote ####
 #############
 
-# Filter data for the desired geotype (e.g., "urban")
 data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_users_results.csv'))
+
 df <- data %>%
   filter(geotype == "remote") %>%
   group_by(region, adoption_scenario, geotype) %>%
   summarize(average = mean(revenue_per_area))
 
-# Rest of your plotting code
+
 df$adoption_scenario = factor(
   df$adoption_scenario,
   levels = c('low', 'baseline', 'high'),
@@ -317,7 +311,7 @@ df$geotype = factor(
 
 remote_mean_area_revenue <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(average, 3))),
     size = 2,
@@ -379,7 +373,7 @@ df$geotype = factor(
 
 rural_mean_area_revenue <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(average, 3))),
     size = 2,
@@ -441,7 +435,7 @@ df$geotype = factor(
 
 suburban_mean_area_revenue <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(average, 3))),
     size = 2,
@@ -503,7 +497,7 @@ df$geotype = factor(
 
 urban_mean_area_revenue <- 
   ggplot(df, aes(x = region, y = average, fill = adoption_scenario)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = as.character(signif(average, 3))),
     size = 2,
@@ -548,12 +542,16 @@ avg_revenues <-
     rural_mean_area_revenue,
     suburban_mean_area_revenue,
     urban_mean_area_revenue,
-    ncol = 2,
-    nrow = 2,
+    ncol = 4,
+    nrow = 1,
     common.legend = TRUE,
     labels = c('A', 'B', 'C', 'D'),
     legend = 'bottom'
   ) 
+avg_revenues <- 
+  annotate_figure(avg_revenues, top = 
+  text_grob('Estimated Average Revenue per User by Sub-Saharan Africa Regions Classification and Demand Scenario', 
+  size = 12))
 
 
 path = file.path(folder, 'figures', 'average_revenue.png')
@@ -561,11 +559,14 @@ dir.create(file.path(folder, 'figures'), showWarnings = FALSE)
 png(
   path,
   units = "in",
-  width = 7,
-  height = 6.5,
+  width = 8,
+  height = 3.5,
   res = 480
 )
 print(avg_revenues)
 dev.off()
+
+
+
 
 
