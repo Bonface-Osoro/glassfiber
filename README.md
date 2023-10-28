@@ -18,7 +18,13 @@ The method (see `Figure 1`) .....
   <img src="/docs/method.png" />
 </p>
 
-The results are based on the data for ....
+Results
+=======
+`Figure 2` shows the estimated revenue per local area for the 3932 local areas.
+#### Figure 2 Demand Results.
+<p align="center">
+  <img src="region_by_revenue_per_area.png" />
+</p>
 
 ## Required Data
 [1]	“Open Spatial Demographic Data and Research,” WorldPop. https://www.worldpop.org/ (accessed May 08, 2023).
