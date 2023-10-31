@@ -29,7 +29,7 @@ Results
 In `Figure 3`, the quantitative Total Cost of Ownership (TCO) per user results are presented.
 #### Figure 3 Supply Results.
 <p align="center">
-  <img src="/docs/average_tco.png" />
+  <img src="revenue_and_tco.png" />
 </p>
 
 ## Required Data

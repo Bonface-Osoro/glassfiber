@@ -4,6 +4,7 @@ import warnings
 import pandas as pd
 import numpy as np
 import geopandas as gpd
+import tqdm
 from glassfibre.inputs import parameters
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
@@ -35,21 +36,21 @@ def cost_model(length, unit):
             The total cost of ownership.
     """
     for key, item in parameters.items():
-
-        capex = (item['dslam'] + item['civil'] 
-                 + (item['transportation']) 
-                 + (item['installation'] * length)
-                 + (item['rpu'] * unit) 
-                 + (item['mdf_unit'] * unit))
         
-        opex = (item['rent'] + item['staff'] 
-                + item['power'] + item['regulatory'] 
-                + item['customer'] + item['other_costs'])
+        capex = (item['dslam_usd'] + item['civil_usd'] 
+                 + (item['transportation_usd']) 
+                 + (item['installation_usd'] * length)
+                 + (item['rpu_usd'] * unit) 
+                 + (item['mdf_unit_usd'] * unit))
+        
+        opex = (item['rent_usd'] + item['staff_usd'] 
+                + item['power_usd'] + item['regulatory_usd'] 
+                + item['customer_usd'] + item['other_costs_usd'])
         year_costs = []
 
-        for time in np.arange(1, item['assessment_period']):  
+        for time in np.arange(1, item['assessment_period_year']):  
 
-            yearly_opex = opex / (((item['discount_rate'] / 100) + 1) ** time)
+            yearly_opex = opex / (((item['discount_rate_percent'] / 100) + 1) ** time)
             year_costs.append(yearly_opex)
 
         total_cost_ownership = capex + sum(year_costs) + opex
@@ -187,67 +188,66 @@ def demand(iso3):
     return None            
 
 
-def fiber_supply(iso3):
+def supply(iso3):
     """
     This function quantifies 
-    the number of projected 
-    fiber broadband users
-
-    Parameters
-    ----------
-    iso3 : string
-        Country ISO3 code
+    the total cost of ownership 
+    for a single fiber broadband user
     """
-    print('processing fiber broadband users {}'.format(iso3))
-    merged_dataframe = pd.DataFrame()
-    line_folder = os.path.join(DATA_RESULTS, iso3, 'demand')
+    print('Generating supply results for {}'.format(iso3))
+    line_folder = os.path.join(DATA_RESULTS, iso3, 'gid_lines')
+    gdf = gpd.GeoDataFrame()
+    for file_name in os.listdir(line_folder):
 
-    for idx, country in countries.iterrows():
-            
-        if not country['iso3'] == 'KEN':
+        if file_name.endswith('.shp'):
 
-            continue
-
-        for file_name in os.listdir(line_folder):
-
-            if file_name.endswith('_users_results.csv'):
-
-                file_path = os.path.join(line_folder, file_name)
-                df = pd.read_csv(file_path)
-                df[['tco', 'tco_per_user']] = ''
-                unit = df['to'].nunique()
-                df_length = df.groupby(['GID_1'])['length'].mean().reset_index()
-                total_length = (df_length['length'].sum()) / 1000
-                
-                tco = cost_model(total_length, unit)
-
-                for i in range(len(df)):
-
-                    df['tco'].loc[i] = tco
-                    df['tco_per_user'].loc[i] = ((df['tco'].loc[i]) / 
-                                    (df['users_area_sqkm'].loc[i]))
-
-                df = df[['iso3', 'GID_1', 'from', 'to', 'length', 'population', 
-                        'area', 'adoption_scenario', 'adoption_value', 'pop_density', 
-                        'geotype', 'users_area_sqkm', 'revenue_per_area', 'tco', 
-                        'tco_per_user', 'geometry']]
-                
-                merged_dataframe = pd.concat([merged_dataframe, df], ignore_index = True)
-
-        fileout = '{}_supply_results.csv'.format(iso3)
-        folder_out = os.path.join(DATA_RESULTS, iso3, 'supply')
-
-        if not os.path.exists(folder_out):
-
-            os.makedirs(folder_out)
-
-        path_out = os.path.join(folder_out, fileout)
-
-        merged_dataframe.to_csv(path_out, index = False)
+            file_path = os.path.join(line_folder, file_name)
+            shapefile = gpd.read_file(file_path)
+            shapefile = shapefile.to_crs(crs = 3857) 
+            gdf = pd.concat([gdf, shapefile], 
+                               ignore_index = True)
+    gdf = gdf[['GID_1', 'to', 'length']] 
+    total_length_km = (gdf['length'].sum()) / 1000
+    unique_nodes = sum(gdf.groupby('GID_1')['to'].nunique())   
     
+    merged_dataframe = pd.DataFrame()
+    demand_folder = os.path.join(DATA_RESULTS, iso3, 'demand')
+    for file_name in os.listdir(demand_folder):
+
+        if file_name.endswith('_demand_results.csv'):
+
+            file_path = os.path.join(demand_folder, file_name)
+            df = pd.read_csv(file_path)
+            df[['tco', 'tco_per_user']] = ''
+
+            tco = cost_model(total_length_km, unique_nodes)
+
+            for i in range(len(df)):
+
+                df['tco'].loc[i] = tco
+                df['tco_per_user'].loc[i] = ((df['tco'].loc[i]) / 
+                                (df['users_area_sqkm'].loc[i]))
+
+            df = df[['iso3', 'GID_1', 'area', 'adoption_scenario', 
+                    'adoption_value', 'pop_density', 'geotype', 
+                    'users_area_sqkm', 'revenue_per_area', 'tco', 
+                    'tco_per_user']]
+            
+            merged_dataframe = pd.concat([merged_dataframe, df], ignore_index = True)
+
+    fileout = '{}_supply_results.csv'.format(iso3)
+    folder_out = os.path.join(DATA_RESULTS, iso3, 'supply')
+
+    if not os.path.exists(folder_out):
+
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+
+    merged_dataframe.to_csv(path_out, index = False)
+
 
     return None
-
 
 if __name__ == '__main__':
 
@@ -255,9 +255,9 @@ if __name__ == '__main__':
             
         if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
             
-        #if not country['iso3'] == 'CPV':
+        #if not country['iso3'] == 'KEN':
             
             continue 
 
-        demand(countries['iso3'].loc[idx])
-        #fiber_supply(countries['iso3'].loc[idx])
+        #demand(countries['iso3'].loc[idx])
+        supply(countries['iso3'].loc[idx])
