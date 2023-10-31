@@ -6,13 +6,13 @@ parameters = {
         'installation_usd' : 66,
         'rpu_usd': 5000,
         'mdf_unit_usd': 500,
-        'rent': 9600, 
-        'staff': 500000,
-        'power': 500,
-        'regulatory': 100000,
-        'customer': 200000,
-        'other_costs': 300000,
-        'discount_rate': 5,
-        'assessment_period': 10
+        'rent_usd': 9600, 
+        'staff_usd': 500000,
+        'power_usd': 500,
+        'regulatory_usd': 100000,
+        'customer_usd': 200000,
+        'other_costs_usd': 300000,
+        'discount_rate_percent': 5,
+        'assessment_period_year': 10
     },
 }
