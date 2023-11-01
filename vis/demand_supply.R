@@ -198,7 +198,7 @@ data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_tco_per_user_tot
 
 df = data %>%
   group_by(geotype, adoption_scenario) %>%
-  summarize(average_tco = sum(tco_per_user, na.rm = TRUE)/1e9)
+  summarize(average_tco = sum(tco_per_user, na.rm = TRUE) / 1e9)
 
 df$adoption_scenario = factor(
   df$adoption_scenario,

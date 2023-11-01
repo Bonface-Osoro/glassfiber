@@ -83,6 +83,14 @@ def csv_merger(csv_name, source_folder):
                             df['region'].loc[i] = 'West'
 
                     merged_data = pd.concat([merged_data, df], ignore_index = True)
+
+                    if csv_name == '_geotype_population.csv':
+
+                        merged_data = merged_data.groupby(['geotype'])['population'].sum().reset_index()
+
+                    if csv_name == '_geotype_total_area.csv':
+
+                        merged_data = merged_data.groupby(['geotype'])['area'].sum().reset_index()
                         
                     fileout = 'SSA{}'.format(csv_name)
                     folder_out = os.path.join(DATA_RESULTS, '..', 'SSA')
@@ -159,8 +167,10 @@ def sum_costs(iso3, metric):
     average_rev.to_csv(path_out_3)
     average_tco.to_csv(path_out_4)
     average_area.to_csv(path_out_5)
+
     print('Summary statistics completed for {}'.format(iso3))
     
+
     return None
 
 
@@ -177,9 +187,10 @@ if __name__ == '__main__':
         #sum_costs(countries['iso3'].loc[idx], 'tco_per_user')
 
 #csv_merger('_demand_results.csv', 'demand')
-csv_merger('_supply_results.csv', 'supply')
+#csv_merger('_supply_results.csv', 'supply')
 #csv_merger('_rev_per_area_average.csv', 'summary')
 #csv_merger('_rev_per_area_total.csv', 'summary')
 #csv_merger('_tco_per_user_total.csv', 'summary')
 #csv_merger('_tco_per_user_average.csv', 'summary')
 csv_merger('_geotype_total_area.csv', 'summary')
+#csv_merger('_geotype_population.csv', 'summary')
