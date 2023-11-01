@@ -59,6 +59,77 @@ def cost_model(length, unit):
         return total_cost_ownership
 
 
+def ssa_summary(iso3):
+    """
+    This function calculate 
+    country geotype characteristics.
+    
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Generating geotype characteristics for {}.'.format(iso3))
+    df_merged = gpd.GeoDataFrame()
+    pop_folder = os.path.join(DATA_RESULTS, iso3, 'population')
+    
+    for root, _, files in os.walk(pop_folder):
+
+        for file in files:
+
+            if file.endswith('.csv'):
+                
+                file_path = os.path.join(pop_folder, '{}_population_results.csv'.format(iso3))
+                df = pd.read_csv(file_path)
+                df = df[['iso3', 'area', 'population']]
+                df[['pop_density', 'geotype']] = ''
+                for i in range(len(df)):
+
+                    df['pop_density'].loc[i] = ((df['population'].loc[i])
+                        / (df['area'].loc[i]))
+                    
+                    if df['pop_density'].loc[i] >= 1000:
+
+                        df['geotype'].loc[i] = 'urban'
+                    
+                    elif df['pop_density'].loc[i] >= 500 and df['pop_density'].loc[i] <= 1000:
+                        
+                        df['geotype'].loc[i] = 'suburban'
+
+                    elif df['pop_density'].loc[i] >= 50 and df['pop_density'].loc[i] <= 500:
+
+                        df['geotype'].loc[i] = 'rural'
+
+                    else:
+
+                        df['geotype'].loc[i] = 'remote'
+
+            df_merged = pd.concat([df_merged, df], ignore_index = True)
+            
+            average_pop = df_merged.groupby(['iso3', 'geotype']
+                          )['population'].sum().reset_index()
+            
+            average_area = df_merged.groupby(['iso3', 'geotype']
+                           )['area'].sum().reset_index()
+    
+    fileout = '{}_geotype_population.csv'.format(iso3)
+    fileout_1 = '{}_geotype_total_area.csv'.format(iso3)
+    folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
+
+    if not os.path.exists(folder_out):
+
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+    path_out_1 = os.path.join(folder_out, fileout_1)
+
+    average_pop.to_csv(path_out, index = False)
+    average_area.to_csv(path_out_1, index = False)
+    
+
+    return None  
+
+
 def demand(iso3):
     """
     This function generate demand results 
@@ -258,6 +329,6 @@ if __name__ == '__main__':
         #if not country['iso3'] == 'KEN':
             
             continue 
-
+        ssa_summary(countries['iso3'].loc[idx])
         #demand(countries['iso3'].loc[idx])
-        supply(countries['iso3'].loc[idx])
+        #supply(countries['iso3'].loc[idx])
