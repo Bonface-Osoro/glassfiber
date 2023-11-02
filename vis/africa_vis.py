@@ -1,12 +1,15 @@
 import os
 import configparser
+import warnings
 import numpy as np
 import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import contextily as ctx
-from pylab import * #is this needed
+from pylab import *
+pd.options.mode.chained_assignment = None
+warnings.filterwarnings('ignore')
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read(os.path.join(os.path.dirname(__file__), '..', 'scripts', 'script_config.ini'))
@@ -63,15 +66,17 @@ def get_regional_shapes():
 
 def plot_regions_by_geotype():
     """
-    Plot regions by geotype.
+    Plot population density 
+    by regions.
 
     """
+    print('Plotting population density by regions')
     regions = get_regional_shapes()
     DATA_AFRICA = os.path.join(BASE_PATH, '..', 'results', 
                  'SSA', 'SSA_demand_results.csv')
     
     data = pd.read_csv(DATA_AFRICA)
-    n = len(regions)
+    n = int((len(data)) / 4)
     data['pop_density'] = round(data['pop_density'])
     data = data[['GID_1', 'pop_density']]
     regions = regions[['GID_1', 'geometry']]#[:1000]
@@ -124,15 +129,17 @@ def plot_regions_by_geotype():
 
 def plot_revenue_per_area():
     """
-    Plot regions by geotype.
+    Plot revenue per area 
+    by regions.
 
     """
+    print('Plotting revenue per area by regions')
     regions = get_regional_shapes()
     DATA_AFRICA = os.path.join(BASE_PATH, '..', 'results', 
                  'SSA', 'SSA_demand_results.csv')
     
     data = pd.read_csv(DATA_AFRICA)
-    n = len(regions)
+    n = int((len(data)) / 4)
     data['revenue_per_area'] = round(data['revenue_per_area'])
     data = data[['GID_1', 'revenue_per_area']]
     regions = regions[['GID_1', 'geometry']]#[:1000]
@@ -180,6 +187,7 @@ def plot_tco_per_user():
     Plot tco per user by subregions.
 
     """
+    print('Plotting TCO per user by regions')
     regions = get_regional_shapes()
     DATA_AFRICA = os.path.join(BASE_PATH, '..', 'results', 
                  'SSA', 'SSA_supply_results.csv')
@@ -195,7 +203,8 @@ def plot_tco_per_user():
     regions.reset_index(drop = True, inplace = True)
 
     metric = 'tco_per_user'
-    bins = [-1, 1000, 3400, 70000, 150000, 200000, 300000, 400000, 500000, 550000, 650000, 750000, 800000, 430000000]
+    bins = ([-1, 1000, 3400, 70000, 150000, 200000, 300000, 400000, 
+             500000, 550000, 650000, 750000, 800000, 430000000])
     labels = ['<15 $US', '15-25 $US', '25-50 $US', '50-75 $US', '75-120 $US',
               '120-180 $US', '180-275 $US', '275-375 $US', '375-750 $US',
               '750-1500 $US', '1500-2000 $US', '2000-3000 $US', '>3000 $US']
@@ -227,6 +236,75 @@ def plot_tco_per_user():
 
     plt.close(fig)
 
-#plot_revenue_per_area()
-plot_tco_per_user()
-#plot_regions_by_geotype()
+
+def plot_demand_area(monthly_traffic):
+    """
+    Plot demand per area by regions.
+
+    """
+    print('Plotting demand per area for {} GB monthly traffic by regions'.format(monthly_traffic))
+    regions = get_regional_shapes()
+    DATA_AFRICA = os.path.join(BASE_PATH, '..', 'results', 
+                 'SSA', 'SSA_demand_user.csv')
+    
+    data = pd.read_csv(DATA_AFRICA)
+    data = data[data['monthly_traffic'] == monthly_traffic]
+    data['demand_mbps_sqkm'] = round(data['demand_mbps_sqkm'])
+    data = data[['GID_1', 'demand_mbps_sqkm']]
+    regions = regions[['GID_1', 'geometry']]#[:1000]
+    regions = regions.copy()
+
+    regions = regions.merge(data, left_on = 'GID_1', right_on = 'GID_1')
+    regions.reset_index(drop = True, inplace = True)
+
+    metric = 'demand_mbps_sqkm'
+    bins = [-1, 0.001, 0.01, 0.05, 0.5, 1, 5, 10, 20, 30, 100, 200]
+    labels = ['<0.001 $\mathregular{Mbps/km^2}$', 
+              '0.001 - 0.01 $\mathregular{Mbps/km^2}$', 
+              '0.01 - 0.05 $\mathregular{Mbps/km^2}$', 
+              '0.05 - 0.5 $\mathregular{Mbps/km^2}$', 
+              '0.5 - 1 $\mathregular{Mbps/km^2}$',
+              '1 - 5 $\mathregular{Mbps/km^2}$', 
+              '5 - 10 $\mathregular{Mbps/km^2}$', 
+              '10 - 20 $\mathregular{Mbps/km^2}$', 
+              '20 - 30 $\mathregular{Mbps/km^2}$',
+              '30 - 100 $\mathregular{Mbps/km^2}$',
+              '>200 $\mathregular{Mbps/km^2}$']
+
+    regions['bin'] = pd.cut(
+        regions[metric],
+        bins = bins,
+        labels = labels)
+
+    sns.set(font_scale = 0.9)
+    fig, ax = plt.subplots(1, 1, figsize = (10, 10))
+
+    base = regions.plot(column = 'bin', ax = ax, 
+        cmap = 'YlGnBu', linewidth = 0.2,
+        legend=True, edgecolor = 'grey')
+
+    handles, labels = ax.get_legend_handles_labels()
+
+    fig.legend(handles[::-1], labels[::-1])
+
+    ctx.add_basemap(ax, crs = regions.crs, source = ctx.providers.CartoDB.Voyager)
+
+    name = "Demand per Area for Sub-National Regions ({} GB/Month)".format(monthly_traffic)
+    ax.set_title(name, fontsize = 14)
+
+    fig.tight_layout()
+    path = os.path.join(VIS, 'demand_{}_per_area.png'.format(monthly_traffic))
+    fig.savefig(path)
+
+    plt.close(fig)
+
+
+if __name__ == '__main__':
+
+    #plot_regions_by_geotype()
+    plot_revenue_per_area()
+    #plot_tco_per_user()
+    traffics = [10, 20, 30, 40]
+    #for traffic in traffics:
+
+        #plot_demand_area(traffic)
