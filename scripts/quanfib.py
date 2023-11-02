@@ -123,50 +123,70 @@ def sum_costs(iso3, metric):
     """
 
     DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
-    path_in = os.path.join(DATA_RESULTS, iso3, 'supply', 
-        '{}_supply_results.csv'.format(iso3))
+    if metric == 'demand_mbps_sqkm':
+
+        path_in = os.path.join(DATA_RESULTS, iso3, 'demand', 
+            '{}_demand_user.csv'.format(iso3))
+        df = pd.read_csv(path_in)
+        average_demand = df.groupby(['iso3', 'adoption_scenario', 
+                   'geotype', 'monthly_traffic'])['demand_mbps_sqkm'].mean()
+        fileout_6 = '{}_average_demand.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
+
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out_6 = os.path.join(folder_out, fileout_6)
+        average_demand.to_csv(path_out_6)
+        
+    else:
+
+        path_in = os.path.join(DATA_RESULTS, iso3, 'supply', 
+            '{}_supply_results.csv'.format(iso3))
     
-    df = pd.read_csv(path_in)
+        df = pd.read_csv(path_in)
+        
+        print('Summing {} data for {}'.format(metric, iso3))
+
+        rev_per_area = df.groupby(['iso3', 'adoption_scenario', 
+                    'geotype'])['revenue_per_area'].sum()
+        
+        average_rev = df.groupby(['iso3', 'adoption_scenario', 
+                    'geotype'])['revenue_per_area'].mean()
+
+        tco_per_user = df.groupby(['iso3', 'adoption_scenario', 
+                    'geotype'])['tco_per_user'].sum()
+        
+        average_tco = df.groupby(['iso3', 'adoption_scenario', 
+                    'geotype'])['tco_per_user'].mean()
+        
+        average_area = df.groupby(['iso3', 'geotype'])['area'].sum()
     
-    print('Summing {} data for {}'.format(metric, iso3))
-
-    rev_per_area = df.groupby(['iso3', 'adoption_scenario', 
-                   'geotype'])['revenue_per_area'].sum()
+        fileout_1 = '{}_rev_per_area_total.csv'.format(iso3)
+        fileout_2 = '{}_tco_per_user_total.csv'.format(iso3)
+        fileout_3 = '{}_rev_per_area_average.csv'.format(iso3)
+        fileout_4 = '{}_tco_per_user_average.csv'.format(iso3)
+        fileout_5 = '{}_geotype_total_area.csv'.format(iso3)
     
-    average_rev = df.groupby(['iso3', 'adoption_scenario', 
-                'geotype'])['revenue_per_area'].mean()
 
-    tco_per_user = df.groupby(['iso3', 'adoption_scenario', 
-                   'geotype'])['tco_per_user'].sum()
-    
-    average_tco = df.groupby(['iso3', 'adoption_scenario', 
-                   'geotype'])['tco_per_user'].mean()
-    
-    average_area = df.groupby(['iso3', 'geotype'])['area'].sum()
-    
-    fileout_1 = '{}_rev_per_area_total.csv'.format(iso3)
-    fileout_2 = '{}_tco_per_user_total.csv'.format(iso3)
-    fileout_3 = '{}_rev_per_area_average.csv'.format(iso3)
-    fileout_4 = '{}_tco_per_user_average.csv'.format(iso3)
-    fileout_5 = '{}_geotype_total_area.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
 
-    folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
+        if not os.path.exists(folder_out):
 
-    if not os.path.exists(folder_out):
+            os.makedirs(folder_out)
 
-        os.makedirs(folder_out)
+        path_out = os.path.join(folder_out, fileout_1)
+        path_out_2 = os.path.join(folder_out, fileout_2)
+        path_out_3 = os.path.join(folder_out, fileout_3)
+        path_out_4 = os.path.join(folder_out, fileout_4)
+        path_out_5 = os.path.join(folder_out, fileout_5)
 
-    path_out = os.path.join(folder_out, fileout_1)
-    path_out_2 = os.path.join(folder_out, fileout_2)
-    path_out_3 = os.path.join(folder_out, fileout_3)
-    path_out_4 = os.path.join(folder_out, fileout_4)
-    path_out_5 = os.path.join(folder_out, fileout_5)
-
-    rev_per_area.to_csv(path_out)
-    tco_per_user.to_csv(path_out_2)
-    average_rev.to_csv(path_out_3)
-    average_tco.to_csv(path_out_4)
-    average_area.to_csv(path_out_5)
+        rev_per_area.to_csv(path_out)
+        tco_per_user.to_csv(path_out_2)
+        average_rev.to_csv(path_out_3)
+        average_tco.to_csv(path_out_4)
+        average_area.to_csv(path_out_5)
 
     print('Summary statistics completed for {}'.format(iso3))
     
@@ -175,6 +195,7 @@ def sum_costs(iso3, metric):
 
 
 if __name__ == '__main__':
+    
     for idx, country in countries.iterrows():
             
         if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
@@ -185,6 +206,7 @@ if __name__ == '__main__':
 
         #sum_costs(countries['iso3'].loc[idx], 'rev_per_area')
         #sum_costs(countries['iso3'].loc[idx], 'tco_per_user')
+        sum_costs(countries['iso3'].loc[idx], 'demand_mbps_sqkm')
 
 #csv_merger('_demand_results.csv', 'demand')
 #csv_merger('_supply_results.csv', 'supply')
@@ -192,5 +214,7 @@ if __name__ == '__main__':
 #csv_merger('_rev_per_area_total.csv', 'summary')
 #csv_merger('_tco_per_user_total.csv', 'summary')
 #csv_merger('_tco_per_user_average.csv', 'summary')
-csv_merger('_geotype_total_area.csv', 'summary')
+#csv_merger('_geotype_total_area.csv', 'summary')
 #csv_merger('_geotype_population.csv', 'summary')
+csv_merger('_demand_user.csv', 'demand')
+csv_merger('_average_demand.csv', 'summary')

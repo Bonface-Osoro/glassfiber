@@ -59,6 +59,39 @@ def cost_model(length, unit):
         return total_cost_ownership
 
 
+def capacity_per_user(monthly_traffic, traffic_hour):
+    """
+    This function calculate the 
+    number of Mbps required per 
+    user (Rt) in time (t).
+
+    30 Monthly traffic in Gigabytes 
+       per month per user
+    1024 x 8  Conversion of Gigabytes to bits
+    30     Number of days in a month (30)
+    3600  Seconds in hour
+
+    Parameters
+    ----------
+    traffic_hour : int.
+        Number of days in a month.
+
+    Returns
+    -------
+    monthly_traffic : int
+        Monthly traffic per user in GB
+    mbps_per_user : float
+        Capacity per user Mbps/user.
+    """ 
+    mbps_per_user = (monthly_traffic * 
+                    1024 * (1 / 30) * 
+                    (traffic_hour / 100) * 
+                    (1 / 3600))
+    
+
+    return mbps_per_user
+
+
 def ssa_summary(iso3):
     """
     This function calculate 
@@ -128,6 +161,72 @@ def ssa_summary(iso3):
     
 
     return None  
+
+
+def capacity_user(iso3):
+    """
+    This function calculate 
+    total demand per km^2.
+    
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Generating demand values {}.'.format(iso3))
+    df_merged = gpd.GeoDataFrame()
+    demand_folder = os.path.join(DATA_RESULTS, iso3, 'demand')
+    
+    for root, _, files in os.walk(demand_folder):
+
+        for file in files:
+
+            if file.endswith('.csv'):
+                
+                file_path = os.path.join(demand_folder, 
+                            '{}_demand_results.csv'.format(iso3))
+                
+                df = pd.read_csv(file_path)
+                df = df[['iso3', 'GID_1', 'area', 
+                         'adoption_scenario', 'pop_density', 
+                         'geotype', 'users_area_sqkm']]
+                
+                df[['monthly_traffic', 'speed_mbps_per_user', 'demand_mbps_sqkm']] = ''
+                monthly_traffics = [10, 20, 30, 40]
+
+                for idx, country in countries.iterrows():
+                        
+                    if not country['iso3'] == iso3:
+
+                        continue
+
+                    traffic = countries['traffic_hour'].loc[idx]
+
+                    for monthly_traffic in monthly_traffics:
+
+                        for i in range(len(df)):
+                            
+                            df['monthly_traffic'].loc[i] = monthly_traffic
+                            df['speed_mbps_per_user'].loc[i] = capacity_per_user(
+                                                        monthly_traffic, traffic)
+                            df['demand_mbps_sqkm'].loc[i] = ((df['users_area_sqkm'].loc[i]) 
+                                                            * (df['speed_mbps_per_user'].loc[i])) 
+
+                        df_merged = pd.concat([df_merged, df], ignore_index = True)   
+    
+    fileout = '{}_demand_user.csv'.format(iso3)
+    folder_out = os.path.join(DATA_RESULTS, iso3, 'demand')
+
+    if not os.path.exists(folder_out):
+
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+
+    df_merged.to_csv(path_out, index = False)
+    
+
+    return None
 
 
 def demand(iso3):
@@ -329,6 +428,7 @@ if __name__ == '__main__':
         #if not country['iso3'] == 'KEN':
             
             continue 
-        ssa_summary(countries['iso3'].loc[idx])
+        capacity_user(countries['iso3'].loc[idx])
+        #ssa_summary(countries['iso3'].loc[idx])
         #demand(countries['iso3'].loc[idx])
         #supply(countries['iso3'].loc[idx])
