@@ -14,7 +14,7 @@ DATA_RAW = os.path.join(BASE_PATH, 'raw')
 DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
 
 path = os.path.join(DATA_RAW, 'countries.csv')
-countries = pd.read_csv(path, encoding = 'latin-1')
+countries = pd.read_csv(path, encoding = 'utf-8-sig')
 
 southern = ['AGO', 'ZMB', 'ZWE', 'NAM', 'BWA', 'ZAF', 'LSO', 
             'SWZ', 'MOZ', 'MWI']
@@ -105,13 +105,10 @@ def csv_merger(csv_name, source_folder):
     return None
 
 
-def sum_costs(iso3, metric):
+def summations(iso3, metric):
     """
     This function calculates 
-    total and average 
-    revenue per area and 
-    the total cost of ownership 
-    per user for each country.
+    averages for each country.
 
     Parameters
     ----------
@@ -139,13 +136,86 @@ def sum_costs(iso3, metric):
 
         path_out_6 = os.path.join(folder_out, fileout_6)
         average_demand.to_csv(path_out_6)
+
+    elif metric == 'emissions_kg_per_subscriber':
+
+        path_in = os.path.join(DATA_RESULTS, iso3, 'emissions', 
+            '{}_emission_results.csv'.format(iso3))
+        df = pd.read_csv(path_in)
+        average_emissions = df.groupby(['iso3', 'adoption_scenario', 
+                   'geotype', 'monthly_traffic'])['emissions_kg_per_subscriber'].mean()
         
+        country_emissions = df.groupby(['iso3', 'adoption_scenario', 
+                    'geotype'])['emissions_kg_per_subscriber'].sum()
+        
+        fileout_7 = '{}_average_emissions.csv'.format(iso3)
+        fileout_8 = '{}_emission_subscriber_total.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out_7 = os.path.join(folder_out, fileout_7)
+        path_out_8 = os.path.join(folder_out, fileout_8)
+
+        average_emissions.to_csv(path_out_7)
+        country_emissions.to_csv(path_out_8)
+
+    elif metric == 'total_eolt_ghg_kg':
+
+        path_in = os.path.join(DATA_RESULTS, iso3, 'emissions', 
+            '{}_eolt_emission_results.csv'.format(iso3))
+        df = pd.read_csv(path_in)
+        average_eolt = df.groupby(['iso3', 'adoption_scenario', 
+                    'geotype', 'emission_category', 
+                    'lca_phase_ghg_kg'])['total_eolt_ghg_kg'].mean()
+        total_eolt = df.groupby(['iso3', 'adoption_scenario', 
+                    'geotype', 'emission_category', 
+                    'lca_phase_ghg_kg'])['total_eolt_ghg_kg'].sum()
+        fileout_9 = '{}_average_eolt.csv'.format(iso3)
+        fileout_sum_9 = '{}_total_eolt.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
+
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out_9 = os.path.join(folder_out, fileout_9)
+        path_out_sum_9 = os.path.join(folder_out, fileout_sum_9)
+        average_eolt.to_csv(path_out_9)
+        total_eolt.to_csv(path_out_sum_9)
+
+    elif metric == 'total_mfg_ghg_kg':
+
+        path_in = os.path.join(DATA_RESULTS, iso3, 'emissions', 
+            '{}_mfg_emission_results.csv'.format(iso3))
+        df = pd.read_csv(path_in)
+        average_mfg = df.groupby(['iso3', 'adoption_scenario', 
+                    'geotype', 'emission_category', 
+                    'lca_phase_ghg_kg'])['total_mfg_ghg_kg'].mean()
+        total_mfg = df.groupby(['iso3', 'adoption_scenario', 
+                    'geotype', 'emission_category', 
+                    'lca_phase_ghg_kg'])['total_mfg_ghg_kg'].sum()
+        fileout_10 = '{}_average_mfg.csv'.format(iso3)
+        fileout_sum_10 = '{}_total_mfg.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
+
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out_10 = os.path.join(folder_out, fileout_10)
+        path_out_sum_10 = os.path.join(folder_out, fileout_sum_10)
+        average_mfg.to_csv(path_out_10)
+        total_mfg.to_csv(path_out_sum_10)
+
     else:
 
         path_in = os.path.join(DATA_RESULTS, iso3, 'supply', 
             '{}_supply_results.csv'.format(iso3))
     
         df = pd.read_csv(path_in)
+        df = df.fillna(1)
         
         print('Summing {} data for {}'.format(metric, iso3))
 
@@ -162,13 +232,12 @@ def sum_costs(iso3, metric):
                     'geotype'])['tco_per_user'].mean()
         
         average_area = df.groupby(['iso3', 'geotype'])['area'].sum()
-    
+
         fileout_1 = '{}_rev_per_area_total.csv'.format(iso3)
         fileout_2 = '{}_tco_per_user_total.csv'.format(iso3)
         fileout_3 = '{}_rev_per_area_average.csv'.format(iso3)
         fileout_4 = '{}_tco_per_user_average.csv'.format(iso3)
         fileout_5 = '{}_geotype_total_area.csv'.format(iso3)
-    
 
         folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
 
@@ -200,13 +269,16 @@ if __name__ == '__main__':
             
         if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
             
-        #if not country['iso3'] == 'KEN':
+        #if not country['iso3'] == 'RWA':
             
             continue 
 
-        #sum_costs(countries['iso3'].loc[idx], 'rev_per_area')
-        #sum_costs(countries['iso3'].loc[idx], 'tco_per_user')
-        sum_costs(countries['iso3'].loc[idx], 'demand_mbps_sqkm')
+        #summations(countries['iso3'].loc[idx], 'rev_per_area')
+        #summations(countries['iso3'].loc[idx], 'tco_per_user')
+        #summations(countries['iso3'].loc[idx], 'demand_mbps_sqkm')
+        #summations(countries['iso3'].loc[idx], 'emissions_kg_per_subscriber')
+        #summations(countries['iso3'].loc[idx], 'total_mfg_ghg_kg')
+        #summations(countries['iso3'].loc[idx], 'total_eolt_ghg_kg')
 
 #csv_merger('_demand_results.csv', 'demand')
 #csv_merger('_supply_results.csv', 'supply')
@@ -216,5 +288,12 @@ if __name__ == '__main__':
 #csv_merger('_tco_per_user_average.csv', 'summary')
 #csv_merger('_geotype_total_area.csv', 'summary')
 #csv_merger('_geotype_population.csv', 'summary')
-csv_merger('_demand_user.csv', 'demand')
-csv_merger('_average_demand.csv', 'summary')
+#csv_merger('_demand_user.csv', 'demand')
+#csv_merger('_average_demand.csv', 'summary')
+#csv_merger('_emission_results.csv', 'emissions')
+#csv_merger('_emission_subscriber_average.csv', 'summary')
+csv_merger('_emission_subscriber_total.csv', 'summary')
+#csv_merger('_average_eolt.csv', 'summary')
+#csv_merger('_average_mfg.csv', 'summary')
+#csv_merger('_total_mfg.csv', 'summary')
+#csv_merger('_total_eolt.csv', 'summary')

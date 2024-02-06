@@ -298,12 +298,87 @@ def plot_demand_area(monthly_traffic):
 
     plt.close(fig)
 
+def plot_regions_by_emissions():
+    """
+    Plot emissions per user 
+    by regions.
+    """
+    print('Plotting emissions per user by regions')
+    
+    regions = get_regional_shapes()
+    
+    DATA_AFRICA = os.path.join(BASE_PATH, '..', 'results', 'SSA', 'SSA_emission_results.csv')
+    data = pd.read_csv(DATA_AFRICA)
+    n = int(len(data) / 4)
+    data['emissions_kg_per_subscriber'] = round(data['emissions_kg_per_subscriber']/1e3)
+    data = data[['GID_1', 'emissions_kg_per_subscriber', 'adoption_scenario']]
+    
+    value_mapping = {'low': 'Low', 'baseline': 'Baseline', 'high': 'High'}
+    data['adoption_scenario'] = data['adoption_scenario'].replace(value_mapping)
+    
+    regions = regions[['GID_1', 'geometry']]
+    regions = regions.merge(data, left_on = 'GID_1', right_on = 'GID_1')
+    regions.reset_index(drop = True, inplace = True)
+
+    metric = 'emissions_kg_per_subscriber'
+    bins = [-1, 1000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 30000000]
+    labels = [
+        '<1k$',
+        '5 - 10k',
+        '10 - 25k',
+        '25 - 50k',
+        '50 - 100k',
+        '100 - 250k',
+        '250 - 500k',
+        '500k - 1 mn',
+        '1 - 3 mn',
+        '>3 mn']
+
+    regions['bin'] = pd.cut(
+        regions[metric],
+        bins = bins,
+        labels = labels)
+    
+    sns.set(font_scale = 0.9)
+    
+    # Create subplots for each category in the "poverty_range" column
+    fig, axes = plt.subplots(1, 3, figsize = (12, 10), sharex = True, sharey = True)
+
+    for i, adoption in enumerate(data['adoption_scenario'].unique()):
+
+        subset_regions = regions[regions['adoption_scenario'] == adoption]
+        if i < len(axes):
+
+            ax = axes[i]
+
+            base = subset_regions.plot(column = 'bin', ax = ax,
+                                    cmap='YlGnBu', linewidth=0.2,
+                                    legend=True, edgecolor='grey')
+
+            handles, labels = ax.get_legend_handles_labels()
+
+            ctx.add_basemap(ax, crs = regions.crs, source = ctx.providers.CartoDB.Voyager)
+
+            name = f'{adoption} (n={n})'
+            ax.set_title(name, fontsize = 14)
+
+        else:
+
+            print(f"Warning: Not enough axes for adoption {adoption}")
+
+    fig.subplots_adjust(wspace = 0)
+    fig.tight_layout(rect = [0, 0, 1, 1])
+
+    path = os.path.join(VIS, 'emission_per_user_map.png')
+    fig.savefig(path)
+    plt.close(fig)
 
 if __name__ == '__main__':
 
     #plot_regions_by_geotype()
-    plot_revenue_per_area()
+    #plot_revenue_per_area()
     #plot_tco_per_user()
+    plot_regions_by_emissions()
     traffics = [10, 20, 30, 40]
     #for traffic in traffics:
 
