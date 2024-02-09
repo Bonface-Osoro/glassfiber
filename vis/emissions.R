@@ -58,8 +58,8 @@ average_emissions_per_subscriber <-
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
     panel.spacing = unit(0.6, "lines"),
-    plot.title = element_text(size = 8, face = "bold"),
-    plot.subtitle = element_text(size = 7),
+    plot.title = element_text(size = 9, face = "bold"),
+    plot.subtitle = element_text(size = 8),
     axis.text.y = element_text(size = 7),
     axis.title.y = element_markdown(size = 7),
     legend.title = element_text(size = 6),
@@ -107,7 +107,7 @@ region_total_emissions <-
     x = NULL
   ) + ylab('Total GHG Emissions <br>per User (kt CO<sub>2</sub> eq.)') + 
   scale_y_continuous(
-    limits = c(0, 21000),
+    limits = c(0, 22000),
     labels = function(y)
       format(y, scientific = FALSE),
     expand = c(0, 0)
@@ -116,8 +116,8 @@ region_total_emissions <-
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
     panel.spacing = unit(0.6, "lines"),
-    plot.title = element_text(size = 8, face = "bold"),
-    plot.subtitle = element_text(size = 7),
+    plot.title = element_text(size = 9, face = "bold"),
+    plot.subtitle = element_text(size = 8),
     axis.text.y = element_text(size = 7),
     axis.title.y = element_markdown(size = 7),
     legend.title = element_text(size = 6),
@@ -196,8 +196,8 @@ manufacturing_emissions <-
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
     panel.spacing = unit(0.6, "lines"),
-    plot.title = element_text(size = 8, face = "bold"),
-    plot.subtitle = element_text(size = 7),
+    plot.title = element_text(size = 9, face = "bold"),
+    plot.subtitle = element_text(size = 8),
     axis.text.y = element_text(size = 7),
     axis.title.y = element_markdown(size = 7),
     legend.title = element_text(size = 6),
@@ -275,8 +275,8 @@ eolts_emissions <-
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
     panel.spacing = unit(0.6, "lines"),
-    plot.title = element_text(size = 8, face = "bold"),
-    plot.subtitle = element_text(size = 7),
+    plot.title = element_text(size = 9, face = "bold"),
+    plot.subtitle = element_text(size = 8),
     axis.text.y = element_text(size = 7),
     axis.title.y = element_markdown(size = 7),
     legend.title = element_text(size = 6),

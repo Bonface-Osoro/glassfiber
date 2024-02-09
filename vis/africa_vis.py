@@ -109,7 +109,7 @@ def plot_regions_by_geotype():
 
     base = regions.plot(column = 'bin', ax = ax, 
         cmap = 'YlGnBu', linewidth = 0.2,
-        legend=True, edgecolor = 'grey')
+        legend=True, edgecolor = None)
 
     handles, labels = ax.get_legend_handles_labels()
 
@@ -164,7 +164,7 @@ def plot_revenue_per_area():
 
     base = regions.plot(column = 'bin', ax = ax, 
         cmap = 'YlGnBu', linewidth = 0.2,
-        legend=True, edgecolor = 'grey')
+        legend=True, edgecolor = None)
 
     handles, labels = ax.get_legend_handles_labels()
 
@@ -219,7 +219,7 @@ def plot_tco_per_user():
 
     base = regions.plot(column = 'bin', ax = ax, 
         cmap = 'YlGnBu', linewidth = 0.2,
-        legend=True, edgecolor = 'grey')
+        legend=True, edgecolor = None)
 
     handles, labels = ax.get_legend_handles_labels()
 
@@ -281,7 +281,7 @@ def plot_demand_area(monthly_traffic):
 
     base = regions.plot(column = 'bin', ax = ax, 
         cmap = 'YlGnBu', linewidth = 0.2,
-        legend=True, edgecolor = 'grey')
+        legend=True, edgecolor = None)
 
     handles, labels = ax.get_legend_handles_labels()
 
@@ -310,7 +310,7 @@ def plot_regions_by_emissions():
     DATA_AFRICA = os.path.join(BASE_PATH, '..', 'results', 'SSA', 'SSA_emission_results.csv')
     data = pd.read_csv(DATA_AFRICA)
     n = int(len(data) / 4)
-    data['emissions_kg_per_subscriber'] = round(data['emissions_kg_per_subscriber']/1e3)
+    data['emissions_kg_per_subscriber'] = round(data['emissions_kg_per_subscriber']/1e6)
     data = data[['GID_1', 'emissions_kg_per_subscriber', 'adoption_scenario']]
     
     value_mapping = {'low': 'Low', 'baseline': 'Baseline', 'high': 'High'}
@@ -321,7 +321,7 @@ def plot_regions_by_emissions():
     regions.reset_index(drop = True, inplace = True)
 
     metric = 'emissions_kg_per_subscriber'
-    bins = [-1, 1000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 30000000]
+    bins = [-1, 1000, 5000, 10000, 25000, 50000, 100000, 150000, 200000, 500000, 1000000]
     labels = [
         '<1k$',
         '5 - 10k',
@@ -352,8 +352,8 @@ def plot_regions_by_emissions():
             ax = axes[i]
 
             base = subset_regions.plot(column = 'bin', ax = ax,
-                                    cmap='YlGnBu', linewidth=0.2,
-                                    legend=True, edgecolor='grey')
+                                    cmap = 'YlGnBu', linewidth = 0.2,
+                                    legend = True, edgecolor = None)
 
             handles, labels = ax.get_legend_handles_labels()
 
@@ -373,13 +373,79 @@ def plot_regions_by_emissions():
     fig.savefig(path)
     plt.close(fig)
 
+
+def plot_emission_subscriber():
+    """
+    Plot emissions per user 
+    by regions.
+    """
+    print('Plotting emissions per user by regions')
+    
+    regions = get_regional_shapes()
+    
+    DATA_AFRICA = os.path.join(BASE_PATH, '..', 'results', 'SSA', 'SSA_emission_results.csv')
+    data = pd.read_csv(DATA_AFRICA)
+    n = int(len(data) / 4)
+    data['emissions_kg_per_subscriber'] = round(data['emissions_kg_per_subscriber']/1e3)
+    data = data[['GID_1', 'emissions_kg_per_subscriber', 'adoption_scenario']]
+    
+    value_mapping = {'low': 'Low', 'baseline': 'Baseline', 'high': 'High'}
+    data['adoption_scenario'] = data['adoption_scenario'].replace(value_mapping)
+    
+    regions = regions[['GID_1', 'geometry']]
+    regions = regions.merge(data, left_on = 'GID_1', right_on = 'GID_1')
+    regions.reset_index(drop = True, inplace = True)
+
+    metric = 'emissions_kg_per_subscriber'
+    bins = [-1, 1000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 60000000]
+    labels = [
+        '<0.5k$',
+        '0.5 - 1k',
+        '1 - 2.5k',
+        '2.5 - 5k',
+        '5 - 10k',
+        '10 - 25k',
+        '25 - 50k',
+        '50k - 100k',
+        '100 - 300k',
+        '>300k']
+
+    regions['bin'] = pd.cut(
+        regions[metric],
+        bins = bins,
+        labels = labels)
+    
+    sns.set(font_scale = 0.9)
+    fig, ax = plt.subplots(1, 1, figsize = (10, 10))
+
+    base = regions.plot(column = 'bin', ax = ax, 
+        cmap = 'YlGnBu', linewidth = 0.2,
+        legend=True, edgecolor = None)
+
+    handles, labels = ax.get_legend_handles_labels()
+
+    fig.legend(handles[::-1], labels[::-1])
+
+    ctx.add_basemap(ax, crs = regions.crs, source = ctx.providers.CartoDB.Voyager)
+
+    name = "Emission per User (kt $\mathregular{ CO_2}$ eq.) by Sub-National Regions"
+    ax.set_title(name, fontsize = 14)
+
+    fig.tight_layout()
+    path = os.path.join(VIS, 'per_user_emissions_map.png')
+    fig.savefig(path)
+
+    plt.close(fig)
+   
+
 if __name__ == '__main__':
 
-    #plot_regions_by_geotype()
-    #plot_revenue_per_area()
-    #plot_tco_per_user()
+    plot_regions_by_geotype()
+    plot_revenue_per_area()
+    plot_tco_per_user()
+    #plot_emission_subscriber()
     plot_regions_by_emissions()
     traffics = [10, 20, 30, 40]
-    #for traffic in traffics:
+    for traffic in traffics:
 
-        #plot_demand_area(traffic)
+        plot_demand_area(traffic)
