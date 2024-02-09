@@ -587,8 +587,8 @@ if __name__ == '__main__':
         #if not country['iso3'] == 'RWA':
             
             continue 
-        #demand(countries['iso3'].loc[idx])
-        #capacity_user(countries['iso3'].loc[idx])
-        #ssa_summary(countries['iso3'].loc[idx])
-        #supply(countries['iso3'].loc[idx])
+        demand(countries['iso3'].loc[idx])
+        capacity_user(countries['iso3'].loc[idx])
+        ssa_summary(countries['iso3'].loc[idx])
+        supply(countries['iso3'].loc[idx])
         quantify_emission(countries['iso3'].loc[idx])

@@ -65,9 +65,8 @@ area_average_revenue <-
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 45)
+      format(y, scientific = FALSE), limit = c(0, 49)
   ) 
-
 
 #############################
 ##TOTAL REVENUE PER AREA ####
@@ -188,7 +187,7 @@ user_average_tco <-
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 11)
+      format(y, scientific = FALSE), limit = c(0, 13)
   ) 
 
 #########################
@@ -198,7 +197,7 @@ data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_tco_per_user_tot
 
 df = data %>%
   group_by(geotype, adoption_scenario) %>%
-  summarize(average_tco = sum(tco_per_user, na.rm = TRUE) / 1e9)
+  summarize(average_tco = sum(tco_per_user, na.rm = TRUE) / 1e6)
 
 df$adoption_scenario = factor(
   df$adoption_scenario,
@@ -229,7 +228,7 @@ user_total_tco <-
     subtitle = 'Total TCO per User.',
     x = NULL,
     y = "Total TCO per User",
-  ) + ylab(expression("Total TCO per User ($US Billions)")) +
+  ) + ylab(expression("Total TCO per User ($US Millions)")) +
   scale_fill_brewer(palette = "YlGnBu") +
   theme(
     legend.position = 'bottom',
@@ -249,7 +248,7 @@ user_total_tco <-
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 12)
+      format(y, scientific = FALSE), limit = c(0, 39000)
   ) 
 
 
@@ -317,7 +316,7 @@ demand_area <-
   scale_y_continuous(
     expand = c(0, 0),
     labels = function(y)
-      format(y, scientific = FALSE), limit = c(0, 800)
+      format(y, scientific = FALSE), limit = c(0, 400)
   ) + facet_wrap( ~ monthly_traffic, ncol = 4)
 
 
