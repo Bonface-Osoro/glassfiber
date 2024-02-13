@@ -10,8 +10,8 @@ folder <- dirname(rstudioapi::getSourceEditorContext()$path)
 ###############################
 ##AVERAGE EMISSIONS PER USER###
 ###############################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission_subscriber_average.csv')) %>%
-  filter(geotype != 'remote')
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission_subscriber_average.csv')) #%>%
+  #filter(geotype != 'remote')
 
 df = data %>%
   group_by(geotype, adoption_scenario, region) %>%
@@ -49,7 +49,7 @@ average_emissions_per_subscriber <-
     fill = "Demand Scenario"
   ) + ylab('Average GHG Emissions <br>per User (t CO<sub>2</sub> eq.)') + 
   scale_y_continuous(
-    limits = c(0, 33000),
+    limits = c(0, 6303000),
     labels = function(y)
       format(y, scientific = FALSE),
     expand = c(0, 0)
