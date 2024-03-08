@@ -1,12 +1,18 @@
 import configparser
 import os
 import warnings
+import rasterio
+import json
 import pandas as pd
 import geopandas as gpd
 from tqdm import tqdm
 import networkx as nx
+from rasterio.mask import mask
+from rasterstats import zonal_stats
 from shapely.geometry import Polygon, MultiPolygon, mapping, shape, MultiLineString, LineString
 from shapely.ops import transform, unary_union, nearest_points
+import fiona
+import fiona.crs
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
 
@@ -14,8 +20,10 @@ CONFIG = configparser.ConfigParser()
 CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
 
+DATA_RAW = os.path.join(BASE_PATH, 'raw')
 DATA_PROCESSED = os.path.join(BASE_PATH, '..', 'results', 'processed')
 DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
+
 
 class PointsGenerator:
 
@@ -183,7 +191,7 @@ class EdgeGenerator:
     of sub-regions.
     """
 
-    def __init__(self, country_iso3):
+    def __init__(self, country_iso3, country_iso2):
         """
         A class constructor
 
@@ -191,8 +199,12 @@ class EdgeGenerator:
         ---------
         country_iso3 : string
             Country iso3 to be processed.
+        country_iso2 : string
+            Country iso2 to be processed 
+            (specific for fiber data).
         """
         self.country_iso3 = country_iso3
+        self.country_iso2 = country_iso2
 
 
     def fit_regional_node_edges(self):
