@@ -5,7 +5,7 @@ import pandas as pd
 from glassfibre.preprocessing import ProcessCountry, ProcessRegions, ProcessPopulation
 from glassfibre.generator import PointsGenerator, EdgeGenerator
 from glassfibre.fiber_process import FiberProcess
-from glassfibre.strategies import baseline_cost_emissions
+from glassfibre.strategies import baseline_cost_emissions, local_cost_emissions
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
 
@@ -26,7 +26,7 @@ for idx, country in countries.iterrows():
         
     if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    #if not country['iso3'] == 'AGO':
+    #if not country['iso3'] == 'GAB':
         
         continue 
 
@@ -50,7 +50,7 @@ for idx, country in countries.iterrows():
     #edges_generator.fit_country_node_edges()
     #edges_generator.process_existing_fiber()
     
-    fiber_processor = FiberProcess(countries['iso3'].loc[idx], countries['iso2'].loc[idx], path)
+    #fiber_processor = FiberProcess(countries['iso3'].loc[idx], countries['iso2'].loc[idx], path)
     '''fiber_processor.process_existing_fiber()
     fiber_processor.generate_agglomeration_lut()
     fiber_processor.find_nodes_on_existing_infrastructure()
@@ -61,3 +61,4 @@ for idx, country in countries.iterrows():
     fiber_processor.generate_backhaul_lut()'''
     
     baseline_cost_emissions(countries['iso3'].loc[idx])
+    local_cost_emissions(countries['iso3'].loc[idx])

@@ -474,6 +474,7 @@ class FiberProcess:
                             'properties': {
                                 'id': idx1,
                                 'GID_0': region['GID_0'],
+                                'GID_1': region['GID_1'],
                                 GID_level: region[GID_level],
                                 'population': node['sum'],
                             }
@@ -486,6 +487,7 @@ class FiberProcess:
                             'properties': {
                                 'id': 'regional_node',
                                 'GID_0': region['GID_0'],
+                                'GID_1': region['GID_1'],
                                 GID_level: region[GID_level],
                                 'population': 1,
                             }
@@ -498,6 +500,7 @@ class FiberProcess:
                             'properties': {
                                 'id': item['properties']['id'],
                                 'GID_0':item['properties']['GID_0'],
+                                'GID_1': item['properties']['GID_1'],
                                 GID_level: item['properties'][GID_level],
                                 'population': item['properties']['population'],
                             }
@@ -514,7 +517,7 @@ class FiberProcess:
 
             agglomerations['lon'] = agglomerations['geometry'].x
             agglomerations['lat'] = agglomerations['geometry'].y
-            agglomerations = agglomerations[['lon', 'lat', GID_level, 'population']]
+            agglomerations = agglomerations[['GID_1', GID_level, 'lon', 'lat', 'population']]
             agglomerations.to_csv(os.path.join(folder, 'agglomerations.csv'), index = False)
 
 
@@ -727,15 +730,15 @@ class FiberProcess:
                     regional_nodes = gpd.read_file(path, crs='epsg:4326')
 
                     for idx, regional_node in regional_nodes.iterrows():
-
+                        
                         output.append({
                             'geometry': regional_node['geometry'],
                             'properties': {
+                                'GID_2' : unique_region,
                                 'value': regional_node['population'],
                                 'source': 'new',
                             }
                         })
-
             output = gpd.GeoDataFrame.from_features(output, crs='epsg:4326')
             path = os.path.join(folder, 'regional_nodes.shp')
             output.to_file(path)
@@ -1168,9 +1171,9 @@ countries = pd.read_csv(path, encoding = 'utf-8-sig')
 
 for idx, country in countries.iterrows():
         
-    #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
+    if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    if not country['iso3'] == 'RWA':
+    #if not country['iso3'] == 'LSO':
 
         continue
 
@@ -1183,6 +1186,8 @@ for idx, country in countries.iterrows():
     fiber_processor.fit_regional_edges()
     fiber_processor.generate_core_lut()
     fiber_processor.generate_backhaul_lut()'''
+    fiber_processor.generate_agglomeration_lut()
+
 
 #file = os.path.join(DATA_PROCESSED, 'KEN', 'network_existing', 'KEN_core_edges_existing.shp')
 #df = gpd.read_file(file, crs='epsg:4326')
