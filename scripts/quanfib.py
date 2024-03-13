@@ -19,7 +19,7 @@ countries = pd.read_csv(path, encoding = 'utf-8-sig')
 southern = ['AGO', 'ZMB', 'ZWE', 'NAM', 'BWA', 'ZAF', 'LSO', 
             'SWZ', 'MOZ', 'MWI']
 
-central = ['CMR', 'CAF', 'TCD', 'COD', 'GNQ', 'GAB', 'STP']
+central = ['CMR', 'CAF', 'TCD', 'COD', 'GNQ', 'GAB', 'STP', 'COG']
 
 eastern = ['BDI', 'COM', 'DJI', 'ERI', 'ETH', 'SWZ', 'MDG', 
            'KEN', 'MUS', 'SDN', 'SYC', 'SOM', 'SSD', 'UGA', 
@@ -98,11 +98,34 @@ def csv_merger(csv_name, source_folder):
                         merged_data = merged_data.groupby(['iso3', 'GID_2']
                         )['emissions_kg_per_subscriber'].mean().reset_index()
 
-                    if csv_name == '_baseline_tco_results.csv':
+                    if csv_name == '_country_baseline_emission.csv':  
 
-                        merged_data = merged_data.groupby(['iso3', 'GID_2']
-                                    )['tco_per_user'].mean().reset_index()       
+                        merged_data = merged_data.groupby(['iso3', 'strategy']
+                                    ).agg({'total_ghg_emissions_kg': 'sum', 
+                                    'emissions_kg_per_subscriber': 'sum'}
+                                    ).reset_index()
+                        
+                    if csv_name == '_country_local_emission.csv':  
 
+                        merged_data = merged_data.groupby(['iso3', 'strategy']
+                                    ).agg({'total_ghg_emissions_kg': 'sum', 
+                                    'emissions_kg_per_subscriber': 'sum'}
+                                    ).reset_index()
+                        
+                    if csv_name == '_baseline_tco_results.csv':  
+
+                        merged_data = merged_data.groupby(['iso3', 'strategy']
+                                    ).agg({'tco': 'mean', 
+                                    'tco_per_user': 'mean'}
+                                    ).reset_index()
+                        
+                    if csv_name == '_local_tco_results.csv':  
+
+                        merged_data = merged_data.groupby(['iso3', 'strategy']
+                                    ).agg({'tco': 'mean', 
+                                    'tco_per_user': 'mean'}
+                                    ).reset_index()   
+                              
                     fileout = 'SSA{}'.format(csv_name)
                     folder_out = os.path.join(DATA_RESULTS, '..', 'SSA')
 
@@ -256,6 +279,42 @@ def summations(iso3, metric):
         path_out_sum_11 = os.path.join(folder_out, fileout_sum_12)
         total_baseline_eolt.to_csv(path_out_sum_11)
 
+    elif metric == '_local_mfg_emission':
+
+        path_in = os.path.join(DATA_RESULTS, iso3, 'emissions', 
+            '{}_local_mfg_emission_results.csv'.format(iso3))
+        df = pd.read_csv(path_in)
+        total_local_mfg = df.groupby(['iso3', 'strategy', 
+                    'emission_category', 'lca_phase_ghg_kg']
+                    )['total_mfg_ghg_kg'].mean()
+        fileout_sum_13 = '{}_local_total_mfg.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
+
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out_sum_12 = os.path.join(folder_out, fileout_sum_13)
+        total_local_mfg.to_csv(path_out_sum_12)
+
+    elif metric == '_local_eolt_emission':
+
+        path_in = os.path.join(DATA_RESULTS, iso3, 'emissions', 
+            '{}_local_eolt_emission_results.csv'.format(iso3))
+        df = pd.read_csv(path_in)
+        total_local_eolt = df.groupby(['iso3', 'strategy', 
+                    'emission_category', 'lca_phase_ghg_kg']
+                    )['total_eolt_ghg_kg'].mean()
+        fileout_sum_14 = '{}_local_total_eolt.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
+
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out_sum_13 = os.path.join(folder_out, fileout_sum_14)
+        total_local_eolt.to_csv(path_out_sum_13)
+
     else:
 
         path_in = os.path.join(DATA_RESULTS, iso3, 'supply', 
@@ -310,6 +369,90 @@ def summations(iso3, metric):
     return None
 
 
+def ssa_csv_merger(csv_name):
+    """
+    This funcion read and merge 
+    multiple CSV files located 
+    in different folders.
+
+    Parameters
+    ----------
+    csv_name : string
+        Name of the file to process. it can be
+        '_customers.csv', '_ev_centers.csv' or
+        '_optimized_ev_centers.csv'
+    source_folder : string
+        Name of the folder containing the files.
+        It can be  
+    """
+    DATA_SSA = os.path.join(BASE_PATH, '..', 'results', 'SSA')
+
+    merged_data = pd.DataFrame()
+
+    print('Merging {} files'. format(csv_name))
+    base_directory = os.path.join(DATA_SSA) 
+
+    for root, _, files in os.walk(base_directory):
+
+        for file in files:
+
+            if file.endswith('{}'.format(csv_name)):
+                
+                file_path = os.path.join(base_directory, file)
+                df = pd.read_csv(file_path)
+                df['region'] = ''
+                merged_data = pd.concat([merged_data, df], ignore_index = True)
+
+                if csv_name == '_emission.csv':  
+
+                    merged_data = merged_data.groupby(['iso3', 'strategy', 
+                        'region']).agg({'total_ghg_emissions_kg': 'sum', 
+                        'emissions_kg_per_subscriber': 'sum'}).reset_index()
+                    
+                    merged_data = merged_data[['iso3', 
+                        'emissions_kg_per_subscriber', 'total_ghg_emissions_kg', 
+                        'strategy', 'region']]
+                    
+                if csv_name == '_tco_results.csv':  
+
+                    merged_data = merged_data.groupby(['iso3', 'strategy',
+                        'region']).agg({'tco': 'mean','tco_per_user': 'mean'}
+                        ).reset_index()
+                    
+                    merged_data = merged_data[['iso3', 'tco', 'tco_per_user', 
+                        'strategy', 'region']]
+                             
+                for i in range(len(merged_data)):
+
+                    if merged_data['iso3'].loc[i]  in southern:
+
+                        merged_data['region'].loc[i] = 'Southern'
+
+                    elif merged_data['iso3'].loc[i]  in central:
+
+                        merged_data['region'].loc[i] = 'Central'
+
+                    elif merged_data['iso3'].loc[i]  in eastern:
+
+                        merged_data['region'].loc[i] = 'Eastern'
+
+                    else: 
+
+                        merged_data['region'].loc[i] = 'West'
+
+                    ''''''
+                
+                fileout = 'SSA{}'.format(csv_name)
+                folder_out = os.path.join(DATA_SSA)
+
+                if not os.path.exists(folder_out):
+
+                    os.makedirs(folder_out)
+
+                path_out = os.path.join(folder_out, fileout)
+                merged_data.to_csv(path_out, index = False)
+
+
 if __name__ == '__main__':
     
     for idx, country in countries.iterrows():
@@ -323,17 +466,18 @@ if __name__ == '__main__':
             #summations(countries['iso3'].loc[idx], 'rev_per_area')
             #summations(countries['iso3'].loc[idx], 'tco_per_user')
             #summations(countries['iso3'].loc[idx], 'demand_mbps_sqkm')
-            #summations(countries['iso3'].loc[idx], 'emissions_kg_per_subscriber')
             #summations(countries['iso3'].loc[idx], 'total_mfg_ghg_kg')
             #summations(countries['iso3'].loc[idx], 'total_eolt_ghg_kg')
             #summations(countries['iso3'].loc[idx], '_baseline_mfg_emission')
             #summations(countries['iso3'].loc[idx], '_baseline_eolt_emission')
+            #summations(countries['iso3'].loc[idx], '_local_mfg_emission')
+            #summations(countries['iso3'].loc[idx], '_local_eolt_emission')
             pass
         except:
 
             pass
 
-csv_merger('_demand_results.csv', 'demand')
+'''csv_merger('_demand_results.csv', 'demand')
 csv_merger('_supply_results.csv', 'supply')
 csv_merger('_rev_per_area_average.csv', 'summary')
 csv_merger('_rev_per_area_total.csv', 'summary')
@@ -343,10 +487,20 @@ csv_merger('_geotype_total_area.csv', 'summary')
 csv_merger('_geotype_population.csv', 'summary')
 csv_merger('_demand_user.csv', 'demand')
 csv_merger('_average_demand.csv', 'summary')
-csv_merger('_emission_results.csv', 'emissions')
-csv_merger('_emission_subscriber_average.csv', 'summary')
-csv_merger('_emission_subscriber_total.csv', 'summary')
-csv_merger('_baseline_emission_results.csv', 'emissions')
-csv_merger('_baseline_tco_results.csv', 'supply')
-csv_merger('_baseline_total_mfg.csv', 'summary')
-csv_merger('_baseline_total_eolt.csv', 'summary')
+'''
+
+########## TOTAL BASELINE AND LOCAL EMISSIONS ##########
+#csv_merger('_country_baseline_emission.csv', 'summary')
+#csv_merger('_country_local_emission.csv', 'summary')
+#ssa_csv_merger('_emission.csv')
+
+###### TOTAL TCO AND PER USER TCO EMISSIONS ######
+#csv_merger('_baseline_tco_results.csv', 'supply')
+#csv_merger('_local_tco_results.csv', 'supply')
+#ssa_csv_merger('_tco_results.csv')
+
+############ TOTAL EMISSION TYPES ##############
+#csv_merger('_baseline_total_mfg.csv', 'summary')
+#csv_merger('_baseline_total_eolt.csv', 'summary')
+#csv_merger('_local_total_mfg.csv', 'summary')
+#csv_merger('_local_total_eolt.csv', 'summary')
