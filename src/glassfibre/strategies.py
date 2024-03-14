@@ -500,3 +500,211 @@ def local_cost_emissions(iso3):
 
 
     return None
+
+
+def regional_cost_emissions(iso3):   
+    """
+    This function calculates the TCO and emissions for regionalfiber nodes
+    """
+    print('Processing regional TCO and emissions for {}'.format(iso3))
+    
+    file = os.path.join(DATA_PROCESSED, iso3, 'regions', 
+                        'regions_1_{}.shp'.format(iso3))
+    
+    file_1 = os.path.join(DATA_PROCESSED, iso3, 'agglomerations', 
+                        'agglomerations.csv')
+    
+    file_2 = os.path.join(DATA_RESULTS, iso3, 'country_lines', 
+                            '{}.shp'.format(iso3))
+    
+    df = gpd.read_file(file)
+    df = df[['GID_1', 'geometry']]
+    df[['area', 'pop_density', 'users_area_sqkm', 'tco', 'tco_per_user']] = ''
+    
+    df1 = pd.read_csv(file_1)
+    df1 = df1.groupby(['GID_1'])['population'].sum().reset_index()
+
+    df = pd.merge(df, df1, on = 'GID_1')
+    
+    for i in range(len(df)):
+
+        df['area'].loc[i] = (df['geometry'].loc[i].area) * 12309
+        df['pop_density'].loc[i] = ((df['population'].loc[i]) 
+                                    / (df['area'].loc[i]))
+        
+    df2 = gpd.read_file(file_2)
+    df2['length'] =  ''
+    for i in range(len(df2)):
+
+        line = LineString(df2['geometry'].loc[i])
+        length_km = (line.length) * 111.32
+        df2['length'].loc[i] = length_km
+    
+    df2 = df2[['GID_1', 'length']]
+
+    df1 = pd.merge(df, df2, on = 'GID_1')
+    total_length = df1['length'].sum()
+    units = (len(df1))
+
+    df1[['optic_fiber_mfg_ghg', 'aluminium_mfg_ghg', 'steel_iron_mfg_ghg', 
+        'plastics_mfg_ghg', 'other_metals_mfg_ghg', 'concrete_mfg_ghg', 
+        'total_mfg_ghg_kg', 'optic_fiber_eolt_ghg', 'aluminium_eolt_ghg', 
+        'steel_iron_eolt_ghg', 'plastics_eolt_ghg', 'other_metals_eolt_ghg', 
+        'concrete_eolt_ghg', 'total_eolt_ghg_kg', 'total_trans_ghg_kg', 
+        'total_ops_ghg_kg', 'total_ghg_emissions_kg', 
+        'emissions_kg_per_subscriber', 'strategy']] = ''
+    
+    lca_mfg = lca_manufacturing()
+    lca_eot = lca_eolt()
+    lca_tran = lca_trans()
+    lca_ops = lca_operations()
+
+    for idx, country in countries.iterrows():
+            
+        if not country['iso3'] == iso3:
+
+            continue
+
+        arpu = countries['arpu'].loc[idx]
+        adoption_low = round(countries['adoption_low'].loc[idx], 0)
+        df1['iso3'] = ''
+
+        for i in range(len(df1)):
+            
+            df1['iso3'].loc[i] = iso3
+
+            df1['tco'].loc[i] = cost_model(total_length, units)
+            
+            df1['users_area_sqkm'].loc[i] = ((df1['population'].loc[i]) * 
+                                            (adoption_low / 100))
+            
+            df1['tco_per_user'].loc[i] = (((df1['tco'].loc[i]) 
+                                        / (df1['users_area_sqkm'].loc[i])) 
+                                        / units)
+            ################# LCA MANUFACTURING PHASE ########################
+            df1['optic_fiber_mfg_ghg'].loc[i] = (lca_mfg['optic_fiber_ghg'] 
+                                                * (total_length))
+            df1['aluminium_mfg_ghg'].loc[i] = (lca_mfg['aluminium_ghg'] * units)
+            df1['steel_iron_mfg_ghg'].loc[i] = (lca_mfg['steel_iron_ghg'] * units)
+            df1['plastics_mfg_ghg'].loc[i] = (lca_mfg['plastics_ghg'] * units)
+            df1['other_metals_mfg_ghg'].loc[i] = (lca_mfg['other_metals_ghg'] 
+                                                * units)
+            df1['concrete_mfg_ghg'].loc[i] = (lca_mfg['concrete_ghg'] * units)
+            df1['total_mfg_ghg_kg'].loc[i] = (df1['optic_fiber_mfg_ghg'].loc[i] 
+                                            + df1['aluminium_mfg_ghg'].loc[i] 
+                                            + df1['steel_iron_mfg_ghg'].loc[i] 
+                                            + df1['plastics_mfg_ghg'].loc[i] 
+                                            + df1['other_metals_mfg_ghg'].loc[i] 
+                                            + df1['concrete_mfg_ghg'].loc[i])
+            
+            ####################### LCA TRANSPORTATION PHASE ###################
+            df1['total_trans_ghg_kg'].loc[i] = (lca_tran['optic_fiber_ghg'] 
+                                                * units)
+
+            ####################### LCA OPERATIONS PHASE #######################
+            df1['total_ops_ghg_kg'].loc[i] = (((lca_ops['cpe_power'] * units) 
+                                    + ((lca_ops['base_station_power_kwh'] * 
+                                        units) 
+                                    / (df1['users_area_sqkm'].loc[i])) + (1.5 
+                                    * ((lca_ops['terminal_unit_pwr_kwh'] * 
+                                        units) 
+                                    / df1['users_area_sqkm'].loc[i]))) * 
+                                    0.19338) 
+            ####################### LCA END OF LIFE TREATMENT PHASE ############
+            df1['optic_fiber_eolt_ghg'].loc[i] = (lca_eot['optic_fiber_ghg'] 
+                                                * total_length)
+            df1['aluminium_eolt_ghg'].loc[i] = (lca_eot['aluminium_ghg'] * 
+                                                units)
+            df1['steel_iron_eolt_ghg'].loc[i] = (lca_eot['steel_iron_ghg'] * 
+                                                units)
+            df1['plastics_eolt_ghg'].loc[i] = (lca_eot['plastics_ghg'] * units)
+            df1['other_metals_eolt_ghg'].loc[i] = (lca_eot['other_metals_ghg'] 
+                                                * units)
+            df1['concrete_eolt_ghg'].loc[i] = (lca_eot['concrete_ghg'] * units)
+            df1['total_eolt_ghg_kg'].loc[i] = (df1['optic_fiber_eolt_ghg'].loc[i] 
+                                            + df1['aluminium_eolt_ghg'].loc[i] 
+                                            + df1['steel_iron_eolt_ghg'].loc[i] 
+                                            + df1['plastics_eolt_ghg'].loc[i] 
+                                            + df1['other_metals_eolt_ghg'].loc[i] 
+                                            + df1['concrete_eolt_ghg'].loc[i])
+            
+            df1['total_ghg_emissions_kg'].loc[i] = (df1['total_mfg_ghg_kg'].loc[i] 
+                                            + df1['total_trans_ghg_kg'].loc[i] 
+                                            + df1['total_ops_ghg_kg'].loc[i] 
+                                            + df1['total_eolt_ghg_kg'].loc[i])
+            df1['emissions_kg_per_subscriber'].loc[i] = (
+                df1['total_ghg_emissions_kg'].loc[i] / 
+                df1['users_area_sqkm'].loc[i]) / units
+            
+            df1['strategy'].loc[i] = 'regional'
+    
+    totat_ghg = df1[['iso3', 'GID_1', 'population', 'pop_density', 
+                'users_area_sqkm', 'area', 'total_mfg_ghg_kg', 
+                'total_trans_ghg_kg', 'total_ops_ghg_kg', 
+                'total_eolt_ghg_kg', 'total_ghg_emissions_kg', 
+                'emissions_kg_per_subscriber', 'strategy']]
+    
+    country_totat_ghg = totat_ghg[['iso3', 'total_ghg_emissions_kg',
+                'emissions_kg_per_subscriber', 'strategy']]
+    
+    ghg_avg = country_totat_ghg['emissions_kg_per_subscriber'].mean()
+
+    country_totat_ghg = pd.DataFrame({'iso3': 
+                        [country_totat_ghg['iso3'].iloc[0]], 
+                        'total_ghg_emissions_kg': [country_totat_ghg[
+                        'total_ghg_emissions_kg'].iloc[0]], 
+                        'emissions_kg_per_subscriber': [ghg_avg], 
+                        'strategy': [country_totat_ghg['strategy'].iloc[0]]})
+
+    df3 = df1[['iso3', 'GID_1', 'pop_density', 'users_area_sqkm', 
+            'optic_fiber_mfg_ghg', 'aluminium_mfg_ghg', 'steel_iron_mfg_ghg', 
+            'plastics_mfg_ghg', 'other_metals_mfg_ghg', 'concrete_mfg_ghg', 
+            'total_mfg_ghg_kg', 'strategy']]
+    
+    total_mfg = pd.melt(df3, id_vars = ['iso3', 'GID_1', 'pop_density', 
+            'users_area_sqkm', 'total_mfg_ghg_kg', 'strategy'], value_vars = 
+            ['optic_fiber_mfg_ghg', 'aluminium_mfg_ghg', 
+            'steel_iron_mfg_ghg', 'plastics_mfg_ghg', 'other_metals_mfg_ghg', 
+            'concrete_mfg_ghg',], var_name = 'emission_category', 
+            value_name = 'lca_phase_ghg_kg')
+    
+    df4 = df1[['iso3', 'GID_1', 'pop_density', 'users_area_sqkm', 
+            'optic_fiber_eolt_ghg', 'aluminium_eolt_ghg', 'steel_iron_eolt_ghg', 
+            'plastics_eolt_ghg', 'other_metals_eolt_ghg', 'concrete_eolt_ghg', 
+            'total_eolt_ghg_kg', 'strategy']]
+    
+    total_eolt = pd.melt(df4, id_vars = ['iso3', 'GID_1', 'pop_density',
+        'users_area_sqkm', 'total_eolt_ghg_kg', 'strategy'], value_vars = 
+        ['optic_fiber_eolt_ghg', 'aluminium_eolt_ghg', 'steel_iron_eolt_ghg', 
+        'plastics_eolt_ghg', 'other_metals_eolt_ghg', 'concrete_eolt_ghg',], 
+        var_name = 'emission_category', value_name = 'lca_phase_ghg_kg')
+    
+    total_tco = df1[['iso3', 'GID_1', 'population', 'pop_density', 
+                    'users_area_sqkm', 'tco', 'tco_per_user', 'strategy']]
+    fileout = '{}_regional_emission_results.csv'.format(iso3)
+    fileout1 = '{}_regional_mfg_emission_results.csv'.format(iso3)
+    fileout2 = '{}_regional_eolt_emission_results.csv'.format(iso3)
+    fileout3 = '{}_regional_tco_results.csv'.format(iso3)
+    fileout4 = '{}_regional_emission.csv'.format(iso3)
+
+    folder_out = os.path.join(DATA_RESULTS, iso3, 'emissions')
+    folder_out1 = os.path.join(DATA_RESULTS, iso3, 'supply')
+    folder_out2 = os.path.join(DATA_RESULTS, iso3, 'summary')
+    if not os.path.exists(folder_out):
+
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+    path_out1 = os.path.join(folder_out, fileout1)
+    path_out2 = os.path.join(folder_out, fileout2)
+    path_out3 = os.path.join(folder_out1, fileout3)
+    path_out4 = os.path.join(folder_out2, fileout4)
+
+    totat_ghg.to_csv(path_out, index = False)
+    total_mfg.to_csv(path_out1, index = False)
+    total_eolt.to_csv(path_out2, index = False)
+    total_tco.to_csv(path_out3, index = False)
+    country_totat_ghg.to_csv(path_out4, index = False)
+    
+    
+    return None

@@ -314,7 +314,43 @@ def summations(iso3, metric):
 
         path_out_sum_13 = os.path.join(folder_out, fileout_sum_14)
         total_local_eolt.to_csv(path_out_sum_13)
+   
+    elif metric == '_regional_mfg_emission':
 
+        path_in = os.path.join(DATA_RESULTS, iso3, 'emissions', 
+            '{}_regional_mfg_emission_results.csv'.format(iso3))
+        df = pd.read_csv(path_in)
+        total_local_eolt = df.groupby(['iso3', 'strategy', 
+                    'emission_category', 'lca_phase_ghg_kg']
+                    )['total_mfg_ghg_kg'].mean()
+        fileout_sum_14 = '{}_regional_total_mfg.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
+
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out_sum_13 = os.path.join(folder_out, fileout_sum_14)
+        total_local_eolt.to_csv(path_out_sum_13)
+    
+    elif metric == '_regional_eolt_emission':
+
+        path_in = os.path.join(DATA_RESULTS, iso3, 'emissions', 
+            '{}_regional_eolt_emission_results.csv'.format(iso3))
+        df = pd.read_csv(path_in)
+        total_local_eolt = df.groupby(['iso3', 'strategy', 
+                    'emission_category', 'lca_phase_ghg_kg']
+                    )['total_eolt_ghg_kg'].mean()
+        fileout_sum_14 = '{}_regional_total_eolt.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
+
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out_sum_13 = os.path.join(folder_out, fileout_sum_14)
+        total_local_eolt.to_csv(path_out_sum_13)
+    
     else:
 
         path_in = os.path.join(DATA_RESULTS, iso3, 'supply', 
@@ -472,6 +508,8 @@ if __name__ == '__main__':
             #summations(countries['iso3'].loc[idx], '_baseline_eolt_emission')
             #summations(countries['iso3'].loc[idx], '_local_mfg_emission')
             #summations(countries['iso3'].loc[idx], '_local_eolt_emission')
+            #summations(countries['iso3'].loc[idx], '_regional_mfg_emission')
+            #summations(countries['iso3'].loc[idx], '_regional_eolt_emission')
             pass
         except:
 
@@ -492,15 +530,19 @@ csv_merger('_average_demand.csv', 'summary')
 ########## TOTAL BASELINE AND LOCAL EMISSIONS ##########
 #csv_merger('_country_baseline_emission.csv', 'summary')
 #csv_merger('_country_local_emission.csv', 'summary')
+#csv_merger('_regional_emission.csv', 'summary')
 #ssa_csv_merger('_emission.csv')
 
 ###### TOTAL TCO AND PER USER TCO EMISSIONS ######
 #csv_merger('_baseline_tco_results.csv', 'supply')
 #csv_merger('_local_tco_results.csv', 'supply')
-#ssa_csv_merger('_tco_results.csv')
+#csv_merger('_regional_tco_results.csv', 'supply')
+ssa_csv_merger('_tco_results.csv')
 
 ############ TOTAL EMISSION TYPES ##############
 #csv_merger('_baseline_total_mfg.csv', 'summary')
 #csv_merger('_baseline_total_eolt.csv', 'summary')
 #csv_merger('_local_total_mfg.csv', 'summary')
 #csv_merger('_local_total_eolt.csv', 'summary')
+#csv_merger('_regional_total_mfg.csv', 'summary')
+#csv_merger('_regional_total_eolt.csv', 'summary')

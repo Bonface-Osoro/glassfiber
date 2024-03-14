@@ -5,57 +5,51 @@ library(tidyverse)
 library("readxl")
 library(ggtext)
 
-# Set default folder
 folder <- dirname(rstudioapi::getSourceEditorContext()$path)
-###############################
-##AVERAGE EMISSIONS PER USER###
-###############################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission_subscriber_average.csv')) #%>%
-  #filter(geotype != 'remote')
 
+####################
+##TOTAL EMISSIONS###
+####################
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission.csv'))
 df = data %>%
-  group_by(geotype, adoption_scenario, region) %>%
-  summarize(mean_emissions = mean(emissions_kg_per_subscriber)/1e3)
+  group_by(region, strategy) %>%
+  summarize(total_ghgs = sum(total_ghg_emissions_kg)) 
 
-df$adoption_scenario = factor(
-  df$adoption_scenario,
-  levels = c('low', 'baseline', 'high'),
-  labels = c('Low', 'Baseline', 'High')
+df$strategy <- factor(
+  df$strategy,
+  levels = c('baseline', 'local'),
+  labels = c('Existing \nCore Network', 'New \nLocal Network')
 )
 
-df$geotype = factor(
-  df$geotype,
-  levels = c('remote', 'rural', 'suburban', 'urban'),
-  labels = c('Remote', 'Rural', 'Suburban', 'Urban')
-)
+label_totals <- df %>%
+  group_by(region, strategy) %>%
+  summarize(total_value = sum(total_ghgs))
 
-average_emissions_per_subscriber <- 
-  ggplot(df, aes(x = geotype, y = mean_emissions, fill = adoption_scenario)) +
-  geom_bar(stat = "identity", position = position_dodge(0.9)) +
-  geom_text(
-    aes(label = as.character(signif(mean_emissions, 3))),
-    size = 2,
-    position = position_dodge(0.9),
-    vjust = 0.5,
-    hjust = -0.1,
-    angle = 90
-  ) +
-  scale_fill_brewer(palette = "YlGnBu") +
+total_emissions <-
+  ggplot(df, aes(x = strategy, y = total_ghgs/1e9)) +
+  geom_bar(stat = "identity", aes(fill = strategy)) + 
+  geom_text(data = label_totals, aes(x = strategy, y = total_value/1e9, 
+                                     label = sprintf("%.2f", total_value/1e9)),
+            vjust = -0.5,
+            hjust = 0.5,
+            position = position_stack(), 
+            size = 2, color = "black") +
+  scale_fill_brewer(palette = "Dark2") +
   labs(
     colour = NULL,
-    title = "(A) Average Emissions per User",
-    subtitle = "Classified by geotype, LCA material type and regions",
+    title = "(A) Total Greenhouse Gas (GHG) Emissions.",
+    subtitle = "Classified by network level and regions.",
     x = NULL,
-    fill = "Demand Scenario"
-  ) + ylab('Average GHG Emissions <br>per User (t CO<sub>2</sub> eq.)') + 
+    fill = "LCA Material Type"
+  ) +  ylab('Total GHG Emissions (Mt CO<sub>2</sub> eq.)') + 
   scale_y_continuous(
-    limits = c(0, 6303000),
+    limits = c(0, 53),
     labels = function(y)
       format(y, scientific = FALSE),
     expand = c(0, 0)
-  ) + scale_x_discrete(limits = rev) +
+  ) + 
   theme(
-    legend.position = 'bottom',
+    legend.position = 'none',
     axis.text.x = element_text(size = 7),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 9, face = "bold"),
@@ -67,53 +61,48 @@ average_emissions_per_subscriber <-
     axis.title.x = element_text(size = 7)
   ) + facet_wrap( ~ region, ncol = 4)
 
-#############################
-##TOTAL EMISSION PER AREA ####
-#############################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission_subscriber_total.csv')) %>%
-  filter(geotype != 'remote')
-
+###################################
+##AVERAGE EMISSIONS PER SUBSCRIBER###
+###################################
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission.csv'))
 df = data %>%
-  group_by(geotype, adoption_scenario, region) %>%
-  summarize(total_emissions = sum(emissions_kg_per_subscriber)/1e6)
+  group_by(region, strategy) %>%
+  summarize(mean_ghg_user = mean(emissions_kg_per_subscriber)) 
 
-df$adoption_scenario = factor(
-  df$adoption_scenario,
-  levels = c('low', 'baseline', 'high'),
-  labels = c('Low', 'Baseline', 'High')
+df$strategy <- factor(
+  df$strategy,
+  levels = c('baseline', 'local'),
+  labels = c('Existing \nCore Network', 'New \nLocal Network')
 )
 
-df$geotype = factor(
-  df$geotype,
-  levels = c('remote', 'rural', 'suburban', 'urban'),
-  labels = c('Remote', 'Rural', 'Suburban', 'Urban')
-)
+label_means <- df %>%
+  group_by(region, strategy) %>%
+  summarize(mean_value = sum(mean_ghg_user))
 
-region_total_emissions <- 
-  ggplot(df, aes(x = geotype, y = total_emissions, fill = adoption_scenario)) +
-  geom_bar(stat = "identity", position = position_dodge(0.9)) +
-  geom_text(
-    aes(label = as.character(signif(total_emissions, 3))),
-    size = 2,
-    position = position_dodge(0.9),
-    vjust = 0.5,
-    hjust = -0.1,
-    angle = 90
-  ) + scale_fill_brewer(palette = "YlGnBu") +
+average_emissions <-
+  ggplot(df, aes(x = strategy, y = mean_ghg_user/1e6)) +
+  geom_bar(stat = "identity", aes(fill = strategy)) + 
+  geom_text(data = label_means, aes(x = strategy, y = mean_value/1e6, 
+                                     label = sprintf("%.2f", mean_value/1e6)),
+            vjust = -0.5,
+            hjust = 0.5,
+            position = position_stack(), 
+            size = 2, color = "black") +
+  scale_fill_brewer(palette = "Dark2") +
   labs(
     colour = NULL,
-    title = '(B) Total Emissions per User',
-    subtitle = 'Classified by geotype, demand scenario and region.',
+    title = "(B) Average Greenhouse Gas (GHG) Emissions per Subscriber.",
+    subtitle = "Classified by network level and regions.",
     x = NULL
-  ) + ylab('Total GHG Emissions <br>per User (kt CO<sub>2</sub> eq.)') + 
+  ) +  ylab('GHG Emissions per user (kt CO<sub>2</sub> eq.)') + 
   scale_y_continuous(
-    limits = c(0, 22000),
+    limits = c(0, 74),
     labels = function(y)
       format(y, scientific = FALSE),
     expand = c(0, 0)
-  ) + scale_x_discrete(limits = rev) +
+  ) + 
   theme(
-    legend.position = 'bottom',
+    legend.position = 'none',
     axis.text.x = element_text(size = 7),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 9, face = "bold"),
@@ -129,7 +118,11 @@ region_total_emissions <-
 ##################################
 ##TOTAL MANUFACTURING EMISSIONS###
 ##################################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_total_mfg.csv'))
+data1 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_baseline_total_mfg.csv'))
+data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_local_total_mfg.csv'))
+data <- merge(data2, data1, by = c("iso3", "strategy", "emission_category", 
+                  "lca_phase_ghg_kg", "total_mfg_ghg_kg", "region"), all = TRUE)
+
 data$emission_category = factor(
   data$emission_category,
   levels = c(
@@ -150,48 +143,45 @@ data$emission_category = factor(
   )
 )
 
+
 df = data %>%
-  group_by(emission_category, geotype, region) %>%
+  group_by(emission_category, region, strategy) %>%
   summarize(mfg_ghgs = lca_phase_ghg_kg) %>%
   distinct(emission_category, .keep_all = TRUE)
 
-df$geotype = factor(
-  df$geotype,
-  levels = c('remote', 'rural', 'suburban', 'urban'),
-  labels = c('Remote', 'Rural', 'Suburban', 'Urban')
+df$strategy <- factor(
+  df$strategy,
+  levels = c('baseline', 'local'),
+  labels = c('Existing \nCore Network', 'New \nLocal Network')
 )
 
-totals <- df %>%
-  group_by(geotype, emission_category, region) %>%
-  summarize(value = signif(sum(mfg_ghgs)))
-
 label_totals <- df %>%
-  group_by(geotype, region) %>%
+  group_by(region, strategy) %>%
   summarize(total_value = sum(mfg_ghgs))
 
 manufacturing_emissions <-
-  ggplot(df, aes(x = geotype, y = mfg_ghgs/1e6)) +
+  ggplot(df, aes(x = strategy, y = mfg_ghgs/1e9)) +
   geom_bar(stat = "identity", aes(fill = emission_category)) + 
-  geom_text(data = label_totals, aes(x = geotype, y = total_value/1e6, 
-    label = sprintf("%.2f", total_value/1e6)),
-    vjust = -0.5,
-    hjust = 0.5,
-    position = position_stack(), 
-    size = 2, color = "black") +
+  geom_text(data = label_totals, aes(x = strategy, y = total_value/1e9, 
+                                     label = sprintf("%.2f", total_value/1e9)),
+            vjust = -0.5,
+            hjust = 0.5,
+            position = position_stack(), 
+            size = 2, color = "black") +
   scale_fill_brewer(palette = "Dark2") +
   labs(
     colour = NULL,
     title = "(A) Manufacturing Phase",
-    subtitle = "Classified by geotype, LCA material type and regions",
+    subtitle = "Classified by LCA material type and regions.",
     x = NULL,
     fill = "LCA Material Type"
-  ) +  ylab('Total GHG Emissions (kt CO<sub>2</sub> eq.)') + 
+  ) +  ylab('Total GHG Emissions (Mt CO<sub>2</sub> eq.)') + 
   scale_y_continuous(
-    limits = c(0, 4000),
+    limits = c(0, 7.99),
     labels = function(y)
       format(y, scientific = FALSE),
     expand = c(0, 0)
-  ) + scale_x_discrete(limits = rev) +
+  ) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
@@ -208,7 +198,10 @@ manufacturing_emissions <-
 ###########################################
 ###TOTAL END OF LIFE TREATMENT EMISSIONS###
 ###########################################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_total_eolt.csv')) 
+data1 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_baseline_total_eolt.csv'))
+data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_local_total_eolt.csv'))
+data <- merge(data2, data1, by = c("iso3", "strategy", "emission_category", 
+                                   "lca_phase_ghg_kg", "total_eolt_ghg_kg", "region"), all = TRUE)
 data$emission_category = factor(
   data$emission_category,
   levels = c(
@@ -230,47 +223,43 @@ data$emission_category = factor(
 )
 
 df = data %>%
-  group_by(emission_category, geotype, region) %>%
+  group_by(emission_category, region, strategy) %>%
   summarize(eolt_ghgs = lca_phase_ghg_kg) %>%
   distinct(emission_category, .keep_all = TRUE)
 
-df$geotype = factor(
-  df$geotype,
-  levels = c('remote', 'rural', 'suburban', 'urban'),
-  labels = c('Remote', 'Rural', 'Suburban', 'Urban')
+df$strategy <- factor(
+  df$strategy,
+  levels = c('baseline', 'local'),
+  labels = c('Existing \nCore Network', 'New \nLocal Network')
 )
 
-totals <- df %>%
-  group_by(geotype, emission_category, region) %>%
-  summarize(value = signif(sum(eolt_ghgs)))
-
 label_totals <- df %>%
-  group_by(geotype, region) %>%
+  group_by(region, strategy) %>%
   summarize(total_value = sum(eolt_ghgs))
 
 eolts_emissions <-
-  ggplot(df, aes(x = geotype, y = eolt_ghgs/1e6)) +
+  ggplot(df, aes(x = strategy, y = eolt_ghgs/1e6)) +
   geom_bar(stat = "identity", aes(fill = emission_category)) + 
-  geom_text(data = label_totals, aes(x = geotype, y = total_value/1e6, 
-    label = sprintf("%.2f", total_value/1e6)),
-    vjust = -0.5,
-    hjust = 0.5,
-    position = position_stack(), 
-    size = 2, color = "black")  +
+  geom_text(data = label_totals, aes(x = strategy, y = total_value/1e6, 
+                                     label = sprintf("%.2f", total_value/1e6)),
+            vjust = -0.5,
+            hjust = 0.5,
+            position = position_stack(), 
+            size = 2, color = "black")  +
   scale_fill_brewer(palette = "Dark2") +
   labs(
     colour = NULL,
     title = "(B) End of Life Treatment Phase",
-    subtitle = "Classified by geotype, LCA material type and regions",
+    subtitle = "Classified by LCA material type and regions",
     x = NULL,
     fill = "LCA Material Type"
   ) + ylab('Total GHG Emissions (kt CO<sub>2</sub> eq.)') + 
   scale_y_continuous(
-    limits = c(0, 15),
+    limits = c(0, 109),
     labels = function(y)
       format(y, scientific = FALSE),
     expand = c(0, 0)
-  ) + scale_x_discrete(limits = rev) +
+  ) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
@@ -289,10 +278,10 @@ eolts_emissions <-
 ##PANEL USER EMISSIONS##
 ########################
 emission_panel <- ggarrange(
-  average_emissions_per_subscriber, 
-  region_total_emissions, 
+  total_emissions, 
+  average_emissions, 
   ncol = 1, nrow = 2, align = c('hv'),
-  common.legend = TRUE, legend='bottom')
+  common.legend = TRUE, legend='none')
 
 emission_category_panel <- ggarrange(
   manufacturing_emissions, 
@@ -301,14 +290,13 @@ emission_category_panel <- ggarrange(
   common.legend = TRUE, legend='bottom') 
 
 path = file.path(folder, 'figures', 'user_emissions_region.png')
-png(path, units="in", width=8.3, height=7, res=300)
+png(path, units="in", width=8.3, height=6, res=300)
 print(emission_panel)
 dev.off()
 
 path = file.path(folder, 'figures', 'user_emissions_category.png')
-png(path, units="in", width=8.3, height=7, res=300)
+png(path, units="in", width=8.3, height=6, res=300)
 print(emission_category_panel)
 dev.off()
-
 
 

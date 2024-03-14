@@ -2,10 +2,12 @@ import configparser
 import os
 import warnings
 import pandas as pd
-from glassfibre.preprocessing import ProcessCountry, ProcessRegions, ProcessPopulation
+from glassfibre.preprocessing import (ProcessCountry, ProcessRegions, 
+                                      ProcessPopulation)
 from glassfibre.generator import PointsGenerator, EdgeGenerator
 from glassfibre.fiber_process import FiberProcess
-from glassfibre.strategies import baseline_cost_emissions, local_cost_emissions
+from glassfibre.strategies import (baseline_cost_emissions, local_cost_emissions, 
+                                   regional_cost_emissions)
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
 
@@ -33,11 +35,13 @@ for idx, country in countries.iterrows():
     country = ProcessCountry(path, countries['iso3'].loc[idx])
     #country.process_country_shapes()
 
-    regions = ProcessRegions(countries['iso3'].loc[idx], countries['lowest'].loc[idx])
+    regions = ProcessRegions(countries['iso3'].loc[idx], 
+                             countries['lowest'].loc[idx])
     #regions.process_regions()
     #regions.process_sub_region_boundaries()
 
-    populations = ProcessPopulation(path, countries['iso3'].loc[idx], countries['lowest'].loc[idx], pop_tif_loc)
+    populations = ProcessPopulation(path, countries['iso3'].loc[idx], 
+                                    countries['lowest'].loc[idx], pop_tif_loc)
     #populations.process_national_population()
     #populations.process_population_tif()
 
@@ -45,12 +49,14 @@ for idx, country in countries.iterrows():
     #points_generator.generate_gid_points()
     #points_generator.generate_country_points()
 
-    edges_generator = EdgeGenerator(countries['iso3'].loc[idx], countries['iso2'].loc[idx])
+    edges_generator = EdgeGenerator(countries['iso3'].loc[idx], 
+                                    countries['iso2'].loc[idx])
     #edges_generator.fit_regional_node_edges()
     #edges_generator.fit_country_node_edges()
     #edges_generator.process_existing_fiber()
     
-    #fiber_processor = FiberProcess(countries['iso3'].loc[idx], countries['iso2'].loc[idx], path)
+    #fiber_processor = FiberProcess(countries['iso3'].loc[idx], 
+                                   #countries['iso2'].loc[idx], path)
     '''fiber_processor.process_existing_fiber()
     fiber_processor.generate_agglomeration_lut()
     fiber_processor.find_nodes_on_existing_infrastructure()
@@ -60,5 +66,6 @@ for idx, country in countries.iterrows():
     fiber_processor.generate_core_lut()
     fiber_processor.generate_backhaul_lut()'''
     
-    baseline_cost_emissions(countries['iso3'].loc[idx])
-    local_cost_emissions(countries['iso3'].loc[idx])
+    #baseline_cost_emissions(countries['iso3'].loc[idx])
+    #local_cost_emissions(countries['iso3'].loc[idx])
+    regional_cost_emissions(countries['iso3'].loc[idx])
