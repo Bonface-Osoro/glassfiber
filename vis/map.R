@@ -16,20 +16,20 @@ africa_shp <- africa_data %>%
 new_names <- c('iso3', 'country', 'gid_1', 'GID_2', 'geometry')
 colnames(africa_shp) <- new_names
 
-#####################
-##SSA TCO Per User ##
-#####################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_baseline_tco_results.csv'))
+############
+##SSA TCO ##
+############
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_local_tco_results.csv'))
 
 data = data %>%
-  distinct(iso3, tco_per_user, .keep_all = TRUE) %>%
+  distinct(iso3, tco, .keep_all = TRUE) %>%
   group_by(iso3) %>%
-  summarize(tco_user = mean(tco_per_user))
+  summarize(tco = (tco)/ 1e6)
 
 merged_data <- merge(africa_shp, data, by = "iso3")
 
 brewer_color_ramp <- colorRampPalette(brewer.pal(11, "Spectral"))
-num_colors <- length(unique(merged_data$poor_pops))
+num_colors <- length(unique(merged_data$tco))
 
 create_sf_plot <-
   function(data, data_2, fill_variable, legend_title, plot_title,
@@ -77,16 +77,112 @@ create_sf_plot <-
     return(plot)
   }
 
-###########################
-##Emission per Subscriber##
-###########################
+######################
+##TCO per Subscriber##
+######################
+tco_country <- create_sf_plot(
+  data = merged_data,
+  merged_data,
+  fill_variable = "tco",
+  legend_title = "Amount (US$ millions)",
+  plot_title = "(A) Total Cost of Ownership (TCO).",
+  plot_subtitle = 'Average TCO for Individual Countries.'
+)
+
+#####################
+##SSA TCO Per User ##
+#####################
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_local_tco_results.csv'))
+
+data = data %>%
+  distinct(iso3, tco_per_user, .keep_all = TRUE) %>%
+  group_by(iso3) %>%
+  summarize(tco_user = (tco_per_user)/ 1e6)
+
+merged_data <- merge(africa_shp, data, by = "iso3")
+
+brewer_color_ramp <- colorRampPalette(brewer.pal(11, "Spectral"))
+num_colors <- length(unique(merged_data$tco_user))
+
 tco_per_user <- create_sf_plot(
   data = merged_data,
   merged_data,
   fill_variable = "tco_user",
   legend_title = "Amount (US$ millions)",
-  plot_title = "Total Cost of Ownership",
-  plot_subtitle = 'Average TCO for Individual Countries.'
+  plot_title = "(B) Average TCO per Subscriber",
+  plot_subtitle = 'Average TCO per subcriber for Individual Countries.'
 )
 
+###########################
+##SSA Total GHG Emission ##
+###########################
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission.csv'))
+data <- data[data$strategy == "local", ]
 
+data = data %>%
+  distinct(iso3, total_ghg_emissions_kg, .keep_all = TRUE) %>%
+  group_by(iso3) %>%
+  summarize(total_ghgs = (total_ghg_emissions_kg)/ 1e9)
+
+merged_data <- merge(africa_shp, data, by = "iso3")
+
+brewer_color_ramp <- colorRampPalette(brewer.pal(11, "Spectral"))
+num_colors <- length(unique(merged_data$total_ghgs))
+
+country_total_ghg <- create_sf_plot(
+  data = merged_data,
+  merged_data,
+  fill_variable = "total_ghgs",
+  legend_title = ylab("GHG Emissions (Mt of Carbondioxide equivalent)"),
+  plot_title = "(A) Total Greenhouse Gas (GHG) Emissions.",
+  plot_subtitle = 'GHG emissions for each country due to construction of local fiber network.'
+)
+
+###################################
+##SSA GHG Emission per subscriber##
+##################################
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission.csv'))
+data <- data[data$strategy == "local", ]
+
+data = data %>%
+  distinct(iso3, emissions_kg_per_subscriber, .keep_all = TRUE) %>%
+  group_by(iso3) %>%
+  summarize(ghg_per_user = (emissions_kg_per_subscriber)/ 1e6)
+
+merged_data <- merge(africa_shp, data, by = "iso3")
+
+brewer_color_ramp <- colorRampPalette(brewer.pal(11, "Spectral"))
+num_colors <- length(unique(merged_data$ghg_per_user))
+
+country_avg_ghg_per_user <- create_sf_plot(
+  data = merged_data,
+  merged_data,
+  fill_variable = "ghg_per_user",
+  legend_title = ylab("GHG Emissions (kt of Carbondioxide equivalent)"),
+  plot_title = "(B) Average GHG Emissions per Subscriber.",
+  plot_subtitle = 'GHG emissions per user for each country due to construction of local fiber network.'
+)
+
+#####################
+##PANEL PLOTS COSTS##
+#####################
+cost_panel <- ggarrange(tco_country, tco_per_user, 
+              ncol = 2, nrow = 1, align = c('hv'),
+              common.legend = FALSE, legend='bottom')
+
+path = file.path(folder, 'figures', 'tco_maps.png')
+png(path, units = "in", width = 10, height = 6, res = 300)
+print(cost_panel)
+dev.off()
+
+#########################
+##PANEL PLOTS EMISSIONS##
+#########################
+emission_panel <- ggarrange(country_total_ghg, country_avg_ghg_per_user, 
+              ncol = 2, nrow = 1, align = c('hv'),
+              common.legend = FALSE, legend='bottom')
+
+path = file.path(folder, 'figures', 'emissions_maps.png')
+png(path, units = "in", width = 10, height = 6, res = 300)
+print(emission_panel)
+dev.off()

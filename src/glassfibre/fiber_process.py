@@ -1171,13 +1171,13 @@ countries = pd.read_csv(path, encoding = 'utf-8-sig')
 
 for idx, country in countries.iterrows():
         
-    if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
+    #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    #if not country['iso3'] == 'LSO':
+    if not country['iso3'] == 'LSO':
 
         continue
 
-    fiber_processor = FiberProcess(countries['iso3'].loc[idx], countries['iso2'].loc[idx], path)
+    #fiber_processor = FiberProcess(countries['iso3'].loc[idx], countries['iso2'].loc[idx], path)
     '''fiber_processor.process_existing_fiber()
     fiber_processor.generate_agglomeration_lut()
     fiber_processor.find_nodes_on_existing_infrastructure()
@@ -1186,7 +1186,7 @@ for idx, country in countries.iterrows():
     fiber_processor.fit_regional_edges()
     fiber_processor.generate_core_lut()
     fiber_processor.generate_backhaul_lut()'''
-    fiber_processor.generate_agglomeration_lut()
+    #fiber_processor.generate_agglomeration_lut()
 
 
 #file = os.path.join(DATA_PROCESSED, 'KEN', 'network_existing', 'KEN_core_edges_existing.shp')
