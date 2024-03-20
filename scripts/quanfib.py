@@ -537,7 +537,7 @@ csv_merger('_average_demand.csv', 'summary')
 #csv_merger('_baseline_tco_results.csv', 'supply')
 #csv_merger('_local_tco_results.csv', 'supply')
 #csv_merger('_regional_tco_results.csv', 'supply')
-ssa_csv_merger('_tco_results.csv')
+#ssa_csv_merger('_tco_results.csv')
 
 ############ TOTAL EMISSION TYPES ##############
 #csv_merger('_baseline_total_mfg.csv', 'summary')

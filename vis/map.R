@@ -16,21 +16,6 @@ africa_shp <- africa_data %>%
 new_names <- c('iso3', 'country', 'gid_1', 'GID_2', 'geometry')
 colnames(africa_shp) <- new_names
 
-############
-##SSA TCO ##
-############
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_local_tco_results.csv'))
-
-data = data %>%
-  distinct(iso3, tco, .keep_all = TRUE) %>%
-  group_by(iso3) %>%
-  summarize(tco = (tco)/ 1e6)
-
-merged_data <- merge(africa_shp, data, by = "iso3")
-
-brewer_color_ramp <- colorRampPalette(brewer.pal(11, "Spectral"))
-num_colors <- length(unique(merged_data$tco))
-
 create_sf_plot <-
   function(data, data_2, fill_variable, legend_title, plot_title,
            plot_subtitle) {
@@ -77,9 +62,20 @@ create_sf_plot <-
     return(plot)
   }
 
-######################
-##TCO per Subscriber##
-######################
+########
+##TCO ##
+########
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_regional_tco_results.csv'))
+data = data %>%
+  distinct(iso3, tco, .keep_all = TRUE) %>%
+  group_by(iso3) %>%
+  summarize(tco = (tco)/ 1e6)
+
+merged_data <- merge(africa_shp, data, by = "iso3")
+
+brewer_color_ramp <- colorRampPalette(brewer.pal(11, "Spectral"))
+num_colors <- length(unique(merged_data$tco))
+
 tco_country <- create_sf_plot(
   data = merged_data,
   merged_data,
@@ -92,7 +88,7 @@ tco_country <- create_sf_plot(
 #####################
 ##SSA TCO Per User ##
 #####################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_local_tco_results.csv'))
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_regional_tco_results.csv'))
 
 data = data %>%
   distinct(iso3, tco_per_user, .keep_all = TRUE) %>%
@@ -117,7 +113,7 @@ tco_per_user <- create_sf_plot(
 ##SSA Total GHG Emission ##
 ###########################
 data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission.csv'))
-data <- data[data$strategy == "local", ]
+data <- data[data$strategy == "regional", ]
 
 data = data %>%
   distinct(iso3, total_ghg_emissions_kg, .keep_all = TRUE) %>%
@@ -135,14 +131,14 @@ country_total_ghg <- create_sf_plot(
   fill_variable = "total_ghgs",
   legend_title = ylab("GHG Emissions (Mt of Carbondioxide equivalent)"),
   plot_title = "(A) Total Greenhouse Gas (GHG) Emissions.",
-  plot_subtitle = 'GHG emissions for each country due to construction of local fiber network.'
+  plot_subtitle = 'GHG emissions for each country due to construction of regional fiber network.'
 )
 
 ###################################
 ##SSA GHG Emission per subscriber##
 ##################################
 data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission.csv'))
-data <- data[data$strategy == "local", ]
+data <- data[data$strategy == "regional", ]
 
 data = data %>%
   distinct(iso3, emissions_kg_per_subscriber, .keep_all = TRUE) %>%
@@ -160,7 +156,7 @@ country_avg_ghg_per_user <- create_sf_plot(
   fill_variable = "ghg_per_user",
   legend_title = ylab("GHG Emissions (kt of Carbondioxide equivalent)"),
   plot_title = "(B) Average GHG Emissions per Subscriber.",
-  plot_subtitle = 'GHG emissions per user for each country due to construction of local fiber network.'
+  plot_subtitle = 'GHG emissions per user for each country due to construction of regional fiber network.'
 )
 
 #####################

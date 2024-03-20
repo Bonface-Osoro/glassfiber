@@ -17,8 +17,8 @@ df = data %>%
 
 df$strategy <- factor(
   df$strategy,
-  levels = c('baseline', 'local'),
-  labels = c('Existing \nCore Network', 'New \nLocal Network')
+  levels = c('baseline', 'regional', 'local'),
+  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nLocal Network')
 )
 
 label_totals <- df %>%
@@ -71,8 +71,8 @@ df = data %>%
 
 df$strategy <- factor(
   df$strategy,
-  levels = c('baseline', 'local'),
-  labels = c('Existing \nCore Network', 'New \nLocal Network')
+  levels = c('baseline', 'regional', 'local'),
+  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nLocal Network')
 )
 
 label_means <- df %>%
@@ -120,8 +120,12 @@ average_emissions <-
 ##################################
 data1 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_baseline_total_mfg.csv'))
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_local_total_mfg.csv'))
-data <- merge(data2, data1, by = c("iso3", "strategy", "emission_category", 
+data3 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_regional_total_mfg.csv'))
+data4 <- merge(data2, data1, by = c("iso3", "strategy", "emission_category", 
                   "lca_phase_ghg_kg", "total_mfg_ghg_kg", "region"), all = TRUE)
+
+data <- merge(data4, data3, by = c("iso3", "strategy", "emission_category", 
+       "lca_phase_ghg_kg", "total_mfg_ghg_kg", "region"), all = TRUE)
 
 data$emission_category = factor(
   data$emission_category,
@@ -151,9 +155,10 @@ df = data %>%
 
 df$strategy <- factor(
   df$strategy,
-  levels = c('baseline', 'local'),
-  labels = c('Existing \nCore Network', 'New \nLocal Network')
+  levels = c('baseline', 'regional', 'local'),
+  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nLocal Network')
 )
+
 
 label_totals <- df %>%
   group_by(region, strategy) %>%
@@ -200,8 +205,12 @@ manufacturing_emissions <-
 ###########################################
 data1 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_baseline_total_eolt.csv'))
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_local_total_eolt.csv'))
-data <- merge(data2, data1, by = c("iso3", "strategy", "emission_category", 
-                                   "lca_phase_ghg_kg", "total_eolt_ghg_kg", "region"), all = TRUE)
+data3 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_regional_total_eolt.csv'))
+data4 <- merge(data2, data1, by = c("iso3", "strategy", "emission_category", 
+        "lca_phase_ghg_kg", "total_eolt_ghg_kg", "region"), all = TRUE)
+data <- merge(data4, data3, by = c("iso3", "strategy", "emission_category", 
+        "lca_phase_ghg_kg", "total_eolt_ghg_kg", "region"), all = TRUE)
+
 data$emission_category = factor(
   data$emission_category,
   levels = c(
@@ -229,8 +238,8 @@ df = data %>%
 
 df$strategy <- factor(
   df$strategy,
-  levels = c('baseline', 'local'),
-  labels = c('Existing \nCore Network', 'New \nLocal Network')
+  levels = c('baseline', 'regional', 'local'),
+  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nLocal Network')
 )
 
 label_totals <- df %>%
@@ -290,12 +299,12 @@ emission_category_panel <- ggarrange(
   common.legend = TRUE, legend='bottom') 
 
 path = file.path(folder, 'figures', 'user_emissions_region.png')
-png(path, units="in", width=8.3, height=6, res=300)
+png(path, units="in", width=11, height=7, res=300)
 print(emission_panel)
 dev.off()
 
 path = file.path(folder, 'figures', 'user_emissions_category.png')
-png(path, units="in", width=8.3, height=6, res=300)
+png(path, units="in", width=11, height=7, res=300)
 print(emission_category_panel)
 dev.off()
 
