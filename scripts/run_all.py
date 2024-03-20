@@ -4,19 +4,18 @@ import warnings
 import pandas as pd
 from glassfibre.preprocessing import (ProcessCountry, ProcessRegions, 
                                       ProcessPopulation)
-from glassfibre.generator import PointsGenerator, EdgeGenerator
+
 from glassfibre.fiber_process import FiberProcess
 from glassfibre.strategies import (baseline_cost_emissions, local_cost_emissions, 
                                    regional_cost_emissions)
 from glassfibre.netPlanning import(process_regional_settlement_tifs, 
-                                   process_access_settlement_tifs, 
-                                   generate_access_settlement_lut, 
-                                   generate_regional_settlement_lut,
-                                   generate_agglomeration_lut,
-                                   find_largest_regional_settlement,
-                                   get_settlement_routing_paths,
-                                   create_regions_to_model,
-                                   create_routing_buffer_zone)
+    process_access_settlement_tifs, generate_access_settlement_lut, 
+    generate_regional_settlement_lut, generate_agglomeration_lut,
+    find_largest_regional_settlement, get_settlement_routing_paths,
+    create_regions_to_model, create_routing_buffer_zone, create_region_nodes,
+    fit_regional_node_edges, combine_access_nodes, combine_access_edges,
+    generate_access_csv, combine_regional_nodes, combine_regional_edges,
+    generate_regional_csv, generate_existing_fiber_csv)
 
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
@@ -26,7 +25,8 @@ CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
 
 DATA_RAW = os.path.join(BASE_PATH, 'raw')
-DATA_PROCESSED = os.path.join(BASE_PATH, 'processed')
+DATA_PROCESSED = os.path.join(BASE_PATH, '..', 'results', 'processed')
+DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
 
 
 path = os.path.join(DATA_RAW, 'countries.csv')
@@ -38,7 +38,7 @@ for idx, country in countries.iterrows():
         
     if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    #if not country['iso3'] == 'SLE':
+    #if not country['iso3'] == 'MDG':
         
         continue 
    
@@ -54,27 +54,11 @@ for idx, country in countries.iterrows():
                                     countries['lowest'].loc[idx], pop_tif_loc)
     #populations.process_national_population()
     #populations.process_population_tif()
-
-    points_generator = PointsGenerator(countries['iso3'].loc[idx])
-    #points_generator.generate_gid_points()
-    #points_generator.generate_country_points()
-
-    edges_generator = EdgeGenerator(countries['iso3'].loc[idx], 
-                                    countries['iso2'].loc[idx])
-    #edges_generator.fit_regional_node_edges()
-    #edges_generator.fit_country_node_edges()
-    #edges_generator.process_existing_fiber()
     
-    #fiber_processor = FiberProcess(countries['iso3'].loc[idx], 
-                                   #countries['iso2'].loc[idx], path)
-    '''fiber_processor.process_existing_fiber()
-    fiber_processor.generate_agglomeration_lut()
-    fiber_processor.find_nodes_on_existing_infrastructure()
-    fiber_processor.find_regional_nodes()
-    fiber_processor.prepare_edge_fitting()
-    fiber_processor.fit_regional_edges()
-    fiber_processor.generate_core_lut()
-    fiber_processor.generate_backhaul_lut()'''
+    fiber_processor = FiberProcess(countries['iso3'].loc[idx], 
+                                   countries['iso2'].loc[idx], path)
+    #fiber_processor.process_existing_fiber()
+    #fiber_processor.find_nodes_on_existing_infrastructure()
     
     #baseline_cost_emissions(countries['iso3'].loc[idx])
     #local_cost_emissions(countries['iso3'].loc[idx])
@@ -83,10 +67,42 @@ for idx, country in countries.iterrows():
     '''process_regional_settlement_tifs(country)
     process_access_settlement_tifs(country)
     generate_access_settlement_lut(country)
-    generate_regional_settlement_lut(country)'''
+    generate_regional_settlement_lut(country)
 
     generate_agglomeration_lut(country)
     find_largest_regional_settlement(country)
     get_settlement_routing_paths(country)
     create_regions_to_model(country)
-    create_routing_buffer_zone(country)
+    create_routing_buffer_zone(country)'''
+
+    #create_region_nodes(countries['iso3'].loc[idx])
+    #fit_regional_node_edges(countries['iso3'].loc[idx])
+   
+    #combine_access_nodes(countries['iso3'].loc[idx])
+    #combine_access_edges(countries['iso3'].loc[idx])
+    #generate_access_csv(countries['iso3'].loc[idx])
+
+    #combine_regional_nodes(countries['iso3'].loc[idx])
+    #combine_regional_edges(countries['iso3'].loc[idx])
+    #generate_regional_csv(countries['iso3'].loc[idx])
+
+    #generate_existing_fiber_csv(countries['iso3'].loc[idx])
+
+    import shutil
+    def delete_folders_with_name(root_dir, target_name):
+        for root, dirs, files in os.walk(root_dir, topdown=False):
+            for dir_name in dirs:
+                if dir_name == target_name:
+                    dir_path = os.path.join(root, dir_name)
+                    try:
+                        shutil.rmtree(dir_path)
+                        print(f"Deleted folder: {dir_path}")
+                    except OSError as e:
+                        print(f"Error deleting folder {dir_path}: {e}")
+
+    isos = os.listdir(DATA_RESULTS)
+    #isos = ['AGO']
+    for iso in isos:
+        root_directory = os.path.join( DATA_RESULTS, iso)
+        target_folder_name = 'gid_points'
+        delete_folders_with_name(root_directory, target_folder_name)

@@ -1210,20 +1210,507 @@ def fit_edges(input_path, output_path, modeling_region):
     return
 
 
-for idx, country in countries.iterrows():
+def create_region_nodes(iso3):
+    """
+    This function creates individual region nodes to route fiber.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Creating individual regional nodes for {}'.format(iso3))
+    file_in = os.path.join(DATA_PROCESSED, iso3, 'network_routing_structure', 
+                               'regional_nodes.shp')
+    gdf = gpd.read_file(file_in) 
+    grouped_gdf = gdf.groupby('GID_1')
+
+    for gid, group_df in grouped_gdf:
+
+        geometries = []
+        populations = []
+        types = []
+
+        for index, row in group_df.iterrows():
+            
+            point = Point(row['lon'], row['lat'])
+            geometries.append(point)
+
+            populations.append(row['population'])
+            types.append(row['type'])
+
+        group_gdf = gpd.GeoDataFrame(geometry = geometries, crs = gdf.crs)
+
+        group_gdf['population'] = populations
+        group_gdf['type'] = types
+        group_gdf[['iso3', 'GID_1']] = ''
+        for i in range(len(group_gdf)):
+
+            group_gdf['GID_1'].loc[i] = gid
+            group_gdf['iso3'].loc[i] = iso3
+
+        group_gdf = group_gdf[['iso3', 'GID_1', 'population', 'type', 'geometry'
+                               ]]
+        filename = f'{gid}.shp'    
+        folder_out = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                                'regions', 'nodes')
+        
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out = os.path.join(folder_out, filename)
+        group_gdf.to_file(path_out, index = False)
+
+
+    return None
+
+
+def fit_regional_node_edges(iso3):
+    """
+    This function fits edges between geospatial points using minimum spanning 
+    tree
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Fitting {} regional edges'.format(iso3))
+    input_path = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                                  'regions', 'nodes')
+    files = os.listdir(input_path)
+    for file in files:
+        
+        if file.endswith('.shp'): 
+
+            file_path = os.path.join(input_path, file)
+            nodes = gpd.read_file(file_path, crs = 'epsg:4326')
+            if len(nodes) == 1 and nodes.geometry.geom_type[0] == 'Point':
+
+                pass
+
+            else:
+
+                nodes = nodes.to_crs('epsg:3857')
+
+                all_possible_edges = []
+                try:
+                    for node1_id, node1 in nodes.iterrows():
+
+                        for node2_id, node2 in nodes.iterrows():
+
+                            if node1_id != node2_id:
+
+                                geom1 = shape(node1['geometry'])
+                                geom2 = shape(node2['geometry'])
+                                line = LineString([geom1, geom2])
+                                all_possible_edges.append({
+                                    'type': 'Feature',
+                                    'geometry': mapping(line),
+                                    'properties':{
+                                        'GID_1': node2['GID_2'],
+                                        'from': node1_id,
+                                        'to':  node2_id,
+                                        'length': line.length,
+                                        'source': 'new',
+                                    }
+                                })
+                except:
+                    for node1_id, node1 in nodes.iterrows():
+
+                        for node2_id, node2 in nodes.iterrows():
+
+                            if node1_id != node2_id:
+
+                                geom1 = shape(node1['geometry'])
+                                geom2 = shape(node2['geometry'])
+                                line = LineString([geom1, geom2])
+                                all_possible_edges.append({
+                                    'type': 'Feature',
+                                    'geometry': mapping(line),
+                                    'properties':{
+                                        'GID_1': node2['GID_1'],
+                                        'from': node1_id,
+                                        'to':  node2_id,
+                                        'length': line.length,
+                                        'source': 'new',
+                                    }
+                                })
+
+                if len(all_possible_edges) == 0:
+
+                    return
+                
+                G = nx.Graph()
+
+                for node_id, node in enumerate(nodes):
+
+                    G.add_node(node_id, object = node)
+
+                for edge in all_possible_edges:
+
+                    G.add_edge(edge['properties']['from'], edge['properties']['to'],
+                        object=edge, weight=edge['properties']['length'])
+
+                tree = nx.minimum_spanning_edges(G)
+
+                edges = []
+
+                for branch in tree:
+
+                    link = branch[2]['object']
+                    if link['properties']['length'] > 0:
+
+                        edges.append(link)
+
+                edges = gpd.GeoDataFrame.from_features(edges, crs = 'epsg:3857')
+
+                if len(edges) > 0:
+
+                    edges = edges.to_crs('epsg:4326')
+                    fileout = str(file)
+
+                folder_out = os.path.join(DATA_PROCESSED, iso3, 
+                            'buffer_routing_zones', 'regions', 'edges')
+                if not os.path.exists(folder_out):
+
+                    os.makedirs(folder_out)
+
+                path_out = os.path.join(folder_out, fileout)
+                edges.to_file(path_out, driver = 'ESRI Shapefile')
+
+
+    return None
+
+
+def combine_access_nodes(iso3):
+    """
+    This function combines the shapefiles into a single shapefile.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Combining access node shapefiles for {}'.format(iso3))
+    shapefile_dir = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                                 'nodes')
+    shapefiles = [os.path.join(shapefile_dir, f) for f in os.listdir(
+        shapefile_dir) if f.endswith('.shp')]
+    gdf_combined = gpd.GeoDataFrame(pd.concat([gpd.read_file(shp) for shp in 
+                                            shapefiles], ignore_index = True))
+
+    folder_out = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                               'combined')
+    fileout = '{}_combined_access_nodes.shp'.format(iso3)
+    if not os.path.exists(folder_out):
+        
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+    gdf_combined.to_file(path_out, index = False)
+
+
+    return None 
+
+
+def combine_access_edges(iso3):
+    """
+    This function combines the shapefiles into a single shapefile.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Combining access edges shapefiles for {}'.format(iso3))
+    merged_shapefile = gpd.GeoDataFrame()
+    shapefile_dir = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                                 'edges')
+    for file_name in os.listdir(shapefile_dir):
+
+        if file_name.endswith('.shp'):
+
+            file_path = os.path.join(shapefile_dir, file_name)
+            shapefile = gpd.read_file(file_path)
+            shapefile[['GID_2', 'strategy']] = ''
+            base_name, extension = os.path.splitext(file_name)
+
+            for i in range(len(shapefile)):
+
+                shapefile['GID_2'].loc[i] = base_name  
+                shapefile['strategy'].loc[i] = 'access'
+
+            merged_shapefile = pd.concat([merged_shapefile, shapefile], 
+                                         ignore_index = True) 
+          
+    folder_out = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                               'combined')
+    fileout = '{}_combined_access_edges.shp'.format(iso3)
+    if not os.path.exists(folder_out):
+        
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+    merged_shapefile.to_file(path_out, index = False)
+
+    return None
+
+
+def generate_access_csv(iso3):
+    """
+    This function generates a csv file for access level.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Generating fiber access csv file for {}'.format(iso3))
+    folder_in = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                               'combined')
+    node_path = os.path.join(folder_in, '{}_combined_access_nodes.shp'.format(
+        iso3))
+    edge_path = os.path.join(folder_in, '{}_combined_access_edges.shp'.format(
+        iso3))
+    
+    gdf = gpd.read_file(node_path)
+    gdf = gdf.drop(columns = ['regions', 'id', 'GID_0', 'geometry'])
+
+    gdf1 = gpd.read_file(edge_path)
+    gdf1 = gdf1.drop(columns = ['regions', 'geometry', 'to', 'from']
+                     ).reset_index()
+    gdf1 = gdf1.groupby(['GID_2', 'strategy'])['length'].sum().reset_index()
+
+    try:
+
+        merged_df = pd.merge(gdf, gdf1, on = 'GID_2', how = 'inner')
+
+    except:
+
+        gdf.rename(columns = {'GID_1': 'GID_2'}, inplace = True)
+        merged_df = pd.merge(gdf, gdf1, on = 'GID_2', how = 'inner')
+
+    merged_df['length_km'] = ''
+    for i in range(len(merged_df)):
+
+        merged_df['length_km'].loc[i] = merged_df['length'].loc[i] / 1000
+    
+    merged_df = merged_df.drop(columns = ['length']).reset_index()
+
+    fileout = '{}_fiber_access.csv'.format(iso3)
+    folder_out = os.path.join(DATA_RESULTS, iso3, 'fiber_design')
+    if not os.path.exists(folder_out):
+
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+    merged_df.to_csv(path_out, index = False)
+
+
+    return None
+
+def combine_regional_nodes(iso3):
+    """
+    This function combines the regional node shapefiles into a single shapefile.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Combining regional node shapefiles for {}'.format(iso3))
+    shapefile_dir = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                                'regions', 'nodes')
+    shapefiles = [os.path.join(shapefile_dir, f) for f in os.listdir(
+        shapefile_dir) if f.endswith('.shp')]
+    gdf_combined = gpd.GeoDataFrame(pd.concat([gpd.read_file(shp) for shp in 
+                                            shapefiles], ignore_index = True))
+    
+    folder_out = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                            'combined')
+    fileout = '{}_combined_regional_nodes.shp'.format(iso3)
+    if not os.path.exists(folder_out):
+        
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+    gdf_combined.to_file(path_out, index = False)
+
+
+    return None 
+
+
+def combine_regional_edges(iso3):
+    """
+    This function combines the regional shapefile nodes into a single shapefile.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Combining regional edges shapefiles for {}'.format(iso3))
+    merged_shapefile = gpd.GeoDataFrame()
+    shapefile_dir = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                                 'regions', 'edges')
+    try:
+        for file_name in os.listdir(shapefile_dir):
+
+            if file_name.endswith('.shp'):
+
+                file_path = os.path.join(shapefile_dir, file_name)
+                shapefile = gpd.read_file(file_path)
+                shapefile[['GID_2', 'strategy']] = ''
+                base_name, extension = os.path.splitext(file_name)
+
+                for i in range(len(shapefile)):
+
+                    shapefile['GID_2'].loc[i] = base_name  
+                    shapefile['strategy'].loc[i] = 'regional'
+
+                merged_shapefile = pd.concat([merged_shapefile, shapefile], 
+                                            ignore_index = True) 
+            
+        folder_out = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                                'combined')
+        fileout = '{}_combined_regional_edges.shp'.format(iso3)
+        if not os.path.exists(folder_out):
+            
+            os.makedirs(folder_out)
+
+        path_out = os.path.join(folder_out, fileout)
+        merged_shapefile.to_file(path_out, index = False)
+    except:
+
+        print('Regional edges already fitted')
+
+    return None
+
+def generate_regional_csv(iso3):
+    """
+    This function generates a csv file for regional level.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Generating regional fiber csv file for {}'.format(iso3))
+    folder_in = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                               'combined')
+    node_path = os.path.join(folder_in, '{}_combined_regional_nodes.shp'.format(
+        iso3))
+    edge_path = os.path.join(folder_in, '{}_combined_regional_edges.shp'.format(
+        iso3))
+    
+    gdf = gpd.read_file(node_path)
+    gdf = gdf.drop(columns = ['geometry'])
+
+    try:
+
+        gdf1 = gpd.read_file(edge_path)
+        gdf1 = gdf1.drop(columns = ['geometry', 'to', 'from']
+                        ).reset_index()
+        gdf1 = gdf1.groupby(['GID_1', 'strategy'])['length'].sum().reset_index()
+
+        try:
+
+            merged_df = pd.merge(gdf, gdf1, on = 'GID_1', how = 'inner')
+
+        except:
+
+            gdf.rename(columns = {'GID_1': 'GID_1'}, inplace = True)
+            merged_df = pd.merge(gdf, gdf1, on = 'GID_1', how = 'inner')
+
+        merged_df['length_km'] = ''
+        for i in range(len(merged_df)):
+
+            merged_df['length_km'].loc[i] = merged_df['length'].loc[i] / 1000
+        
+        merged_df = merged_df.drop(columns = ['length']).reset_index()
+
+        fileout = '{}_fiber_regional.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'fiber_design')
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out = os.path.join(folder_out, fileout)
+        merged_df.to_csv(path_out, index = False)
+    except:
+
+        print('No regional fiber data available')
+
+    return None
+
+
+
+def generate_existing_fiber_csv(iso3):
+    """
+    This function generates a csv file for existing fiber.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Generating regional fiber csv file for {}'.format(iso3))
+    folder_in = os.path.join(DATA_PROCESSED, iso3, 'network_existing')
+    node_path = os.path.join(folder_in, '{}_core_nodes_existing.shp'.format(
+        iso3))
+    edge_path = os.path.join(folder_in, '{}_core_edges_existing.shp'.format(
+        iso3))
+    
+    if os.path.exists(edge_path):
+
+        gdf = gpd.read_file(node_path)
+        gdf = gdf.drop(columns = ['geometry'])
+
+        gdf1 = gpd.read_file(edge_path)
+        gdf1[['iso3', 'length_km', 'nodes', 'strategy']] = ''
+        #111.32km is equaivalent to 1 decimal degree. The distance calculated 
+        #from EPSG:4326 coordinate system is always in decimal degrees
+        for i in range(len(gdf1)):
+
+            gdf1['iso3'].loc[i] = iso3
+            gdf1['nodes'].loc[i] = len(gdf1)
+            gdf1['length_km'].loc[i] = (gdf1['geometry'].loc[i]).length * 111.32
+            gdf1['strategy'].loc[i] = 'existing'
+
+        gdf1 = gdf1.drop(columns = ['geometry', 'operators', 'source']
+                        ).reset_index()
+        gdf1 = gdf1.groupby(['iso3', 'strategy', 'nodes'])['length_km'].sum().reset_index()
+        
+        gdf.rename(columns = {'GID_0': 'iso3'}, inplace = True)
+        merged_df = pd.merge(gdf, gdf1, on = 'iso3', how = 'inner').reset_index()
+
+        merged_df = merged_df[['iso3', 'length_km', 'nodes', 'strategy', 
+                               'population']]
+        merged_df = merged_df.groupby(['iso3', 'length_km', 'nodes', 'strategy']
+                                      )['population'].sum().reset_index()
+        
+        fileout = '{}_fiber_existing.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'fiber_design')
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out = os.path.join(folder_out, fileout)
+        merged_df.to_csv(path_out, index = False)
+
+    else:
+
+        print('No existing fiber data found for {}'.format(iso3))
+
+    return None
+
+
+'''for idx, country in countries.iterrows():
         
     #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
     if not country['iso3'] == 'RWA':
 
-        continue
-
-    '''process_regional_settlement_tifs(country)
-    process_access_settlement_tifs(country)
-    generate_access_settlement_lut(country)
-    generate_regional_settlement_lut(country)'''
-    #generate_agglomeration_lut(country)
-    #find_largest_regional_settlement(country)
-    #get_settlement_routing_paths(country)
-    #create_regions_to_model(country)
-    #create_routing_buffer_zone(country)
+        continue'''
