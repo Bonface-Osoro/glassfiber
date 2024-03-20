@@ -8,6 +8,16 @@ from glassfibre.generator import PointsGenerator, EdgeGenerator
 from glassfibre.fiber_process import FiberProcess
 from glassfibre.strategies import (baseline_cost_emissions, local_cost_emissions, 
                                    regional_cost_emissions)
+from glassfibre.netPlanning import(process_regional_settlement_tifs, 
+                                   process_access_settlement_tifs, 
+                                   generate_access_settlement_lut, 
+                                   generate_regional_settlement_lut,
+                                   generate_agglomeration_lut,
+                                   find_largest_regional_settlement,
+                                   get_settlement_routing_paths,
+                                   create_regions_to_model,
+                                   create_routing_buffer_zone)
+
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
 
@@ -28,11 +38,11 @@ for idx, country in countries.iterrows():
         
     if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    #if not country['iso3'] == 'GAB':
+    #if not country['iso3'] == 'SLE':
         
         continue 
-
-    country = ProcessCountry(path, countries['iso3'].loc[idx])
+   
+    #country = ProcessCountry(path, countries['iso3'].loc[idx])
     #country.process_country_shapes()
 
     regions = ProcessRegions(countries['iso3'].loc[idx], 
@@ -68,4 +78,15 @@ for idx, country in countries.iterrows():
     
     #baseline_cost_emissions(countries['iso3'].loc[idx])
     #local_cost_emissions(countries['iso3'].loc[idx])
-    regional_cost_emissions(countries['iso3'].loc[idx])
+    #regional_cost_emissions(countries['iso3'].loc[idx])
+
+    '''process_regional_settlement_tifs(country)
+    process_access_settlement_tifs(country)
+    generate_access_settlement_lut(country)
+    generate_regional_settlement_lut(country)'''
+
+    generate_agglomeration_lut(country)
+    find_largest_regional_settlement(country)
+    get_settlement_routing_paths(country)
+    create_regions_to_model(country)
+    create_routing_buffer_zone(country)
