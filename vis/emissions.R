@@ -18,7 +18,7 @@ df = data %>%
 df$strategy <- factor(
   df$strategy,
   levels = c('baseline', 'regional', 'local'),
-  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nLocal Network')
+  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nAccess Network')
 )
 
 label_totals <- df %>%
@@ -43,7 +43,7 @@ total_emissions <-
     fill = "LCA Material Type"
   ) +  ylab('Total GHG Emissions (Mt CO<sub>2</sub> eq.)') + 
   scale_y_continuous(
-    limits = c(0, 53),
+    limits = c(0, 40),
     labels = function(y)
       format(y, scientific = FALSE),
     expand = c(0, 0)
@@ -72,7 +72,7 @@ df = data %>%
 df$strategy <- factor(
   df$strategy,
   levels = c('baseline', 'regional', 'local'),
-  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nLocal Network')
+  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nAccess Network')
 )
 
 label_means <- df %>%
@@ -83,7 +83,7 @@ average_emissions <-
   ggplot(df, aes(x = strategy, y = mean_ghg_user/1e6)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + 
   geom_text(data = label_means, aes(x = strategy, y = mean_value/1e6, 
-                                     label = sprintf("%.2f", mean_value/1e6)),
+                                     label = sprintf("%.3f", mean_value/1e6)),
             vjust = -0.5,
             hjust = 0.5,
             position = position_stack(), 
@@ -96,7 +96,7 @@ average_emissions <-
     x = NULL
   ) +  ylab('GHG Emissions per user (kt CO<sub>2</sub> eq.)') + 
   scale_y_continuous(
-    limits = c(0, 74),
+    limits = c(0, 5.9),
     labels = function(y)
       format(y, scientific = FALSE),
     expand = c(0, 0)
@@ -156,7 +156,7 @@ df = data %>%
 df$strategy <- factor(
   df$strategy,
   levels = c('baseline', 'regional', 'local'),
-  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nLocal Network')
+  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nAccess Network')
 )
 
 
@@ -182,7 +182,7 @@ manufacturing_emissions <-
     fill = "LCA Material Type"
   ) +  ylab('Total GHG Emissions (Mt CO<sub>2</sub> eq.)') + 
   scale_y_continuous(
-    limits = c(0, 7.99),
+    limits = c(0, 3.2),
     labels = function(y)
       format(y, scientific = FALSE),
     expand = c(0, 0)
@@ -239,7 +239,7 @@ df = data %>%
 df$strategy <- factor(
   df$strategy,
   levels = c('baseline', 'regional', 'local'),
-  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nLocal Network')
+  labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nAccess Network')
 )
 
 label_totals <- df %>%
@@ -264,7 +264,7 @@ eolts_emissions <-
     fill = "LCA Material Type"
   ) + ylab('Total GHG Emissions (kt CO<sub>2</sub> eq.)') + 
   scale_y_continuous(
-    limits = c(0, 109),
+    limits = c(0, 44),
     labels = function(y)
       format(y, scientific = FALSE),
     expand = c(0, 0)

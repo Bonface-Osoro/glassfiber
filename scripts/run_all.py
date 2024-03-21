@@ -38,7 +38,7 @@ for idx, country in countries.iterrows():
         
     if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    #if not country['iso3'] == 'MDG':
+    #if not country['iso3'] == 'BEN':
         
         continue 
    
@@ -60,9 +60,9 @@ for idx, country in countries.iterrows():
     #fiber_processor.process_existing_fiber()
     #fiber_processor.find_nodes_on_existing_infrastructure()
     
-    #baseline_cost_emissions(countries['iso3'].loc[idx])
-    #local_cost_emissions(countries['iso3'].loc[idx])
-    #regional_cost_emissions(countries['iso3'].loc[idx])
+    baseline_cost_emissions(countries['iso3'].loc[idx])
+    local_cost_emissions(countries['iso3'].loc[idx])
+    regional_cost_emissions(countries['iso3'].loc[idx])
 
     '''process_regional_settlement_tifs(country)
     process_access_settlement_tifs(country)
@@ -87,22 +87,3 @@ for idx, country in countries.iterrows():
     #generate_regional_csv(countries['iso3'].loc[idx])
 
     #generate_existing_fiber_csv(countries['iso3'].loc[idx])
-
-    import shutil
-    def delete_folders_with_name(root_dir, target_name):
-        for root, dirs, files in os.walk(root_dir, topdown=False):
-            for dir_name in dirs:
-                if dir_name == target_name:
-                    dir_path = os.path.join(root, dir_name)
-                    try:
-                        shutil.rmtree(dir_path)
-                        print(f"Deleted folder: {dir_path}")
-                    except OSError as e:
-                        print(f"Error deleting folder {dir_path}: {e}")
-
-    isos = os.listdir(DATA_RESULTS)
-    #isos = ['AGO']
-    for iso in isos:
-        root_directory = os.path.join( DATA_RESULTS, iso)
-        target_folder_name = 'gid_points'
-        delete_folders_with_name(root_directory, target_folder_name)
