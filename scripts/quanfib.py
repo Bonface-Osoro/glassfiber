@@ -195,16 +195,15 @@ def summations(iso3, metric):
         average_emissions.to_csv(path_out_7)
         country_emissions.to_csv(path_out_8)
 
-    elif metric == 'total_eolt_ghg_kg':
+    elif metric == '_total_eolt_ghg_kg':
 
         path_in = os.path.join(DATA_RESULTS, iso3, 'emissions', 
             '{}_eolt_emission_results.csv'.format(iso3))
         df = pd.read_csv(path_in)
         average_eolt = df.groupby(['iso3', 'adoption_scenario', 
-                    'geotype', 'emission_category', 
-                    'lca_phase_ghg_kg'])['total_eolt_ghg_kg'].mean()
-        total_eolt = df.groupby(['iso3', 'adoption_scenario', 
-                    'geotype', 'emission_category', 
+                    'emission_category', 'lca_phase_ghg_kg'])[
+                        'total_eolt_ghg_kg'].mean()
+        total_eolt = df.groupby(['iso3', 'emission_category', 
                     'lca_phase_ghg_kg'])['total_eolt_ghg_kg'].sum()
         fileout_9 = '{}_average_eolt.csv'.format(iso3)
         fileout_sum_9 = '{}_total_eolt.csv'.format(iso3)
@@ -219,16 +218,16 @@ def summations(iso3, metric):
         average_eolt.to_csv(path_out_9)
         total_eolt.to_csv(path_out_sum_9)
 
-    elif metric == 'total_mfg_ghg_kg':
+    elif metric == '_total_mfg_ghg_kg':
 
         path_in = os.path.join(DATA_RESULTS, iso3, 'emissions', 
             '{}_mfg_emission_results.csv'.format(iso3))
         df = pd.read_csv(path_in)
+        print(df.head(3))
         average_mfg = df.groupby(['iso3', 'adoption_scenario', 
-                    'geotype', 'emission_category', 
-                    'lca_phase_ghg_kg'])['total_mfg_ghg_kg'].mean()
-        total_mfg = df.groupby(['iso3', 'adoption_scenario', 
-                    'geotype', 'emission_category', 
+                    'emission_category', 'lca_phase_ghg_kg'])[
+                        'total_mfg_ghg_kg'].mean()
+        total_mfg = df.groupby(['iso3', 'adoption_scenario', 'emission_category', 
                     'lca_phase_ghg_kg'])['total_mfg_ghg_kg'].sum()
         fileout_10 = '{}_average_mfg.csv'.format(iso3)
         fileout_sum_10 = '{}_total_mfg.csv'.format(iso3)
@@ -528,21 +527,21 @@ csv_merger('_average_demand.csv', 'summary')
 '''
 
 ########## TOTAL BASELINE AND LOCAL EMISSIONS ##########
-#csv_merger('_country_baseline_emission.csv', 'summary')
-#csv_merger('_country_local_emission.csv', 'summary')
-#csv_merger('_regional_emission.csv', 'summary')
-#ssa_csv_merger('_emission.csv')
+'''csv_merger('_country_baseline_emission.csv', 'summary')
+csv_merger('_country_local_emission.csv', 'summary')
+csv_merger('_regional_emission.csv', 'summary')
+ssa_csv_merger('_emission.csv')'''
 
 ###### TOTAL TCO AND PER USER TCO EMISSIONS ######
-#csv_merger('_baseline_tco_results.csv', 'supply')
-#csv_merger('_local_tco_results.csv', 'supply')
-#csv_merger('_regional_tco_results.csv', 'supply')
-#ssa_csv_merger('_tco_results.csv')
+'''csv_merger('_baseline_tco_results.csv', 'supply')
+csv_merger('_local_tco_results.csv', 'supply')
+csv_merger('_regional_tco_results.csv', 'supply')
+ssa_csv_merger('_tco_results.csv')'''
 
 ############ TOTAL EMISSION TYPES ##############
-#csv_merger('_baseline_total_mfg.csv', 'summary')
-#csv_merger('_baseline_total_eolt.csv', 'summary')
-#csv_merger('_local_total_mfg.csv', 'summary')
-#csv_merger('_local_total_eolt.csv', 'summary')
-#csv_merger('_regional_total_mfg.csv', 'summary')
-#csv_merger('_regional_total_eolt.csv', 'summary')
+csv_merger('_baseline_total_mfg.csv', 'summary')
+csv_merger('_baseline_total_eolt.csv', 'summary')
+csv_merger('_local_total_mfg.csv', 'summary')
+csv_merger('_local_total_eolt.csv', 'summary')
+csv_merger('_regional_total_mfg.csv', 'summary')
+csv_merger('_regional_total_eolt.csv', 'summary')
