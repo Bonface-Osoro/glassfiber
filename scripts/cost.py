@@ -162,7 +162,7 @@ def ssa_summary(iso3):
     path_out = os.path.join(folder_out, fileout)
     path_out_1 = os.path.join(folder_out, fileout_1)
 
-    average_pop.to_csv(path_out, index = False)
+    average_pop.to_csv(path_out, index = False) 
     average_area.to_csv(path_out_1, index = False)
     
 
@@ -364,68 +364,6 @@ def demand(iso3):
     return None            
 
 
-def supply(iso3):
-    """
-    This function quantifies 
-    the total cost of ownership 
-    for a single fiber broadband user
-    """
-    print('Generating supply results for {}'.format(iso3))
-    line_folder = os.path.join(DATA_RESULTS, iso3, 'gid_lines')
-    gdf = gpd.GeoDataFrame()
-    for file_name in os.listdir(line_folder):
-
-        if file_name.endswith('.shp'):
-
-            file_path = os.path.join(line_folder, file_name)
-            shapefile = gpd.read_file(file_path)
-            shapefile = shapefile.to_crs(crs = 3857) 
-            gdf = pd.concat([gdf, shapefile], 
-                               ignore_index = True)
-    gdf = gdf[['GID_1', 'to', 'length']] 
-    total_length_km = (gdf['length'].sum()) / 1000
-    unique_nodes = sum(gdf.groupby('GID_1')['to'].nunique())   
-    
-    merged_dataframe = pd.DataFrame()
-    demand_folder = os.path.join(DATA_RESULTS, iso3, 'demand')
-    for file_name in os.listdir(demand_folder):
-
-        if file_name.endswith('_demand_results.csv'):
-
-            file_path = os.path.join(demand_folder, file_name)
-            df = pd.read_csv(file_path)
-            df[['tco', 'tco_per_user']] = ''
-
-            tco = cost_model(total_length_km, unique_nodes)
-
-            for i in range(len(df)):
-
-                df['tco'].loc[i] = tco
-                df['tco_per_user'].loc[i] = ((df['tco'].loc[i]) / 
-                                (df['users_area_sqkm'].loc[i]))
-
-            df = df[['iso3', 'GID_1', 'area', 'adoption_scenario', 
-                    'adoption_value', 'pop_density', 'geotype', 
-                    'users_area_sqkm', 'revenue_per_area', 'tco', 
-                    'tco_per_user']]
-            
-            merged_dataframe = pd.concat([merged_dataframe, df], ignore_index = True)
-
-    fileout = '{}_supply_results.csv'.format(iso3)
-    folder_out = os.path.join(DATA_RESULTS, iso3, 'supply')
-
-    if not os.path.exists(folder_out):
-
-        os.makedirs(folder_out)
-
-    path_out = os.path.join(folder_out, fileout)
-
-    merged_dataframe.to_csv(path_out, index = False)
-
-
-    return None
-
-
 if __name__ == '__main__':
 
     for idx, country in countries.iterrows():
@@ -438,4 +376,3 @@ if __name__ == '__main__':
         demand(countries['iso3'].loc[idx])
         capacity_user(countries['iso3'].loc[idx])
         ssa_summary(countries['iso3'].loc[idx])
-        supply(countries['iso3'].loc[idx])
