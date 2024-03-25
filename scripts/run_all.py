@@ -36,9 +36,9 @@ countries = pd.read_csv(path, encoding = 'utf-8-sig')
 
 for idx, country in countries.iterrows():
         
-    if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
+    #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    #if not country['iso3'] == 'BEN':
+    if not country['iso3'] == 'COD':
         
         continue 
    
@@ -60,11 +60,11 @@ for idx, country in countries.iterrows():
     #fiber_processor.process_existing_fiber()
     #fiber_processor.find_nodes_on_existing_infrastructure()
     
-    baseline_cost_emissions(countries['iso3'].loc[idx])
+    '''baseline_cost_emissions(countries['iso3'].loc[idx])
     local_cost_emissions(countries['iso3'].loc[idx])
     regional_cost_emissions(countries['iso3'].loc[idx])
 
-    '''process_regional_settlement_tifs(country)
+    process_regional_settlement_tifs(country)
     process_access_settlement_tifs(country)
     generate_access_settlement_lut(country)
     generate_regional_settlement_lut(country)
@@ -87,3 +87,4 @@ for idx, country in countries.iterrows():
     #generate_regional_csv(countries['iso3'].loc[idx])
 
     #generate_existing_fiber_csv(countries['iso3'].loc[idx])
+    print(country[2])

@@ -88,13 +88,15 @@ def find_nodes(country, regions):
             if len(shapes_df) == 0:
                 continue
 
-            nodes = gpd.overlay(shapes_df, gpd_region, how='intersection')
+            nodes = gpd.overlay(shapes_df, gpd_region, how = 'intersection')
 
-            stats = zonal_stats(shapes_df['geometry'], path, stats=['count', 'sum'])
+            stats = zonal_stats(shapes_df['geometry'], path, stats =[ 'count', 
+                                                                     'sum'])
 
             stats_df = pd.DataFrame(stats)
 
-            nodes = pd.concat([shapes_df, stats_df], axis=1).drop(columns='value')
+            nodes = pd.concat([shapes_df, stats_df], axis=1).drop(columns = 
+                                                                  'value')
 
             nodes_subset = nodes[nodes['sum'] >= settlement_size]
 
@@ -245,7 +247,7 @@ def fit_edges(input_path, output_path):
 
     for node_id, node in enumerate(nodes):
 
-        G.add_node(node_id, object=node)
+        G.add_node(node_id, object = node)
 
     for edge in all_possible_edges:
 
@@ -264,7 +266,7 @@ def fit_edges(input_path, output_path):
             edges.append(link)
 
     try:
-        edges = gpd.GeoDataFrame.from_features(edges, crs='epsg:3857')
+        edges = gpd.GeoDataFrame.from_features(edges, crs = 'epsg:3857')
 
         if len(edges) > 0:
 

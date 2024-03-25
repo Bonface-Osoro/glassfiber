@@ -15,10 +15,11 @@ CONFIG = configparser.ConfigParser()
 CONFIG.read(os.path.join(os.path.dirname(__file__), '..', 'scripts', 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
 
+DATA_RAW = os.path.join(BASE_PATH, 'raw')
 DATA_PROCESS = os.path.join(BASE_PATH, '..', 'results', 'processed')
 USER_COSTS = os.path.join(BASE_PATH, '..', 'results', 'user_costs')
 VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
-
+DATA_AFRICA = os.path.join(BASE_PATH, '..', 'results', 'SSA')
 
 def get_regional_shapes():
     """
@@ -436,9 +437,9 @@ def plot_emission_subscriber():
     fig.savefig(path)
 
     plt.close(fig)
-   
 
-if __name__ == '__main__':
+
+'''if __name__ == '__main__':
 
     plot_regions_by_geotype()
     plot_revenue_per_area()
@@ -448,4 +449,4 @@ if __name__ == '__main__':
     traffics = [10, 20, 30, 40]
     for traffic in traffics:
 
-        plot_demand_area(traffic)
+        plot_demand_area(traffic)'''
