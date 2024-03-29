@@ -38,11 +38,11 @@ for idx, country in countries.iterrows():
         
     #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    if not country['iso3'] == 'COD':
+    if not country['iso3'] == 'TUN':
         
         continue 
    
-    #country = ProcessCountry(path, countries['iso3'].loc[idx])
+    country = ProcessCountry(path, countries['iso3'].loc[idx])
     #country.process_country_shapes()
 
     regions = ProcessRegions(countries['iso3'].loc[idx], 
@@ -52,13 +52,13 @@ for idx, country in countries.iterrows():
 
     populations = ProcessPopulation(path, countries['iso3'].loc[idx], 
                                     countries['lowest'].loc[idx], pop_tif_loc)
-    #populations.process_national_population()
+    #opulations.process_national_population()
     #populations.process_population_tif()
     
     fiber_processor = FiberProcess(countries['iso3'].loc[idx], 
                                    countries['iso2'].loc[idx], path)
-    #fiber_processor.process_existing_fiber()
-    #fiber_processor.find_nodes_on_existing_infrastructure()
+    fiber_processor.process_existing_fiber()
+    fiber_processor.find_nodes_on_existing_infrastructure()
     
     '''baseline_cost_emissions(countries['iso3'].loc[idx])
     local_cost_emissions(countries['iso3'].loc[idx])
@@ -87,4 +87,3 @@ for idx, country in countries.iterrows():
     #generate_regional_csv(countries['iso3'].loc[idx])
 
     #generate_existing_fiber_csv(countries['iso3'].loc[idx])
-    print(country[2])

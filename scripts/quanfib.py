@@ -121,10 +121,9 @@ def csv_merger(csv_name, source_folder):
                         
                     if csv_name == '_local_tco_results.csv':  
 
-                        merged_data = merged_data.groupby(['iso3', 'strategy']
-                                    ).agg({'tco': 'mean', 
-                                    'tco_per_user': 'mean'}
-                                    ).reset_index()   
+                        merged_data = merged_data.groupby(['iso3', 'GID_2', 
+                                    'strategy']).agg({'tco': 'mean', 
+                                    'tco_per_user': 'mean'}).reset_index()   
                               
                     fileout = 'SSA{}'.format(csv_name)
                     folder_out = os.path.join(DATA_RESULTS, '..', 'SSA')
@@ -497,6 +496,7 @@ if __name__ == '__main__':
         #if not country['iso3'] == 'AGO':
             
             continue 
+
         try:
             #summations(countries['iso3'].loc[idx], 'rev_per_area')
             #summations(countries['iso3'].loc[idx], 'tco_per_user')
@@ -509,7 +509,9 @@ if __name__ == '__main__':
             #summations(countries['iso3'].loc[idx], '_local_eolt_emission')
             #summations(countries['iso3'].loc[idx], '_regional_mfg_emission')
             #summations(countries['iso3'].loc[idx], '_regional_eolt_emission')
+
             pass
+
         except:
 
             pass
@@ -525,7 +527,6 @@ csv_merger('_geotype_population.csv', 'summary')
 csv_merger('_demand_user.csv', 'demand')
 csv_merger('_average_demand.csv', 'summary')
 '''
-
 ########## TOTAL BASELINE AND LOCAL EMISSIONS ##########
 '''csv_merger('_country_baseline_emission.csv', 'summary')
 csv_merger('_country_local_emission.csv', 'summary')
@@ -537,11 +538,13 @@ ssa_csv_merger('_emission.csv')'''
 csv_merger('_local_tco_results.csv', 'supply')
 csv_merger('_regional_tco_results.csv', 'supply')
 ssa_csv_merger('_tco_results.csv')'''
+#csv_merger('_local_tco_results.csv', 'supply')
 
 ############ TOTAL EMISSION TYPES ##############
-csv_merger('_baseline_total_mfg.csv', 'summary')
+'''csv_merger('_baseline_total_mfg.csv', 'summary')
 csv_merger('_baseline_total_eolt.csv', 'summary')
 csv_merger('_local_total_mfg.csv', 'summary')
 csv_merger('_local_total_eolt.csv', 'summary')
 csv_merger('_regional_total_mfg.csv', 'summary')
-csv_merger('_regional_total_eolt.csv', 'summary')
+csv_merger('_regional_total_eolt.csv', 'summary')'''
+

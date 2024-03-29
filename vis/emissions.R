@@ -29,18 +29,15 @@ total_emissions <-
   ggplot(df, aes(x = strategy, y = total_ghgs/1e9)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + 
   geom_text(data = label_totals, aes(x = strategy, y = total_value/1e9, 
-                                     label = sprintf("%.2f", total_value/1e9)),
-            vjust = -0.5,
-            hjust = 0.5,
-            position = position_stack(), 
-            size = 2, color = "black") +
+    label = sprintf("%.2f", total_value/1e9)), vjust = -0.5,
+    hjust = 0.5, position = position_stack(), size = 2, color = "black") +
   scale_fill_brewer(palette = "Dark2") +
   labs(
     colour = NULL,
     title = "(A) Total Greenhouse Gas (GHG) Emissions.",
     subtitle = "Classified by network level and regions.",
     x = NULL,
-    fill = "LCA Material Type"
+    fill = "Network Level"
   ) +  ylab('Total GHG Emissions (Mt CO<sub>2</sub> eq.)') + 
   scale_y_continuous(
     limits = c(0, 40),
@@ -60,6 +57,134 @@ total_emissions <-
     legend.text = element_text(size = 6),
     axis.title.x = element_text(size = 7)
   ) + facet_wrap( ~ region, ncol = 4)
+
+############################
+##FIBER INFRASTRUCTURE MAP##
+############################
+africa_data <- st_read(file.path(folder, '..', 'data', 'raw', 
+   'Africa_Boundaries', 'SSA_combined_shapefile.shp'))
+
+#################################
+##CORE FIBER INFRASTRUCTURE MAP##
+#################################
+core_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                'SSA_core_nodes_existing.shp'))
+core_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                'SSA_core_edges_existing.shp'))
+core_nodes$Type <- 'Core Nodes'
+core_edges$Type <- 'Core Fiber'
+
+core_fiber <- ggplot() +
+  geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
+  geom_sf(data = core_nodes, color = "tomato", size = 0.5, aes(fill = Type)) + 
+  geom_sf(data = core_edges, color = "green4", linewidth = 0.3) + 
+  labs(title = "(A) Existing fiber infrastructure in SSA", 
+       subtitle = "Only live fiber lines with core are nodes mapped", 
+       fill = NULL) + 
+  theme_void() +
+  theme(
+    strip.text.x = element_blank(),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title.y = element_text(size = 6),
+    legend.position = 'bottom',
+    axis.title = element_text(size = 8),
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    legend.key.size = unit(0.6, "lines"),
+    plot.subtitle = element_text(size = 6),
+    plot.title = element_text(size = 7, face = "bold")
+  )
+
+#####################################
+##REGIONAL FIBER INFRASTRUCTURE MAP##
+#####################################
+regional_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                    'SSA_combined_regional_nodes.shp'))
+regional_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                    'SSA_combined_regional_edges.shp'))
+regional_nodes$Type <- 'Regional Nodes'
+regional_edges$Type <- 'Regional Fiber'
+
+regional_fiber <- ggplot() +
+  geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
+  geom_sf(data = regional_nodes, color = "darkorange", size = 0.2, aes(fill = Type)) + 
+  geom_sf(data = regional_edges, color = "aquamarine4", size = 0.3, linewidth = 0.3) + 
+  labs(title = "(B) Designed regional fiber network for SSA", 
+       subtitle = "Based on aggregated regional settlement points", fill = NULL) + 
+  theme_void() +
+  theme(
+    strip.text.x = element_blank(),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title.y = element_text(size = 6),
+    legend.position = 'bottom',
+    axis.title = element_text(size = 8),
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    legend.key.size = unit(0.6, "lines"),
+    plot.subtitle = element_text(size = 6),
+    plot.title = element_text(size = 7, face = "bold")
+  )
+
+###################################
+##ACCESS FIBER INFRASTRUCTURE MAP##
+###################################
+access_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                  'SSA_combined_access_nodes.shp'))
+access_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                  'SSA_combined_access_edges.shp'))
+access_nodes$Type <- 'Access Nodes'
+access_edges$Type <- 'Access Fiber'
+
+access_fiber <- ggplot() +
+  geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
+  geom_sf(data = access_nodes, color = "gray35", size = 0.002, aes(fill = Type)) + 
+  geom_sf(data = access_edges, color = "coral", size = 0.3, linewidth = 0.3) + 
+  labs(title = "(C) Designed access fiber Network for SSA", 
+       subtitle = "Based on settlement points", fill = NULL) + 
+  theme_void() +
+  theme(
+    strip.text.x = element_blank(),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title.y = element_text(size = 6),
+    legend.position = 'bottom',
+    axis.title = element_text(size = 8),
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    legend.key.size = unit(0.6, "lines"),
+    plot.subtitle = element_text(size = 6),
+    plot.title = element_text(size = 7, face = "bold")
+  )
+
+#######################
+##PANEL FIBER DESIGN ##
+#######################
+emission_panel <- ggarrange(
+  total_emissions, legend = 'bottom',
+  ncol = 1)
+
+fiber_nodes <- ggarrange(
+  core_fiber, 
+  regional_fiber,
+  access_fiber, align = c('hv'),
+  ncol = 3, nrow = 1, legend = 'bottom')
+
+fiber_emission_panel <- ggarrange(
+  emission_panel, 
+  fiber_nodes,
+  ncol = 1, nrow = 2, 
+  common.legend = TRUE, legend='bottom')
+
+path = file.path(folder, 'figures', 'fiber_design_emissions.png')
+png(path, units = "in", width = 11, height = 8, res = 300)
+print(fiber_emission_panel)
+dev.off()
+
 
 ###################################
 ##AVERAGE EMISSIONS PER SUBSCRIBER###
@@ -286,16 +411,11 @@ eolts_emissions <-
 ########################
 ##PANEL USER EMISSIONS##
 ########################
-emission_panel <- ggarrange(
-  total_emissions, 
-  average_emissions, 
-  ncol = 1, nrow = 2, align = c('hv'),
-  common.legend = TRUE, legend='none')
-
 emission_category_panel <- ggarrange(
+  average_emissions, 
   manufacturing_emissions, 
   eolts_emissions, 
-  ncol = 1, nrow = 2, align = c('hv'),
+  ncol = 1, nrow = 3, align = c('hv'),
   common.legend = TRUE, legend='bottom') 
 
 path = file.path(folder, 'figures', 'user_emissions_region.png')
