@@ -108,49 +108,30 @@ def ssa_summary(iso3):
     iso3 : string
         Country ISO3 code
     """
-    print('Generating geotype characteristics for {}.'.format(iso3))
-    df_merged = gpd.GeoDataFrame()
-    pop_folder = os.path.join(DATA_RESULTS, iso3, 'population')
+    #print('Generating geotype characteristics for {}.'.format(iso3))
+    pop_folder = os.path.join(DATA_RESULTS, iso3, 'demand')
     
     for root, _, files in os.walk(pop_folder):
 
         for file in files:
 
             if file.endswith('.csv'):
-                
-                file_path = os.path.join(pop_folder, '{}_population_results.csv'.format(iso3))
+                df_merged = gpd.GeoDataFrame()
+                file_path = os.path.join(pop_folder, '{}_demand_results.csv'.format(iso3))
                 df = pd.read_csv(file_path)
-                df = df[['iso3', 'area', 'population']]
-                df[['pop_density', 'geotype']] = ''
-                for i in range(len(df)):
+                df = df[df['adoption_scenario'] == 'baseline']
+                df1 = df[['iso3', 'population', 'geotype']]
+                df2 = df[['iso3', 'area', 'geotype']]
 
-                    df['pop_density'].loc[i] = ((df['population'].loc[i])
-                        / (df['area'].loc[i]))
-                    
-                    if df['pop_density'].loc[i] >= 1000:
+                df_merged = pd.concat([df_merged, df1], ignore_index = True)
+                
+                total_pop = df_merged.groupby(['iso3', 'geotype']
+                            )['population'].sum().reset_index()
+                
+                df_merged2 = pd.concat([df_merged, df2], ignore_index = True)  
+                total_area = df_merged2.groupby(['iso3', 'geotype']
+                            )['area'].sum().reset_index()
 
-                        df['geotype'].loc[i] = 'urban'
-                    
-                    elif df['pop_density'].loc[i] >= 500 and df['pop_density'].loc[i] <= 1000:
-                        
-                        df['geotype'].loc[i] = 'suburban'
-
-                    elif df['pop_density'].loc[i] >= 50 and df['pop_density'].loc[i] <= 500:
-
-                        df['geotype'].loc[i] = 'rural'
-
-                    else:
-
-                        df['geotype'].loc[i] = 'remote'
-
-            df_merged = pd.concat([df_merged, df], ignore_index = True)
-            
-            average_pop = df_merged.groupby(['iso3', 'geotype']
-                          )['population'].sum().reset_index()
-            
-            average_area = df_merged.groupby(['iso3', 'geotype']
-                           )['area'].sum().reset_index()
-    
     fileout = '{}_geotype_population.csv'.format(iso3)
     fileout_1 = '{}_geotype_total_area.csv'.format(iso3)
     folder_out = os.path.join(DATA_RESULTS, iso3, 'summary')
@@ -162,8 +143,8 @@ def ssa_summary(iso3):
     path_out = os.path.join(folder_out, fileout)
     path_out_1 = os.path.join(folder_out, fileout_1)
 
-    average_pop.to_csv(path_out, index = False) 
-    average_area.to_csv(path_out_1, index = False)
+    total_pop.to_csv(path_out, index = False) 
+    total_area.to_csv(path_out_1, index = False)
     
 
     return None  
@@ -171,8 +152,7 @@ def ssa_summary(iso3):
 
 def capacity_user(iso3):
     """
-    This function calculate 
-    total demand per km^2.
+    This function calculate total demand per km^2.
     
     Parameters
     ----------
@@ -193,12 +173,12 @@ def capacity_user(iso3):
                             '{}_demand_results.csv'.format(iso3))
                 
                 df = pd.read_csv(file_path)
-                df = df[['iso3', 'GID_1', 'area', 
-                         'adoption_scenario', 'pop_density', 
+                df = df[['iso3', 'GID_2', 'area', 
+                         'adoption_scenario', 'pop_den_km', 
                          'geotype', 'users_area_sqkm']]
                 
                 df[['monthly_traffic', 'speed_mbps_per_user', 'demand_mbps_sqkm']] = ''
-                monthly_traffics = [10, 20, 30, 40]
+                monthly_traffics = [10, 15, 20, 30]
 
                 for idx, country in countries.iterrows():
                         
@@ -237,8 +217,7 @@ def capacity_user(iso3):
 
 def demand(iso3):
     """
-    This function generate demand results 
-    for each country.
+    This function generate demand results for each country.
     
     Parameters
     ----------
@@ -246,43 +225,18 @@ def demand(iso3):
         Country ISO3 code
     """
     print('Generating demand results for {} csv'.format(iso3))
-    merged_shapefile = gpd.GeoDataFrame()
-    line_folder = os.path.join(DATA_RESULTS, iso3, 'gid_points')
-    pop_folder = os.path.join(DATA_RESULTS, iso3, 'population', 
-                 '{}_population_results.csv'.format(iso3))
+    demand_folder = os.path.join(DATA_RESULTS, iso3, 'population', 
+                 '{}_demand_metrics.shp'.format(iso3))
+    df = gpd.read_file(demand_folder)
+    df = df[['GID_2', 'area', 'population']]
+    df = df.groupby(['GID_2', 'area'])['population'].sum().reset_index()
+    df[['iso3', 'pop_den_km']] = ''
 
-    df = pd.read_csv(pop_folder)
-
-    for file_name in os.listdir(line_folder):
-
-        if file_name.endswith('.shp'):
-
-            file_path = os.path.join(line_folder, file_name)
-            shapefile = gpd.read_file(file_path)
-            shapefile = shapefile.to_crs(crs = 3857) 
-            merged_shapefile = pd.concat([merged_shapefile, shapefile], 
-                               ignore_index = True)
-    try:
-        merged_gdf = merged_shapefile.merge(df, left_on = 'GID_2', 
-                     right_on = 'GID_1')
-
-    except:
-
-        merged_gdf = merged_shapefile.merge(df, left_on ='GID_1', 
-                     right_on='GID_1')
-    merged_gdf = merged_gdf.drop(columns = ['geometry_x', 
-                 'latitude', 'longitude', 'region'])
-    merged_gdf = merged_gdf.rename(columns={'geometry_y': 'geometry'})   
-    merged_gdf = merged_gdf[['iso3', 'GID_1','population', 'area', 
-                 'geometry']]
-    merged_gdf[['area']] = merged_gdf[['area']].round(4)
-    df = merged_gdf
-    df['pop_density'] = ''
     for i in range(len(df)):
 
-        df['pop_density'].loc[i] = ((df['population'].loc[i])
-            / (df['area'].loc[i]))
-    
+        df['iso3'].loc[i] = iso3
+        df['pop_den_km'].loc[i] = df['population'].loc[i] / df['area'].loc[i] 
+
     for idx, country in countries.iterrows():
             
         if not country['iso3'] == iso3:
@@ -295,19 +249,20 @@ def demand(iso3):
         df['low_adoption'] = 'low'
         df['baseline_adoption'] = 'baseline'
         df['high_adoption'] = 'high'
-        df = pd.melt(df, id_vars = ['iso3', 'GID_1', 'area', 'pop_density', 
-                'geometry'], var_name = 'adoption_scenario', 
-                value_vars = ['low', 'baseline', 'high'])
+        df = pd.melt(df, id_vars = ['iso3', 'GID_2', 'area', 'population', 
+            'pop_den_km', ], var_name = 'adoption_scenario', value_vars = 
+            ['low', 'baseline', 'high'])
         df = df.drop(columns = ['value'])
         df[['adoption_value', 'users_area_sqkm', 'revenue_per_area', 'geotype']] = ''
+        df['pop_den_km'] = df['pop_den_km'].astype(float)
 
         for i in range(len(df)):
 
             if df['adoption_scenario'].loc[i] == 'low':
-                
+
                 df['adoption_value'].loc[i] = round((adoption_low / 100), 4)
                 df['users_area_sqkm'].loc[i] = (df['adoption_value'].loc[i] 
-                                                * df['pop_density'].loc[i])
+                                                * df['pop_den_km'].loc[i])
                 df['revenue_per_area'].loc[i] = ((df['users_area_sqkm'].loc[i]) 
                                                  * (arpu))
                 
@@ -316,7 +271,7 @@ def demand(iso3):
                 df['adoption_value'].loc[i] = round((adoption_low / 100) + (0.1 
                                               * ((adoption_low / 100))), 4)
                 df['users_area_sqkm'].loc[i] = (df['adoption_value'].loc[i] 
-                                                * df['pop_density'].loc[i])
+                                                * df['pop_den_km'].loc[i])
                 df['revenue_per_area'].loc[i] = ((df['users_area_sqkm'].loc[i]) 
                                                  * (arpu))
                 
@@ -325,29 +280,25 @@ def demand(iso3):
                 df['adoption_value'].loc[i] = round((adoption_low / 100) + (0.2 
                                               * ((adoption_low / 100))), 4)
                 df['users_area_sqkm'].loc[i] = (df['adoption_value'].loc[i] 
-                                                * df['pop_density'].loc[i])
+                                                * df['pop_den_km'].loc[i])
                 df['revenue_per_area'].loc[i] = ((df['users_area_sqkm'].loc[i]) 
                                                  * (arpu))
 
-            if df['pop_density'].loc[i] >= 1000:
+            if df['pop_den_km'].loc[i] >= 1000:
 
                 df['geotype'].loc[i] = 'urban'
             
-            elif df['pop_density'].loc[i] >= 500 and df['pop_density'].loc[i] <= 1000:
+            elif df['pop_den_km'].loc[i] >= 500 and df['pop_den_km'].loc[i] <= 1000:
                 
                 df['geotype'].loc[i] = 'suburban'
 
-            elif df['pop_density'].loc[i] >= 50 and df['pop_density'].loc[i] <= 500:
-
-                df['geotype'].loc[i] = 'rural'
-
             else:
 
-                df['geotype'].loc[i] = 'remote'
+                df['geotype'].loc[i] = 'rural'
                 
-        df = df[['iso3', 'GID_1', 'area', 'adoption_scenario',
-                 'adoption_value', 'pop_density', 'geotype', 'users_area_sqkm', 
-                 'revenue_per_area', 'geometry']]
+        df = df[['iso3', 'GID_2', 'area', 'population', 'adoption_scenario',
+                 'adoption_value', 'pop_den_km', 'geotype', 'users_area_sqkm', 
+                 'revenue_per_area']]
 
     fileout = '{}_demand_results.csv'.format(iso3)
     folder_out = os.path.join(DATA_RESULTS, iso3, 'demand')
@@ -373,6 +324,6 @@ if __name__ == '__main__':
         #if not country['iso3'] == 'RWA':
             
             continue 
-        demand(countries['iso3'].loc[idx])
-        capacity_user(countries['iso3'].loc[idx])
-        ssa_summary(countries['iso3'].loc[idx])
+        #demand(countries['iso3'].loc[idx])
+        #capacity_user(countries['iso3'].loc[idx])
+        #ssa_summary(countries['iso3'].loc[idx])

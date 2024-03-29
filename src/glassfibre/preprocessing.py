@@ -639,3 +639,9 @@ def lca_operations():
         ops_emission_dict['lca_phase'] = 'ops'
 
     return ops_emission_dict
+
+
+
+'''import pyarrow.parquet as pq
+df = gpd.read_parquet('part-00160-4dfc75cd-2680-4d52-b5e0-f4cc9f36b267-c000.zstd.parquet')
+print(df.head(5))'''
