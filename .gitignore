@@ -130,7 +130,7 @@ dmypy.json
 
 # Exclusions
 vis/*/* 
-cacheds/*/* 
+cache/*/* 
 data/*/*
 results/*/*
 figures/*
