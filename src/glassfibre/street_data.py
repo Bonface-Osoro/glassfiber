@@ -20,10 +20,10 @@ path = os.path.join(DATA_RAW, 'countries.csv')
 countries = pd.read_csv(path, encoding = 'utf-8-sig')
 
 
-def download_road_data(iso3):
+def download_street_data(iso3):
 
     """
-    This function download the road data for each country.
+    This function download the street data for each country.
 
     Parameters
     ----------
@@ -39,7 +39,7 @@ def download_road_data(iso3):
             continue
         
         print('Extracting street data for {}'.format(iso3))
-        roads = ox.graph_from_place(format(ssa['country']))
+        roads = ox.graph_from_place(format('{}'.format(ssa['country'])))
 
         print('Converting extracted {} street data to geodataframe'.format(iso3))
         road_gdf = ox.graph_to_gdfs(roads, nodes = False, edges = True)
@@ -85,10 +85,7 @@ def generate_street_shapefile(iso3):
         df['iso3'] = ''
 
         print('Processing CSV street data for {}'.format(iso3))
-        for i in range(len(df)):
-
-            df['iso3'].loc[i] = iso3
-
+        df['iso3'] = iso3
         df['geometry'] = df['geometry'].apply(lambda x: shapely.wkt.loads(x))
         gdf = gpd.GeoDataFrame(data = df, geometry = df['geometry'], crs = 4329)
 
@@ -106,6 +103,153 @@ def generate_street_shapefile(iso3):
     return None
 
 
+def process_region_street(iso3):
+    """
+    Function to process the street data at regional level.  
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    regions = os.path.join(DATA_PROCESSED, iso3, 'regions', 
+                           'regions_1_{}.shp'.format(iso3))
+    
+    for idx, country in countries.iterrows():
+
+        if not country["iso3"] == iso3:
+
+            continue
+
+        regions = gpd.read_file(regions)
+        gid = 'GID_1'
+
+        for idx, region in regions.iterrows():
+            
+            gdf_region = regions
+            gid_id = region[gid]
+
+            file_in = os.path.join(DATA_RAW, 'street_data', iso3, 
+                                   '{}_street_data.shp'.format(iso3))
+
+            gdf_street = gpd.read_file(file_in)
+            gdf_region = gdf_region[gdf_region[gid] == gid_id]
+            print('Intersecting {} street data points'.format(gid_id))
+            gdf_street = gpd.overlay(gdf_street, gdf_region, how = 
+                                    'intersection')
+            
+            filename = '{}.shp'.format(gid_id)
+            folder_out = os.path.join(DATA_PROCESSED, iso3, 'streets', 
+                                    'regions')
+            
+            if not os.path.exists(folder_out):
+
+                os.makedirs(folder_out)
+
+            path_out = os.path.join(folder_out, filename)
+            gdf_street.to_file(path_out, crs = 'EPSG:4326')
+
+
+    return None
+
+
+def process_subregion_street(iso3):
+    """
+    Function to process the street data at sub-regional level.  
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    for idx, country in countries.iterrows():
+
+        if not country["iso3"] == iso3:
+
+            continue
+
+        region_path = os.path.join(DATA_PROCESSED, iso3, 'regions', 
+                            'regions_2_{}.shp'.format(iso3))
+        region_path_2 = os.path.join('results', 'processed', iso3, 'regions', 
+                                    'regions_1_{}.shp'.format(iso3))
+
+        if os.path.exists(region_path):
+
+            regions = gpd.read_file(region_path)
+            gid = 'GID_2'
+
+        else:
+
+            regions = gpd.read_file(region_path_2)
+            gid = 'GID_1'
+
+        for idx, region in regions.iterrows():
+
+            gid_id = region[gid]
+            gdf_region = regions
+
+            file_in = os.path.join(DATA_RAW, 'street_data', iso3, 
+                                   '{}_street_data.shp'.format(iso3))
+
+            gdf_street = gpd.read_file(file_in)
+            gdf_region = gdf_region[gdf_region[gid] == gid_id]
+            print('Intersecting {} street data points'.format(gid_id))
+            gdf_street = gpd.overlay(gdf_street, gdf_region, how = 
+                                     'intersection')
+            
+            filename = '{}.shp'.format(gid_id)
+            folder_out = os.path.join(DATA_PROCESSED, iso3, 'streets', 
+                                      'sub_regions')
+
+            if not os.path.exists(folder_out):
+
+                os.makedirs(folder_out)
+
+            path_out = os.path.join(folder_out, filename)
+            gdf_street.to_file(path_out, crs = 'EPSG:4326')
+
+    
+    return None
+
+def combine_street_csv(iso3):
+    """
+    This function combines street data generated for countries whose data cannot 
+    be downloaded at once.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+
+    combined_df = pd.DataFrame()
+    csv_path = os.path.join(DATA_RAW, 'street_data', iso3)
+
+    print('Merging {} csv files'.format(iso3))
+    for root, _, files in os.walk(csv_path):
+
+        for file in files:
+
+            if file.endswith('.csv'):
+
+                file_path = os.path.join(root, file)
+                df = pd.read_csv(file_path)
+
+                combined_df = pd.concat([combined_df, df], ignore_index = True)
+
+                fileout = '{}_national_street_data.csv'.format(iso3)
+                folder_out = os.path.join(DATA_RAW, 'street_data', iso3)
+                if not os.path.exists(folder_out):
+
+                    os.makedirs(folder_out)
+
+                path_out = os.path.join(folder_out, fileout)
+                combined_df.to_csv(path_out, index = False) 
+
+    
+    return None
+
+
 for idx, country in countries.iterrows():
         
     #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
@@ -114,5 +258,8 @@ for idx, country in countries.iterrows():
 
         continue
 
-    #download_road_data(countries['iso3'].loc[idx])
-    generate_street_shapefile(countries['iso3'].loc[idx])
+    #download_street_data(countries['iso3'].loc[idx])
+    #combine_street_csv(countries['iso3'].loc[idx])
+    #generate_street_shapefile(countries['iso3'].loc[idx])
+    #process_region_street(countries['iso3'].loc[idx])
+    process_subregion_street(countries['iso3'].loc[idx])
