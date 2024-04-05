@@ -5,18 +5,23 @@ import random
 import math
 import json
 import rasterio
+import fiona
+import fiona.crs
+
 import numpy as np
 import pandas as pd
 import geopandas as gpd
-from tqdm import tqdm
 import networkx as nx
+
+from tqdm import tqdm
 from rtree import index
 from rasterio.mask import mask
 from rasterstats import zonal_stats
-from shapely.geometry import Polygon, MultiPolygon, mapping, shape, MultiLineString, LineString, Point
 from shapely.ops import transform, unary_union, nearest_points
-import fiona
-import fiona.crs
+from shapely.geometry import (Polygon, MultiPolygon, mapping, shape, 
+                              MultiLineString, LineString, Point)
+
+
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
 

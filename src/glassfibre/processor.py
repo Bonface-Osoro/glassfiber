@@ -5,24 +5,26 @@ import os
 import pickle
 import logging
 import copy
-from collections import OrderedDict, defaultdict
 import json
 import pyproj
 import configparser
 import shapely
+import h3
 
 import numpy as np
 import pandas as pd
 import geopandas as gpd
 import multiprocessing as mp
 import networkx as nx
-from networkx.readwrite import json_graph
+
 from shapely import wkt
 from shapely.ops import split, snap
-from shapely.geometry import LineString, Point, MultiPoint, MultiLineString
 from pyproj import Proj, transform
 from scipy.spatial import cKDTree
-import h3
+from networkx.readwrite import json_graph
+from collections import OrderedDict, defaultdict
+from shapely.geometry import LineString, Point, MultiPoint, MultiLineString
+
 CONFIG = configparser.ConfigParser()
 CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
