@@ -191,7 +191,11 @@ class Processor():
         updated_points = points.copy()
         updated_points = updated_points.drop(columns=["geometry"]).join(snapped)
         # You may want to drop any that didn't snap, if so: 
-        updated_points.dropna(subset=["geometry"]).geometry.apply(lambda x: self.get_demand_nodes(x))
+
+        updated_points = gpd.GeoDataFrame(updated_points, geometry="geometry", crs="epsg:3857")
+        updated_points = updated_points.dropna(subset=["geometry"])
+        updated_points.geometry.apply(lambda x: self.get_demand_nodes(x))
+
         updated_points['x2'] = updated_points['geometry'].x
         updated_points['y2'] = updated_points['geometry'].y
         snap_gdf = updated_points.copy()
@@ -241,7 +245,7 @@ class Processor():
             self.edges[(start, end)] = geometry.length
             self.edge_to_geom[(start, end)] = geometry.wkt
         else:
-            for line in geometry:
+            for line in list(geometry.geoms):
                 coords = line.coords[:]
                 s = coords[0]
                 e = coords[-1]
@@ -267,7 +271,8 @@ class Processor():
             for i in range(len(coords) - 1):
                 new_lines.append([coords[i], coords[i + 1]])
         else:
-            for sub_geom in geom:
+            # Note this changed: https://shapely.readthedocs.io/en/stable/reference/shapely.MultiLineString.html
+            for sub_geom in list(geom.geoms):
                 coords = sub_geom.coords[:]
                 for i in range(len(coords) - 1):
                     new_lines.append([coords[i], coords[i + 1]])

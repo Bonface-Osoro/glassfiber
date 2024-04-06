@@ -48,7 +48,27 @@ setup(
         'setuptools_scm'
     ],
     install_requires=[
-        'numpy>=1.16.4',
+        'attrs==23.2.0',
+        'certifi==2024.2.2',
+        'click==8.1.7',
+        'click-plugins==1.1.1',
+        'cligj==0.7.2',
+        'fiona==1.9.6',
+        'geopandas==0.14.3',
+        'h3==3.7.7',
+        'networkx==3.2.1',
+        'numpy==1.26.4',
+        'packaging==24.0',
+        'pandas==2.2.1',
+        'pcst-fast==1.0.10',
+        'pybind11==2.12.0',
+        'pyproj==3.6.1',
+        'python-dateutil==2.9.0.post0',
+        'pytz==2024.1',
+        'scipy==1.13.0',
+        'shapely==2.0.3',
+        'six==1.16.0',
+        'tzdata==2024.1'
     ],
     entry_points={
         'console_scripts': [
