@@ -32,9 +32,26 @@ In `Figure 3`, the quantitative Total Cost of Ownership (TCO) per user results a
   <img src = "/docs/revenue_and_tco.png" />
 </p>
 
+
+## Install
+```
+conda craete -n "glass" python=3.11
+conda activate glass
+python setup.py develop
+```
+
+## Run network solver
+
+```
+python src/glassfibre/pcst.py
+```
+
+
 ## Required Data
 [1]	“Open Spatial Demographic Data and Research,” WorldPop. https://www.worldpop.org/ (accessed May 08, 2023).
 
 [2]	GADM, “Global Administrative Areas Boundaries.” https://gadm.org/download_world.html (accessed Sep. 14, 2022).
 
 [3] Country metadafile. Contained in `/data/countries.csv`
+
+

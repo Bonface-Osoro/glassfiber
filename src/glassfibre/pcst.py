@@ -21,10 +21,10 @@ CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
 
 DATA_RAW = os.path.join(BASE_PATH, 'raw')
-DATA_PROCESSED = os.path.join(BASE_PATH, '..', 'results', 'processed')
+DATA_PROCESSED = os.path.join(BASE_PATH, 'SLE_data')
 
-fiber_path = os.path.join(DATA_PROCESSED, 'SLE', 'buffer_routing_zones', 'nodes', 'SLE.1.2_1.shp')
-street_path = os.path.join(DATA_PROCESSED, 'SLE', 'streets', 'sub_regions', 'SLE.1.2_1.shp')
+fiber_path = os.path.join(DATA_PROCESSED, 'settlement nodes', 'SLE.1.1_1.shp')
+street_path = os.path.join(DATA_PROCESSED, 'street', 'SLE.1.1_1.shp')
 
 def main():
 
@@ -33,7 +33,7 @@ def main():
     fiber_sites = fiber_sites[['iso3', 'GID_0', 'GID_2', 'population', 'lon', 
                                'lat', 'geometry']]
     #fiber_sites['geometry'] = fiber_sites.apply(lambda x: x.geometry.centroid, axis = 1)
-    
+
     streets = gpd.read_file(street_path)
     
     logging.info(f"Running on {fiber_sites}")
