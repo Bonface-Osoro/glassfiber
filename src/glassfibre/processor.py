@@ -194,6 +194,7 @@ class Processor():
 
         updated_points = gpd.GeoDataFrame(updated_points, geometry="geometry", crs="epsg:3857")
         updated_points = updated_points.dropna(subset=["geometry"])
+        updated_points.geometry.apply(lambda x: self.get_demand_nodes(x))
 
         updated_points['x2'] = updated_points['geometry'].x
         updated_points['y2'] = updated_points['geometry'].y
