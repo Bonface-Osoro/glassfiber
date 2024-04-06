@@ -17,6 +17,7 @@ import geopandas as gpd
 import multiprocessing as mp
 import networkx as nx
 
+from scipy.spatial import KDTree 
 from shapely import wkt
 from shapely.ops import split, snap
 from pyproj import Proj, transform
@@ -221,6 +222,7 @@ class Processor():
     def get_demand_nodes(self, geometry):
         coords = geometry.coords[0]
         coord_string = f'[{coords[0]:.0f}, {coords[1]:.0f}]'
+
         self.demand_nodes[coord_string] = 1
 
     def set_node_ids(self, geometry):
@@ -437,10 +439,25 @@ class Processor():
         for n in self.g.nodes():
             self.g.nodes[n]['coords'] = self.flip_look_up[n]
 
+        # HACK - this may get slow on large regions
+        # Need to redo the graph snapping and creation to have a tolerance
+        # assume order will be the same
+        tree = KDTree(np.array([eval(d['coords']) for _, d in self.g.nodes(data=True)]))
+        node_i_to_coords = {i: (n, d['coords']) for i, (n, d) in enumerate(self.g.nodes(data=True))}
+
+        new_demand_nodes = {}
         for n, d in self.demand_nodes.items():
-            # TODO: fix missing key
+            # [HACK DONE] TODO: fix missing key
             if n in self.look_up:
+
                 self.g.nodes[self.look_up[n]]['demand'] = d
+            else:
+                result = tree.query(np.array(eval(n)))
+                self.g.nodes[node_i_to_coords[result[1]][0]]['demand'] = d
+                new_demand_nodes[node_i_to_coords[result[1]][1]] = d
+                self.flip_look_up[node_i_to_coords[result[1]][0]] = node_i_to_coords[result[1]][1]
+
+        self.demand_nodes.update(new_demand_nodes)
 
         graph_json = json_graph.node_link_data(self.g)
         with open('graph_for_solver.json', 'w') as og:
