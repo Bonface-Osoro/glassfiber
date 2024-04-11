@@ -31,11 +31,11 @@ CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
 
 DATA_RAW = os.path.join(BASE_PATH, 'raw')
-DATA_PROCESSED = os.path.join(BASE_PATH, '..', 'results', 'processed')
-DATA_PROCESSED = os.path.join(BASE_PATH, '..', 'results', 'final')
+DATA_PROCESSED = os.path.join(BASE_PATH)
 
 class Processor():
-    def __init__(self, where):
+    def __init__(self, where, iso):
+        self.iso = iso
         self.where = where
         self.snap_lines = None
         self.all_lines = None
@@ -156,7 +156,9 @@ class Processor():
         Taken from here: https://medium.com/@brendan_ward/how-to-leverage-geopandas-for-faster-snapping-of-points-to-lines-6113c94e59aa
         """
         # this creates and also provides us access to the spatial index
-        if os.path.isfile(f'{self.where}/output/edge_to_geom.pickle'):
+        print('RUNNING THIS LINE XXXXXXXXXXXXXXXX')
+        folder_out = os.path.join(BASE_PATH, '..', 'results', 'final', self.iso)
+        if os.path.exists(os.path.join(folder_out, 'edge_to_geom.pickle')):
             self.load_intermediate()
             self.loaded = True
             return
@@ -204,7 +206,7 @@ class Processor():
         snap_gdf['length'] = snap_gdf.geometry.length
         updated_points = updated_points.drop(columns=['x1', 'y1', 'x2', 'y2'])
         self.snap_lines = snap_gdf.drop(columns=['x1', 'y1', 'x2', 'y2'])
-        folder_out = os.path.join(BASE_PATH, '..', 'results', 'final')
+        folder_out = os.path.join(BASE_PATH)
         fileout = 'updated.shp'
         if write:
             if not os.path.exists(folder_out):
@@ -217,7 +219,7 @@ class Processor():
             snap_gdf['lat'] = snap_gdf.geometry.apply(lambda x: x.coords[0][0])
             snap_gdf['lon'] = snap_gdf.geometry.apply(lambda x: x.coords[0][1])
             snap_gdf[['iso3', 'GID_2', "lat", "lon", "length"]].to_csv(f"{folder_out}/connections.csv")
-            snap_gdf.to_file(f"{folder_out}/test_lines.shp")
+            #snap_gdf.to_file(f"{folder_out}/test_lines.shp")
 
     def get_demand_nodes(self, geometry):
         coords = geometry.coords[0]
@@ -490,7 +492,7 @@ class Processor():
         self.solution = gpd.GeoDataFrame(s_frame, geometry = 'geom', 
                                          crs = 'epsg:3857')
 
-    def load_intermediate(self):
+    '''def load_intermediate(self):
         folder_out = os.path.join(BASE_PATH, '..', 'results', 'final')
         if not os.path.exists(folder_out):
 
@@ -532,4 +534,4 @@ class Processor():
             pickle.dump(self.edge_to_geom, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         with open(f'{folder_out}/convert_ids.pickle', 'wb') as handle:
-            pickle.dump(self.convert_ids, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(self.convert_ids, handle, protocol=pickle.HIGHEST_PROTOCOL)'''

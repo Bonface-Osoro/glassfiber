@@ -21,10 +21,11 @@ CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
 
 DATA_RAW = os.path.join(BASE_PATH, 'raw')
-DATA_PROCESSED = os.path.join(BASE_PATH, 'SLE_data')
+DATA_PROCESSED = os.path.join(BASE_PATH, '..', 'results', 'processed')
+DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
 
-fiber_path = os.path.join(DATA_PROCESSED, 'settlement nodes', 'SLE.1.1_1.shp')
-street_path = os.path.join(DATA_PROCESSED, 'street', 'SLE.1.1_1.shp')
+fiber_path = os.path.join(DATA_PROCESSED, 'SLE', 'buffer_routing_zones', 'nodes', 'SLE.1.1_1.shp')
+street_path = os.path.join(DATA_PROCESSED, 'SLE', 'streets', 'sub_regions', 'SLE.1.1_1.shp')
 
 def main():
 
