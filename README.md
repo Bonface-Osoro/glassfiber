@@ -20,16 +20,16 @@ The method (see `Figure 1`) .....
 
 Results
 =======
-`Figure 2` shows the estimated revenue per local area for the 3932 local areas.
+`Figure 2` shows the spatial distribution of the targeted population for fixed broadband service.
 #### Figure 2 Demand Results.
 <p align="center">
-  <img src="/docs/region_by_revenue_per_area.png" />
+  <img src="/docs/population_demand_metrics.png" />
 </p>
 
-In `Figure 3`, the quantitative Total Cost of Ownership (TCO) per user results are presented.
+In `Figure 3`, the quantitative emission results for different fiber network design approach is presented.
 #### Figure 3 Supply Results.
 <p align="center">
-  <img src = "/docs/revenue_and_tco.png" />
+  <img src = "/docs/fiber_design_emissions.png" />
 </p>
 
 
