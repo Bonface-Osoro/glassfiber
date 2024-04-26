@@ -4,6 +4,7 @@ library(dplyr)
 library(tidyverse)
 library("readxl")
 library(ggtext)
+library(sf)
 
 folder <- dirname(rstudioapi::getSourceEditorContext()$path)
 
@@ -89,11 +90,11 @@ core_fiber <- ggplot() +
     panel.grid.minor = element_blank(),
     axis.title.y = element_text(size = 6),
     legend.position = 'bottom',
-    axis.title = element_text(size = 8),
+    axis.title = element_text(size = 12),
     legend.title = element_text(size = 6),
     legend.text = element_text(size = 6),
     legend.key.size = unit(0.6, "lines"),
-    plot.subtitle = element_text(size = 6),
+    plot.subtitle = element_text(size = 8),
     plot.title = element_text(size = 7, face = "bold")
   )
 

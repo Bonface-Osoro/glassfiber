@@ -16,6 +16,7 @@ from glassfibre.netPlanning import(process_regional_settlement_tifs,
     fit_regional_node_edges, combine_access_nodes, combine_access_edges,
     generate_access_csv, combine_regional_nodes, combine_regional_edges,
     generate_regional_csv, generate_existing_fiber_csv)
+from glassfibre.street_data import(generate_region_nodes)
 
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
@@ -36,9 +37,9 @@ countries = pd.read_csv(path, encoding = 'utf-8-sig')
 
 for idx, country in countries.iterrows():
         
-    #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
+    if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    if not country['iso3'] == 'TUN':
+    #if not country['iso3'] == 'BWA':
         
         continue 
    
@@ -57,10 +58,10 @@ for idx, country in countries.iterrows():
     
     fiber_processor = FiberProcess(countries['iso3'].loc[idx], 
                                    countries['iso2'].loc[idx], path)
-    fiber_processor.process_existing_fiber()
+    '''fiber_processor.process_existing_fiber()
     fiber_processor.find_nodes_on_existing_infrastructure()
     
-    '''baseline_cost_emissions(countries['iso3'].loc[idx])
+    baseline_cost_emissions(countries['iso3'].loc[idx])
     local_cost_emissions(countries['iso3'].loc[idx])
     regional_cost_emissions(countries['iso3'].loc[idx])
 
@@ -87,3 +88,11 @@ for idx, country in countries.iterrows():
     #generate_regional_csv(countries['iso3'].loc[idx])
 
     #generate_existing_fiber_csv(countries['iso3'].loc[idx])
+
+    #download_street_data(countries['iso3'].loc[idx])
+    #combine_street_csv(countries['iso3'].loc[idx])
+    #generate_street_shapefile(countries['iso3'].loc[idx])
+    #process_region_street(countries['iso3'].loc[idx])
+    #process_subregion_street(countries['iso3'].loc[idx])
+
+    generate_region_nodes(countries['iso3'].loc[idx])
