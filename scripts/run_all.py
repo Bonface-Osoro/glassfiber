@@ -16,7 +16,8 @@ from glassfibre.netPlanning import(process_regional_settlement_tifs,
     fit_regional_node_edges, combine_access_nodes, combine_access_edges,
     generate_access_csv, combine_regional_nodes, combine_regional_edges,
     generate_regional_csv, generate_existing_fiber_csv)
-from glassfibre.street_data import(generate_region_nodes)
+from glassfibre.street_data import(generate_region_nodes, 
+                                   generate_sub_region_nodes)
 
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
@@ -37,9 +38,9 @@ countries = pd.read_csv(path, encoding = 'utf-8-sig')
 
 for idx, country in countries.iterrows():
         
-    if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
+    #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    #if not country['iso3'] == 'BWA':
+    if not country['iso3'] == 'BEN':
         
         continue 
    
@@ -95,4 +96,5 @@ for idx, country in countries.iterrows():
     #process_region_street(countries['iso3'].loc[idx])
     #process_subregion_street(countries['iso3'].loc[idx])
 
-    generate_region_nodes(countries['iso3'].loc[idx])
+    #generate_region_nodes(countries['iso3'].loc[idx])
+    generate_sub_region_nodes(countries['iso3'].loc[idx])
