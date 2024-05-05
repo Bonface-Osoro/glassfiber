@@ -4,6 +4,9 @@ library(dplyr)
 library(tidyverse)
 library("readxl")
 library(ggtext)
+library(sf)
+library(ggspatial)
+library(ggmap)
 
 folder <- dirname(rstudioapi::getSourceEditorContext()$path)
 
@@ -73,29 +76,41 @@ core_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles',
                                 'SSA_core_edges_existing.shp'))
 core_nodes$Type <- 'Core Nodes'
 core_edges$Type <- 'Core Fiber'
+legend_core_nodes <- guides(fill = guide_legend(title = "Legend"))
 
 core_fiber <- ggplot() +
   geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
   geom_sf(data = core_nodes, color = "tomato", size = 0.5, aes(fill = Type)) + 
   geom_sf(data = core_edges, color = "green4", linewidth = 0.3) + 
   labs(title = "(A) Existing fiber infrastructure in SSA", 
-       subtitle = "Only live fiber lines with core are nodes mapped", 
+       subtitle = "Only live fiber lines with core nodes are mapped", 
        fill = NULL) + 
-  theme_void() +
   theme(
     strip.text.x = element_blank(),
     panel.border = element_blank(),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     axis.title.y = element_text(size = 6),
-    legend.position = 'bottom',
-    axis.title = element_text(size = 8),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 6),
+    legend.position = 'right',
+    legend.box = "horizontal", 
+    legend.margin = margin(t = -0.2, unit = "in"),
+    axis.title = element_text(size = 12),
+    legend.title = element_text(size = 8),
+    legend.text = element_text(size = 8),
     legend.key.size = unit(0.6, "lines"),
-    plot.subtitle = element_text(size = 6),
-    plot.title = element_text(size = 7, face = "bold")
-  )
+    plot.subtitle = element_text(size = 9),
+    plot.title = element_text(size = 11, face = "bold")
+  ) +   annotation_scale(location = "bl", width_hint = 0.5) + 
+  coord_sf(crs = 4326) + legend_core_nodes +
+  ggspatial::annotation_north_arrow(
+    location = "tr", which_north = "true",
+    pad_x = unit(0.4, "in"), pad_y = unit(0.4, "in"),
+    style = ggspatial::north_arrow_nautical(
+      fill = c("grey40", "white"),
+      line_col = "grey20",
+      text_family = "ArcherPro Book"
+    )
+  ) 
 
 #####################################
 ##REGIONAL FIBER INFRASTRUCTURE MAP##

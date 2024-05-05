@@ -2,6 +2,7 @@ import configparser
 import os
 import warnings
 import shapely
+import shutil
 import geopandas as gpd
 import pandas as pd
 import osmnx as ox
@@ -250,16 +251,143 @@ def combine_street_csv(iso3):
     return None
 
 
+def generate_region_nodes(iso3):
+    """
+    This function aggregates sub-regional settlement nodes within a region
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Generating {} regional settlement nodes'.format(iso3))
+    regions = os.path.join(DATA_PROCESSED, iso3, 'regions', 
+                           'regions_1_{}.shp'.format(iso3))
+    
+    for idx, country in countries.iterrows():
+
+        if not country["iso3"] == iso3:
+
+            continue
+
+        regions = gpd.read_file(regions)
+        gid = 'GID_1'
+
+        for idx, region in regions.iterrows():
+            
+            gdf_region = regions
+            gid_id = region[gid]
+
+            file_in = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                      'combined', '{}_combined_access_nodes.shp'.format(iso3))
+
+            gdf_settlement = gpd.read_file(file_in)
+            gdf_region = gdf_region[gdf_region[gid] == gid_id]
+            gdf_settlement = gpd.overlay(gdf_settlement, gdf_region, how = 
+                                    'intersection')
+            
+            filename = '{}.shp'.format(gid_id)
+            folder_out = os.path.join(DATA_PROCESSED, iso3, 
+                        'buffer_routing_zones', 'pcsf_regional_nodes')
+            try:
+                gdf_settlement = gdf_settlement[['iso3', 'GID_1', 'GID_2', 
+                                'population', 'type', 'lon', 'lat', 'geometry']]
+            except:
+                gdf_settlement.rename(columns = {'GID_1_1': 'GID_1', 'GID_1_2': 'GID_2'}, inplace = True)
+                gdf_settlement = gdf_settlement[['iso3', 'GID_1', 'GID_2', 
+                                'population', 'type', 'lon', 'lat', 'geometry']]
+            if not os.path.exists(folder_out):
+
+                os.makedirs(folder_out)
+
+            path_out = os.path.join(folder_out, filename)
+            gdf_settlement.to_file(path_out, crs = 'EPSG:4326')
+
+
+    return None
+
+
+def generate_sub_region_nodes(iso3):
+    """
+    This function aggregates sub-regional settlement nodes within a subregion
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Generating {} sub-regional settlement nodes'.format(iso3))
+    
+    for idx, country in countries.iterrows():
+
+        if not country["iso3"] == iso3:
+
+            continue
+
+        region_path = os.path.join('results', 'processed', iso3, 'regions', 
+                                   'regions_2_{}.shp'.format(iso3)) 
+        
+        region_path_2 = os.path.join('results', 'processed', iso3, 'regions', 
+                                   'regions_1_{}.shp'.format(iso3))        
+        if os.path.exists(region_path):
+
+            regions = gpd.read_file(region_path)
+            gid = 'GID_2'
+
+        else:
+
+            regions = gpd.read_file(region_path_2)
+            gid = 'GID_1'
+
+        for idx, region in regions.iterrows():
+            
+            gdf_region = regions
+            gid_id = region[gid]
+
+            file_in = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                      'combined', '{}_combined_access_nodes.shp'.format(iso3))
+
+            gdf_settlement = gpd.read_file(file_in)
+            gdf_region = gdf_region[gdf_region[gid] == gid_id]
+            gdf_settlement = gpd.overlay(gdf_settlement, gdf_region, how = 
+                                    'intersection')
+            
+            filename = '{}.shp'.format(gid_id)
+            folder_out = os.path.join(DATA_PROCESSED, iso3, 
+                        'buffer_routing_zones', 'pcsf_subregional_nodes')
+            
+            try:
+                gdf_settlement = gdf_settlement[['iso3', 'GID_1', 'GID_2_2', 
+                                'population', 'type', 'lon', 'lat', 'geometry']]
+                gdf_settlement.rename(columns = {'GID_2_2': 'GID_2'}, 
+                                      inplace = True)
+            except:
+                gdf_settlement.rename(columns = {'GID_1_1': 'GID_1', 'GID_1_2': 'GID_2'}, inplace = True)
+                gdf_settlement = gdf_settlement[['iso3', 'GID_1', 'GID_2', 
+                                'population', 'type', 'lon', 'lat', 'geometry']]
+            if not os.path.exists(folder_out):
+
+                os.makedirs(folder_out)
+
+            path_out = os.path.join(folder_out, filename)
+            gdf_settlement.to_file(path_out, crs = 'EPSG:4326')
+
+
+    return None
+
+
 for idx, country in countries.iterrows():
         
-    if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
+    #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    #if not country['iso3'] == 'SLE':
+    if not country['iso3'] == 'GMB':
 
         continue
-
+    
+    
     #download_street_data(countries['iso3'].loc[idx])
     #combine_street_csv(countries['iso3'].loc[idx])
     #generate_street_shapefile(countries['iso3'].loc[idx])
     #process_region_street(countries['iso3'].loc[idx])
-    process_subregion_street(countries['iso3'].loc[idx])
+    #process_subregion_street(countries['iso3'].loc[idx])
+    #generate_sub_region_nodes(countries['iso3'].loc[idx])
