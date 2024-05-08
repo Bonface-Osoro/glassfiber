@@ -345,26 +345,27 @@ def generate_sub_region_nodes(iso3):
             gid_id = region[gid]
 
             file_in = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
-                      'combined', '{}_combined_access_nodes.shp'.format(iso3))
+                      'combined', 
+                      '{}_combined_pcsf_regional_nodes.shp'.format(iso3))
 
             gdf_settlement = gpd.read_file(file_in)
             gdf_region = gdf_region[gdf_region[gid] == gid_id]
             gdf_settlement = gpd.overlay(gdf_settlement, gdf_region, how = 
                                     'intersection')
-            
+
             filename = '{}.shp'.format(gid_id)
             folder_out = os.path.join(DATA_PROCESSED, iso3, 
                         'buffer_routing_zones', 'pcsf_subregional_nodes')
             
             try:
-                gdf_settlement = gdf_settlement[['iso3', 'GID_1', 'GID_2_2', 
-                                'population', 'type', 'lon', 'lat', 'geometry']]
+                gdf_settlement = gdf_settlement[['iso3', 'GID_1', 'population', 'geometry']]
                 gdf_settlement.rename(columns = {'GID_2_2': 'GID_2'}, 
                                       inplace = True)
             except:
-                gdf_settlement.rename(columns = {'GID_1_1': 'GID_1', 'GID_1_2': 'GID_2'}, inplace = True)
+                pass
+                '''gdf_settlement.rename(columns = {'GID_1_1': 'GID_1', 'GID_1_2': 'GID_2'}, inplace = True)
                 gdf_settlement = gdf_settlement[['iso3', 'GID_1', 'GID_2', 
-                                'population', 'type', 'lon', 'lat', 'geometry']]
+                                'population', 'type', 'lon', 'lat', 'geometry']]'''
             if not os.path.exists(folder_out):
 
                 os.makedirs(folder_out)
