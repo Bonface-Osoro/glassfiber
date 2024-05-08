@@ -1484,37 +1484,45 @@ def generate_access_csv(iso3):
     gdf = gdf.drop(columns = ['regions', 'id', 'GID_0', 'geometry'])
 
     gdf1 = gpd.read_file(edge_path)
-    gdf1 = gdf1.drop(columns = ['regions', 'geometry', 'to', 'from']
-                     ).reset_index()
-    gdf1 = gdf1.groupby(['GID_2', 'strategy'])['length'].sum().reset_index()
-
-    try:
-
-        merged_df = pd.merge(gdf, gdf1, on = 'GID_2', how = 'inner')
-
-    except:
-
-        gdf.rename(columns = {'GID_1': 'GID_2'}, inplace = True)
-        merged_df = pd.merge(gdf, gdf1, on = 'GID_2', how = 'inner')
-
-    merged_df['length_km'] = ''
-    for i in range(len(merged_df)):
-
-        merged_df['length_km'].loc[i] = merged_df['length'].loc[i] / 1000
     
-    merged_df = merged_df.drop(columns = ['length']).reset_index()
+    if iso3 == 'GMB':
 
-    fileout = '{}_fiber_access.csv'.format(iso3)
-    folder_out = os.path.join(DATA_RESULTS, iso3, 'fiber_design')
-    if not os.path.exists(folder_out):
+        pass
 
-        os.makedirs(folder_out)
+    else:
+        gdf1 = gdf1.drop(columns = ['regions', 'geometry', 'to', 'from']
+                        ).reset_index()
+        gdf1 = gdf1.groupby(['GID_2', 'strategy'])['length'].sum().reset_index()
 
-    path_out = os.path.join(folder_out, fileout)
-    merged_df.to_csv(path_out, index = False)
+        try:
+
+            merged_df = pd.merge(gdf, gdf1, on = 'GID_2', how = 'inner')
+
+        except:
+
+            gdf.rename(columns = {'GID_1': 'GID_2'}, inplace = True)
+            merged_df = pd.merge(gdf, gdf1, on = 'GID_2', how = 'inner')
+
+        merged_df['length_km'] = ''
+        for i in range(len(merged_df)):
+
+            merged_df['length_km'].loc[i] = merged_df['length'].loc[i] / 1000
+        
+        merged_df['algorithm'] = 'Dijkstras'
+        merged_df = merged_df.drop(columns = ['length']).reset_index()
+
+        fileout = '{}_fiber_access.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'fiber_design')
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out = os.path.join(folder_out, fileout)
+        merged_df.to_csv(path_out, index = False)
 
 
     return None
+
 
 def combine_regional_nodes(iso3):
     """
@@ -1634,6 +1642,7 @@ def generate_regional_csv(iso3):
 
             merged_df['length_km'].loc[i] = merged_df['length'].loc[i] / 1000
         
+        merged_df['algorithm'] = 'Dijkstras'
         merged_df = merged_df.drop(columns = ['length']).reset_index()
 
         fileout = '{}_fiber_regional.csv'.format(iso3)
@@ -1696,6 +1705,7 @@ def generate_existing_fiber_csv(iso3):
         merged_df = merged_df.groupby(['iso3', 'length_km', 'nodes', 'strategy']
                                       )['population'].sum().reset_index()
         
+        merged_df['algorithm'] = 'none'
         fileout = '{}_fiber_existing.csv'.format(iso3)
         folder_out = os.path.join(DATA_RESULTS, iso3, 'fiber_design')
         if not os.path.exists(folder_out):
@@ -1712,10 +1722,228 @@ def generate_existing_fiber_csv(iso3):
     return None
 
 
+def combine_pcsf_access_edges(iso3):
+    """
+    This function combines the shapefiles obtained from running
+    PCSF algorthm into a single shapefile.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    try: 
+        print('Combining PCSF access edges shapefiles for {}'.format(iso3))
+        merged_shapefile = gpd.GeoDataFrame()
+        shapefile_dir = os.path.join(DATA_RESULTS, iso3, 'pcsf_solutions', 
+                                    'regions_soln')
+        for file_name in os.listdir(shapefile_dir):
+
+            if file_name.endswith('.shp'):
+
+                file_path = os.path.join(shapefile_dir, file_name)
+                shapefile = gpd.read_file(file_path)
+                shapefile[['GID_2', 'strategy', 'algorithm']] = ''
+                base_name = '_'.join(file_name.split('_')[:-1])
+
+                for i in range(len(shapefile)):
+
+                    shapefile['GID_2'].loc[i] = base_name  
+                    shapefile['strategy'].loc[i] = 'access'
+                    shapefile['algorithm'].loc[i] = 'pcsf'
+
+                merged_shapefile = pd.concat([merged_shapefile, shapefile], 
+                                            ignore_index = True) 
+            
+        folder_out = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                                'combined')
+        fileout = '{}_combined_pcsf_access_edges.shp'.format(iso3)
+        if not os.path.exists(folder_out):
+            
+            os.makedirs(folder_out)
+
+        path_out = os.path.join(folder_out, fileout)
+        merged_shapefile.to_file(path_out, index = False)
+
+    except:
+
+        pass
+
+    return None
+
+
+def combine_pcsf_regional_nodes(iso3):
+    """
+    This function combines the regional node shapefiles obtained from running
+    PCSF algorthm into a single shapefile.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Combining PCSF regional node shapefiles for {}'.format(iso3))
+    shapefile_dir = os.path.join(DATA_PROCESSED, iso3, 'pcsf_region_nodes')
+
+    shapefiles = [os.path.join(shapefile_dir, files) for files in os.listdir(
+        shapefile_dir) if files.endswith('updated.shp')]
+    gdf_combined = gpd.GeoDataFrame(pd.concat([gpd.read_file(shp) for shp in 
+                                            shapefiles], ignore_index = True))
+    
+    folder_out = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                            'combined')
+    fileout = '{}_combined_pcsf_regional_nodes.shp'.format(iso3)
+    if not os.path.exists(folder_out):
+        
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+    gdf_combined.to_file(path_out, index = False)
+
+
+    return None 
+
+
+def generate_pcsf_regional_csv(iso3):
+    """
+    This function generates a csv file for connected population at regional 
+    level using PCSF.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Generating PCSF regional fiber csv file for {}'.format(iso3))
+    folder_in = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                               'combined')
+    node_path = os.path.join(folder_in, '{}_combined_pcsf_regional_nodes.shp'.format(
+        iso3))
+    edge_path = os.path.join(folder_in, '{}_combined_pcsf_access_edges.shp'.format(
+        iso3))
+    
+    gdf = gpd.read_file(node_path)
+    gdf = gdf.drop(columns = ['geometry'])
+
+    try:
+
+        gdf1 = gpd.read_file(edge_path)
+        gdf1 = gdf1.drop(columns = ['id', 'start', 'strategy', 'end', 'type']
+                        ).reset_index()
+        gdf1.rename(columns = {'GID_2': 'GID_1'}, 
+                                inplace = True)
+        gdf1['length'] = gdf1.geometry.length
+        gdf1['strategy'] = 'regional'
+        gdf1 = gdf1.groupby(['GID_1', 'strategy', 'algorithm']
+                            )['length'].sum().reset_index()
+
+        try:
+
+            merged_df = pd.merge(gdf, gdf1, on = 'GID_1', how = 'inner')
+
+        except:
+
+            gdf.rename(columns = {'GID_1': 'GID_1'}, inplace = True)
+            merged_df = pd.merge(gdf, gdf1, on = 'GID_1', how = 'inner')
+
+        merged_df['length_km'] = ''
+        for i in range(len(merged_df)):
+
+            merged_df['length_km'].loc[i] = merged_df['length'].loc[i] * 110.567
+        
+        merged_df = merged_df.drop(columns = ['length']).reset_index()
+
+        fileout = '{}_fiber_pcsf_regional.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'fiber_design')
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out = os.path.join(folder_out, fileout)
+        merged_df.to_csv(path_out, index = False)
+
+    except:
+
+        print('No regional fiber data available')
+
+    return None
+
+
+def generate_pcsf_access_csv(iso3):
+    """
+    This function generates a csv file for connected population at access 
+    level using PCSF.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Generating PCSF access fiber csv file for {}'.format(iso3))
+    folder_in = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                               'combined')
+    node_path = os.path.join(folder_in, '{}_combined_pcsf_subregional_nodes.shp'.format(
+        iso3))
+    edge_path = os.path.join(folder_in, '{}_combined_pcsf_access_edges.shp'.format(
+        iso3))
+    
+    gdf = gpd.read_file(node_path)
+    gdf = gdf.drop(columns = ['geometry'])
+
+    try:
+
+        gdf1 = gpd.read_file(edge_path)
+        gdf1 = gdf1.drop(columns = ['id', 'start', 'strategy', 'end', 'type']
+                        ).reset_index()
+        gdf1.rename(columns = {'GID_2': 'GID_1'}, 
+                                inplace = True)
+
+        gdf1['length'] = gdf1.geometry.length
+        gdf1['strategy'] = 'access'
+        gdf1 = gdf1.groupby(['GID_1','strategy', 'algorithm']
+                            )['length'].sum().reset_index()
+        
+
+        try:
+
+            merged_df = pd.merge(gdf, gdf1, on = 'GID_2', how = 'inner')
+
+        except:
+
+            gdf.rename(columns = {'GID_1': 'GID_1'}, inplace = True)
+            merged_df = pd.merge(gdf, gdf1, on = 'GID_1', how = 'inner')
+
+        merged_df['length_km'] = ''
+        for i in range(len(merged_df)):
+
+            merged_df['length_km'].loc[i] = merged_df['length'].loc[i] * 110.567
+        
+        merged_df = merged_df.drop(columns = ['length']).reset_index()
+        merged_df = merged_df[['iso3', 'GID_1', 'GID_2', 'population', 
+                              'length_km', 'strategy', 'algorithm']]
+
+        fileout = '{}_fiber_pcsf_access.csv'.format(iso3)
+        folder_out = os.path.join(DATA_RESULTS, iso3, 'fiber_design')
+        if not os.path.exists(folder_out):
+
+            os.makedirs(folder_out)
+
+        path_out = os.path.join(folder_out, fileout)
+        merged_df.to_csv(path_out, index = False)
+
+    except:
+
+        print('No access fiber data available')
+
+    return None
+
+
 '''for idx, country in countries.iterrows():
         
     #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    if not country['iso3'] == 'RWA':
+    if not country['iso3'] == 'BWA':
 
-        continue'''
+        continue
+
+    generate_pcsf_access_csv(countries['iso3'].loc[idx])'''

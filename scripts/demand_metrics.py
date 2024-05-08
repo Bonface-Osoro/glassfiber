@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import geopandas as gpd
 
+from glassfibre.preprocessing import (population_decile)
+
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
 
@@ -293,8 +295,76 @@ def combine_africa_shapefile():
 
     return None
 
-combine_africa_shapefile()
-#combine_shapefiles()
+
+def generate_population_decile():
+
+    """
+    This function generates population decile for each country and combine them 
+    together.
+    """
+
+    isos = os.listdir(DATA_RESULTS)
+    merged_data = pd.DataFrame()
+    merged_data_1 = pd.DataFrame()
+    print('Generating population deciles')
+
+    for iso3 in isos:
+
+        base_directory = os.path.join(DATA_RESULTS, iso3, 'population') 
+
+        for root, _, files in os.walk(base_directory):
+
+            for file in files:
+
+                if file.endswith('_population_results.csv'):
+                    
+                    file_path = os.path.join(base_directory, 
+                                '{}_population_results.csv'.format(iso3))
+                    df = pd.read_csv(file_path)
+                    df['pop_density_sqkm'] = df['population'] / df['area']
+                    df['decile'] = ''
+
+                    df1 = pd.read_csv(file_path)
+                    df1 = df1.groupby(['iso3', 'GID_1']).agg({'population': 
+                                        'sum', 'area': 'sum'}).reset_index()
+                                                                  
+                    df1['pop_density_sqkm'] = df1['population'] / df1['area']
+                    df1['decile'] = ''
+
+                    for i in range(len(df)):
+
+                        df['decile'].loc[i] = population_decile(
+                            df['pop_density_sqkm'].loc[i])
+                        
+                    for i in range(len(df1)):
+
+                        df1['decile'].loc[i] = population_decile(
+                            df1['pop_density_sqkm'].loc[i])
+
+                    df = df[['iso3', 'GID_2', 'pop_density_sqkm', 'decile']]
+                    df1 = df1[['iso3', 'GID_1', 'pop_density_sqkm', 'decile']]
+                    merged_data = pd.concat([merged_data, df], 
+                                            ignore_index = True)
+                    merged_data_1 = pd.concat([merged_data_1, df1], 
+                                              ignore_index = True)
+
+
+                fileout = 'SSA_subregional_population_deciles.csv'
+                fileout_1 = 'SSA_regional_population_deciles.csv'
+                folder_out = os.path.join(DATA_RESULTS, '..', 'SSA')
+
+                if not os.path.exists(folder_out):
+
+                    os.makedirs(folder_out)
+
+                path_out = os.path.join(folder_out, fileout)
+                path_out_1 = os.path.join(folder_out, fileout_1)
+                merged_data.to_csv(path_out, index = False)
+                merged_data_1.to_csv(path_out_1, index = False)
+
+    
+    return None
+
 '''for idx, country in countries.iterrows():
         
     if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
@@ -309,4 +379,5 @@ combine_fiber_shapefiles('combined_regional_edges')
 combine_fiber_shapefiles('combined_access_nodes')
 combine_fiber_shapefiles('combined_access_edges')
 combine_existing_fiber_shapefiles('core_nodes_existing')
-combine_existing_fiber_shapefiles('core_edges_existing')'''
+combine_existing_fiber_shapefiles('core_edges_existing')
+generate_population_decile'''

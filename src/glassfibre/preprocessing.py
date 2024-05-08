@@ -248,8 +248,11 @@ class ProcessRegions:
 
     def process_sub_region_boundaries(self):
 
-        region_path = os.path.join('results', 'processed', self.country_iso3, 'regions', 'regions_{}_{}.shp'.format(2, self.country_iso3)) 
-        region_path_2 = os.path.join('results', 'processed', self.country_iso3, 'regions', 'regions_{}_{}.shp'.format(1, self.country_iso3))
+        region_path = os.path.join('results', 'processed', 
+                    self.country_iso3, 'regions', 'regions_{}_{}.shp'.format(
+                        2, self.country_iso3)) 
+        region_path_2 = os.path.join('results', 'processed', self.country_iso3, 
+                    'regions', 'regions_{}_{}.shp'.format(1, self.country_iso3))
         
         if os.path.exists(region_path):
 
@@ -261,13 +264,16 @@ class ProcessRegions:
             countries = gpd.read_file(region_path_2)
             gid = 'GID_1'
 
-        for index, row in tqdm(countries.iterrows(), desc = 'Processing sub-region boundaries for {}'.format(self.country_iso3)):
+        for index, row in tqdm(countries.iterrows(), 
+                desc = 'Processing sub-region boundaries for {}'.format(
+                    self.country_iso3)):
 
             sub_region_shapefile = gpd.GeoDataFrame([row], crs = countries.crs)
 
             filename = '{}.shp'.format(row[gid])    
 
-            folder_out = os.path.join('results', 'processed', self.country_iso3, 'boundaries')
+            folder_out = os.path.join('results', 'processed', self.country_iso3, 
+                                      'boundaries')
 
             if not os.path.exists(folder_out):
 
@@ -415,7 +421,8 @@ class ProcessPopulation:
                     output.append({
                         'iso3':boundary['GID_0'],
                         'region':boundary['NAME_1'],
-                        'GID_1': boundary['GID_2'],
+                        'GID_1': boundary['GID_1'],
+                        'GID_2': boundary['GID_2'],
                         'population': population,
                         'latitude': boundary['latitude'],
                         'longitude': boundary['longitude'],
@@ -428,6 +435,7 @@ class ProcessPopulation:
                         'iso3':boundary['GID_0'],
                         'region':boundary['NAME_1'],
                         'GID_1': boundary['GID_1'],
+                        'GID_2': boundary['GID_1'],
                         'population': population,
                         'latitude': boundary['latitude'],
                         'longitude': boundary['longitude'],
@@ -641,7 +649,60 @@ def lca_operations():
     return ops_emission_dict
 
 
+def population_decile(pop_density):
 
-'''import pyarrow.parquet as pq
-df = gpd.read_parquet('part-00160-4dfc75cd-2680-4d52-b5e0-f4cc9f36b267-c000.zstd.parquet')
-print(df.head(5))'''
+    """
+    This function determines the population decile
+
+    Parameters
+    ----------
+    pop_density : float
+        Population density of an area
+
+    Returns
+    -------
+    decile : string
+        Population decile category where the region belongs
+    """
+
+    if pop_density >= 700:
+
+        decile = 'decile 10'
+
+    elif pop_density >= 600 and pop_density <= 700:
+
+        decile = 'decile 9'
+
+    elif pop_density >= 500 and pop_density <= 600:
+
+        decile = 'decile 8'
+
+    elif pop_density >= 400 and pop_density <= 500:
+
+        decile = 'decile 7'
+
+    elif pop_density >= 300 and pop_density <= 400:
+
+        decile = 'decile 6'
+
+    elif pop_density >= 200 and pop_density <= 300:
+
+        decile = 'decile 5'
+
+    elif pop_density >= 100 and pop_density <= 200:
+
+        decile = 'decile 4'
+
+    elif pop_density >= 75 and pop_density <= 100:
+
+        decile = 'decile 3'
+
+    elif pop_density >= 50 and pop_density <= 75:
+
+        decile = 'decile 2'
+
+    else:
+
+        decile = 'decile 1'
+
+    return decile 

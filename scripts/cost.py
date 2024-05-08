@@ -9,7 +9,8 @@ from glassfibre.inputs import parameters
 from glassfibre.preprocessing import (
     lca_manufacturing, lca_eolt, 
     lca_trans, 
-    lca_operations)
+    lca_operations,
+    population_decile)
 
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
@@ -108,7 +109,7 @@ def ssa_summary(iso3):
     iso3 : string
         Country ISO3 code
     """
-    #print('Generating geotype characteristics for {}.'.format(iso3))
+    print('Generating geotype characteristics for {}.'.format(iso3))
     pop_folder = os.path.join(DATA_RESULTS, iso3, 'demand')
     
     for root, _, files in os.walk(pop_folder):
@@ -284,18 +285,8 @@ def demand(iso3):
                 df['revenue_per_area'].loc[i] = ((df['users_area_sqkm'].loc[i]) 
                                                  * (arpu))
 
-            if df['pop_den_km'].loc[i] >= 1000:
-
-                df['geotype'].loc[i] = 'urban'
+            df['geotype'].loc[i] = population_decile(df['pop_den_km'].loc[i])
             
-            elif df['pop_den_km'].loc[i] >= 500 and df['pop_den_km'].loc[i] <= 1000:
-                
-                df['geotype'].loc[i] = 'suburban'
-
-            else:
-
-                df['geotype'].loc[i] = 'rural'
-                
         df = df[['iso3', 'GID_2', 'area', 'population', 'adoption_scenario',
                  'adoption_value', 'pop_den_km', 'geotype', 'users_area_sqkm', 
                  'revenue_per_area']]
@@ -315,7 +306,7 @@ def demand(iso3):
     return None            
 
 
-if __name__ == '__main__':
+'''if __name__ == '__main__':
 
     for idx, country in countries.iterrows():
             
@@ -326,4 +317,4 @@ if __name__ == '__main__':
             continue 
         #demand(countries['iso3'].loc[idx])
         #capacity_user(countries['iso3'].loc[idx])
-        #ssa_summary(countries['iso3'].loc[idx])
+        ssa_summary(countries['iso3'].loc[idx])'''
