@@ -519,6 +519,18 @@ def ssa_csv_merger(csv_name):
                     
                     merged_data = merged_data[['iso3', 'tco', 'tco_per_user', 
                         'strategy', 'algorithm']]
+                    
+                if csv_name == '_local_emission_results.csv':  
+
+                    merged_data = merged_data.groupby(['iso3', 'strategy', 'GID_2',
+                        'algorithm']).agg({'total_ghg_emissions_kg': 'mean',
+                        'emissions_kg_per_subscriber': 'mean'}
+                        ).reset_index()
+                    
+                    merged_data = merged_data[['iso3', 'GID_2', 
+                        'total_ghg_emissions_kg', 'emissions_kg_per_subscriber', 
+                        'strategy', 'algorithm']]
+                    
                              
                 merged_data['algorithm'] = merged_data['algorithm'].fillna(
                     'Dijkstras')
@@ -532,6 +544,66 @@ def ssa_csv_merger(csv_name):
 
                 path_out = os.path.join(folder_out, fileout)
                 merged_data.to_csv(path_out, index = False)
+
+    return None
+
+
+def ssa_hireachy_emissions(csv_name):
+    """
+    This funcion read and merge multiple CSV files located  in different folders.
+
+    Parameters
+    ----------
+    csv_name : string
+        Name of the file to process. It can be '_local_emission_results.csv'
+    """
+
+    isos = os.listdir(DATA_RESULTS)
+
+    merged_data = pd.DataFrame()
+    for iso3 in isos:
+
+        print('Merging {} csv files'. format(iso3))
+        base_directory = os.path.join(DATA_RESULTS, iso3, 'emissions') 
+
+        for root, _, files in os.walk(base_directory):
+
+            for file in files:
+                
+                if file.endswith('{}'.format(csv_name)):
+
+                    file_path = os.path.join(base_directory, '{}{}'.format(iso3, csv_name))
+
+                    if csv_name == '_local_emission_results.csv':  
+
+                        df = pd.read_csv(file_path)
+                        merged_data = pd.concat([merged_data, df], ignore_index = True)
+
+                    if csv_name == '_pcsf_local_emission_results.csv':  
+
+                        df = pd.read_csv(file_path)
+                        merged_data = pd.concat([merged_data, df], ignore_index = True)
+
+                    if csv_name == '_regional_emission_results.csv':  
+
+                        df = pd.read_csv(file_path)
+                        merged_data = pd.concat([merged_data, df], ignore_index = True)
+
+                    if csv_name == '_pcsf_regional_emission_results.csv':  
+
+                        df = pd.read_csv(file_path)
+                        merged_data = pd.concat([merged_data, df], ignore_index = True)
+
+                    fileout = 'SSA{}'.format(csv_name)
+                    folder_out = os.path.join(DATA_RESULTS, '..', 'SSA', 
+                                              'fiber_levels')
+
+                    if not os.path.exists(folder_out):
+
+                        os.makedirs(folder_out)
+
+                    path_out = os.path.join(folder_out, fileout)
+                    merged_data.to_csv(path_out, index = False)
 
 
 if __name__ == '__main__':
@@ -603,15 +675,24 @@ ssa_csv_merger('_tco_results.csv')'''
 #run after running summations
 #csv_merger('_baseline_total_mfg.csv', 'summary')
 #csv_merger('_baseline_total_eolt.csv', 'summary')
+
+### Dijkstras algorithm ####
 #csv_merger('_local_total_mfg.csv', 'summary')
 #csv_merger('_local_total_eolt.csv', 'summary')
 #csv_merger('_regional_total_mfg.csv', 'summary')
 #csv_merger('_regional_total_eolt.csv', 'summary')
 
+### PCSF algorithm ####
 #csv_merger('_pcsf_local_total_mfg.csv', 'summary')
 #csv_merger('_pcsf_local_total_eolt.csv', 'summary')
 #csv_merger('_pcsf_regional_total_mfg.csv', 'summary')
 #csv_merger('_pcsf_regional_total_eolt.csv', 'summary')
 
 #ssa_csv_merger('_total_mfg.csv')
-ssa_csv_merger('_total_eolt.csv')
+#ssa_csv_merger('_total_eolt.csv')
+
+#### Results for decile plots ####
+#ssa_hireachy_emissions('_local_emission_results.csv')
+#ssa_hireachy_emissions('_pcsf_local_emission_results.csv')
+#ssa_hireachy_emissions('_regional_emission_results.csv')
+ssa_hireachy_emissions('_pcsf_regional_emission_results.csv')

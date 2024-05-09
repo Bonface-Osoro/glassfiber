@@ -341,7 +341,7 @@ def generate_population_decile():
                         df1['decile'].loc[i] = population_decile(
                             df1['pop_density_sqkm'].loc[i])
 
-                    df = df[['iso3', 'GID_2', 'pop_density_sqkm', 'decile']]
+                    df = df[['iso3', 'GID_1', 'GID_2', 'pop_density_sqkm', 'decile']]
                     df1 = df1[['iso3', 'GID_1', 'pop_density_sqkm', 'decile']]
                     merged_data = pd.concat([merged_data, df], 
                                             ignore_index = True)
@@ -379,5 +379,5 @@ combine_fiber_shapefiles('combined_regional_edges')
 combine_fiber_shapefiles('combined_access_nodes')
 combine_fiber_shapefiles('combined_access_edges')
 combine_existing_fiber_shapefiles('core_nodes_existing')
-combine_existing_fiber_shapefiles('core_edges_existing')
-generate_population_decile'''
+combine_existing_fiber_shapefiles('core_edges_existing')'''
+generate_population_decile()
