@@ -2,6 +2,8 @@ library(ggpubr)
 library(ggplot2)
 library(tidyverse)
 library(cowplot)
+library(ggtext)
+library(sf)
 
 suppressMessages(library(tidyverse))
 folder <- dirname(rstudioapi::getSourceEditorContext()$path)
@@ -30,20 +32,23 @@ df$monthly_traffic = factor(
 
 df$geotype = factor(
   df$geotype,
-  levels = c('remote', 'rural', 'suburban', 'urban'),
-  labels = c('Decile 1 \n(<50 per km²)', 'Decile 2 \n(50 - 500 per km²)', 
-             'Decile 3 \n(500 - 1000 per km²)', 'Decile 4 \n(>1000 per km²)')
+  levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
+             'decile 5', 'decile 4', 'decile 3', 'decile 2', 'decile 1'),
+  labels = c('Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
+             'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
+             'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
+             'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
+             'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)')
 )
 
 demand_area <- 
   ggplot(df, aes(x = geotype, y = average_demand, fill = adoption_scenario)) +
-  geom_bar(stat = "identity", position = position_dodge(0.9)) +
-  geom_text(aes(label = as.character(signif(average_demand, 3))), size = 2.5, 
-    position = position_dodge(0.9), vjust = 0.5, hjust = -0.1, angle = 90) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) + coord_flip() + 
+  geom_text(aes(label = as.character(signif(average_demand, 3))), size = 2, 
+    position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   labs(colour = NULL, title = '(a) Average Demand per Area.',
     subtitle = 'Based on geotype, demand scenario and monthly traffic.',
-    x = NULL, y = "Average Demand per Area") + 
-  ylab("Demand per Area (Mbps per km<sup>2)") +
+    x = NULL, y = "Average Demand per Area (Mbps per km²)") + 
   scale_fill_brewer(palette = "YlGnBu") +
   theme(
     legend.position = 'none',
@@ -77,7 +82,7 @@ data = data %>%
   group_by(GID_2, monthly_traffic) %>%
   summarize(avg_demand = sum(demand_mbps_sqkm))
 
-merged_data <- merge(africa_shp, data, by = "GID_2")
+merged_data <- merge(africa_data, data, by = "GID_2")
 merged_data <- merged_data[!duplicated(merged_data$avg_demand), ]
 demand_bins <- c(-Inf, 0.1, 0.5, 1, 3, 5, 10, 15, 20, Inf)
 merged_data$demand_bins <- cut(merged_data$avg_demand, breaks = demand_bins, 
@@ -126,7 +131,7 @@ png(
   path,
   units = "in",
   width = 11,
-  height = 8,
+  height = 10,
   res = 480
 )
 print(demand_panel)
@@ -139,26 +144,37 @@ data <- read.csv(file.path(folder, '..', 'results', 'SSA',
         'SSA_tco_results.csv'))
 
 df = data %>%
-  group_by(region, strategy) %>%
+  group_by(algorithm, strategy) %>%
   summarize(avg_tco_per_user = (mean(tco_per_user)) / 1e3) 
 
 df$strategy <- factor(
   df$strategy,
-  levels = c('baseline', 'regional', 'local'),
+  levels = c('baseline', 'regional', 'access'),
   labels = c('Existing \nCore Network', 'New \nRegional Network', 'New \nAccess Network')
 )
 
+df$algorithm <- factor(
+  df$algorithm,
+  levels = c('none', 'Dijkstras', 'pcsf'),
+  labels = c('Unknown', 'Dijkstras', 'PCSF')
+)
+
+totals <- df %>%
+  group_by(algorithm) %>%
+  summarize(value = signif(sum(avg_tco_per_user)))
+
 revenue_area <- 
-  ggplot(df, aes(x = strategy, y = avg_tco_per_user)) +
+  ggplot(df, aes(x = algorithm, y = avg_tco_per_user)) +
   geom_bar(stat = "identity", aes(fill = strategy)) +
-  geom_text(aes(label = as.character(signif(avg_tco_per_user, 3))), 
-    size = 2.5, position = position_dodge(0.9), vjust = 0.5, hjust = -0.1, angle = 90) +
+  geom_text(aes(x = algorithm, y = value, label = round(value, 2)
+    ),size = 2.5, data = totals, vjust = 0.06, hjust = -0.1, 
+    position = position_dodge(0.9)) + 
   labs(colour = NULL, title = '(a) Average TCO per user.',
-       subtitle = 'Estimated by averaging the per user TCO for each SSA region.',
-       x = NULL, y = "Average TCO per user ($ '000')") + 
+       subtitle = 'Estimated by averaging the per user TCO for each SSA country.',
+       x = 'Spatial Optimization Algorithm', y = "Average TCO per user ($ '000')") + 
   scale_fill_brewer(palette = "YlGnBu") +
   theme(
-    legend.position = 'none',
+    legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 9, face = "bold"),
@@ -167,29 +183,9 @@ revenue_area <-
     axis.title.y = element_markdown(size = 7),
     legend.title = element_text(size = 6),
     legend.text = element_text(size = 6),
-    axis.title.x = element_text(size = 7)) +
-  expand_limits(y = 0) + 
-  guides(fill = guide_legend(ncol = 6) +
-  scale_x_discrete(expand = c(0, 0.15)) + 
-  scale_y_continuous(expand = c(0, 0)),
-  labels = function(y)format(y, 
-  scientific = FALSE), limit = c(0, 160)) + 
-  facet_wrap( ~ region, ncol = 4)
-
-#############
-##TCO MAPS ##
-#############
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 
-                           'SSA_local_tco_results.csv'))
-
-data = data %>%
-  distinct(iso3, GID_2, tco_per_user, .keep_all = TRUE) %>%
-  group_by(GID_2) %>%
-  summarize(tco_per_user)
-
-merged_data <- merge(africa_shp, data, by = "GID_2")
-
-
-
-
-
+    axis.title.x = element_text(size = 7)
+  ) +
+  expand_limits(y = 0) +
+  guides(fill = guide_legend(ncol = 6, title = 'Fiber Hirearchy')) +
+  scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 73))
