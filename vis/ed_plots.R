@@ -18,16 +18,16 @@ df <- read.csv(file.path(folder, '..', 'results', 'SSA', 'sample',
 df <- df[df$decile != "National", ]
 
 df$decile = factor(df$decile,
-                   levels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
-                              'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
-                              'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
-                              'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
-                              'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'),
-                   labels = c('National', 'Decile 1 \n(>700 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-                              'Decile 3 \n(500 - 600 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-                              'Decile 5 \n(300 - 400 per km²)', 'Decile 6 \n(200 - 300 per km²)',
-                              'Decile 7 \n(100 - 200 per km²)', 'Decile 8 \n(75 - 100 per km²)',
-                              'Decile 9 \n(50 - 75 per km²)', 'Decile 10 \n(<50 per km²)'))
+  levels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
+  'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
+  'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
+  'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
+  'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'),
+  labels = c('National', 'Decile 1 \n(>700 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
+  'Decile 3 \n(500 - 600 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
+  'Decile 5 \n(300 - 400 per km²)', 'Decile 6 \n(200 - 300 per km²)',
+  'Decile 7 \n(100 - 200 per km²)', 'Decile 8 \n(75 - 100 per km²)',
+  'Decile 9 \n(50 - 75 per km²)', 'Decile 10 \n(<50 per km²)'))
 
 label_totals <- df %>%
   group_by(decile) %>%
@@ -57,7 +57,7 @@ djikistra_total_emissions <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-                                                             labels = function(y)format(y, scientific = FALSE), limit = c(0, 32900))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 32900))
 
 ##########################
 ##TOTAL EMISSIONS: PCSF###
@@ -68,16 +68,16 @@ df <- read.csv(file.path(folder, '..', 'results', 'SSA', 'sample',
 df <- df[df$decile != "National", ]
 
 df$decile = factor(df$decile,
-                   levels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
-                              'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
-                              'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
-                              'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
-                              'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'),
-                   labels = c('National', 'Decile 1 \n(>700 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-                              'Decile 3 \n(500 - 600 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-                              'Decile 5 \n(300 - 400 per km²)', 'Decile 6 \n(200 - 300 per km²)',
-                              'Decile 7 \n(100 - 200 per km²)', 'Decile 8 \n(75 - 100 per km²)',
-                              'Decile 9 \n(50 - 75 per km²)', 'Decile 10 \n(<50 per km²)'))
+  levels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
+  'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
+  'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
+  'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
+  'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'),
+  labels = c('National', 'Decile 1 \n(>700 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
+  'Decile 3 \n(500 - 600 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
+  'Decile 5 \n(300 - 400 per km²)', 'Decile 6 \n(200 - 300 per km²)',
+  'Decile 7 \n(100 - 200 per km²)', 'Decile 8 \n(75 - 100 per km²)',
+  'Decile 9 \n(50 - 75 per km²)', 'Decile 10 \n(<50 per km²)'))
 
 label_totals <- df %>%
   group_by(decile) %>%
@@ -118,16 +118,16 @@ df <- read.csv(file.path(folder, '..', 'results', 'SSA', 'sample',
 df <- df[df$decile != "National", ]
 
 df$decile = factor(df$decile,
-                   levels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
-                              'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
-                              'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
-                              'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
-                              'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'),
-                   labels = c('National', 'Decile 1 \n(>700 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-                              'Decile 3 \n(500 - 600 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-                              'Decile 5 \n(300 - 400 per km²)', 'Decile 6 \n(200 - 300 per km²)',
-                              'Decile 7 \n(100 - 200 per km²)', 'Decile 8 \n(75 - 100 per km²)',
-                              'Decile 9 \n(50 - 75 per km²)', 'Decile 10 \n(<50 per km²)'))
+   levels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
+   'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
+   'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
+   'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
+   'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'),
+   labels = c('National', 'Decile 1 \n(>700 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
+   'Decile 3 \n(500 - 600 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
+   'Decile 5 \n(300 - 400 per km²)', 'Decile 6 \n(200 - 300 per km²)',
+   'Decile 7 \n(100 - 200 per km²)', 'Decile 8 \n(75 - 100 per km²)',
+   'Decile 9 \n(50 - 75 per km²)', 'Decile 10 \n(<50 per km²)'))
 
 label_totals <- df %>%
   group_by(decile) %>%
@@ -168,16 +168,16 @@ df <- read.csv(file.path(folder, '..', 'results', 'SSA', 'sample',
 df <- df[df$decile != "National", ]
 
 df$decile = factor(df$decile,
-                   levels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
-                              'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
-                              'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
-                              'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
-                              'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'),
-                   labels = c('National', 'Decile 1 \n(>700 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-                              'Decile 3 \n(500 - 600 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-                              'Decile 5 \n(300 - 400 per km²)', 'Decile 6 \n(200 - 300 per km²)',
-                              'Decile 7 \n(100 - 200 per km²)', 'Decile 8 \n(75 - 100 per km²)',
-                              'Decile 9 \n(50 - 75 per km²)', 'Decile 10 \n(<50 per km²)'))
+  levels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
+  'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
+  'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
+  'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
+  'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'),
+  labels = c('National', 'Decile 1 \n(>700 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
+  'Decile 3 \n(500 - 600 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
+  'Decile 5 \n(300 - 400 per km²)', 'Decile 6 \n(200 - 300 per km²)',
+  'Decile 7 \n(100 - 200 per km²)', 'Decile 8 \n(75 - 100 per km²)',
+  'Decile 9 \n(50 - 75 per km²)', 'Decile 10 \n(<50 per km²)'))
 
 label_totals <- df %>%
   group_by(decile) %>%
