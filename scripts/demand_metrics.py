@@ -182,26 +182,6 @@ def combine_fiber_shapefiles(metric):
 
                     file_path = os.path.join(root, file)
                     gdf = gpd.read_file(file_path)
-                    gdf['region'] = ''
-                    
-                    for i in range(len(gdf)):
-
-                        if iso3 in southern:
-
-                            gdf['region'].loc[i] = 'southern'
-                        
-                        elif iso3 in central:
-
-                            gdf['region'].loc[i] = 'central'
-
-                        elif iso3 in eastern:
-
-                            gdf['region'].loc[i] = 'eastern'
-
-                        else:
-
-                            gdf['region'].loc[i] = 'west'
-
                     combined_gdf = pd.concat([combined_gdf, gdf], 
                                                 ignore_index = True) 
                     
@@ -237,26 +217,6 @@ def combine_existing_fiber_shapefiles(metric):
 
                     file_path = os.path.join(root, file)
                     gdf = gpd.read_file(file_path)
-                    gdf['region'] = ''
-                    
-                    for i in range(len(gdf)):
-
-                        if iso3 in southern:
-
-                            gdf['region'].loc[i] = 'southern'
-                        
-                        elif iso3 in central:
-
-                            gdf['region'].loc[i] = 'central'
-
-                        elif iso3 in eastern:
-
-                            gdf['region'].loc[i] = 'eastern'
-
-                        else:
-
-                            gdf['region'].loc[i] = 'west'
-
                     combined_gdf = pd.concat([combined_gdf, gdf], 
                                                 ignore_index = True) 
                     
@@ -365,6 +325,47 @@ def generate_population_decile():
     
     return None
 
+
+def combine_pcsf_fiber_shapefiles():
+    """
+    This function combines shapefiles of individual country into a single one.
+
+    Parameters
+    ----------
+    metric : string
+        Network level and shape being quantified'
+    """
+    isos = os.listdir(DATA_PROCESSED)
+    combined_gdf = gpd.GeoDataFrame()
+    
+    for iso3 in isos:
+
+        print('Combining data for {}'.format(iso3))
+        shapefile_path = os.path.join(DATA_PROCESSED, iso3, 'buffer_routing_zones', 
+                                      'combined')
+
+        for root, _, files in os.walk(shapefile_path):
+
+            for file in files:
+    
+                if file.endswith('{}_combined_pcsf_access_edges.shp'.format(iso3)):
+
+                    file_path = os.path.join(root, file)
+                    gdf = gpd.read_file(file_path)
+                    combined_gdf = pd.concat([combined_gdf, gdf], 
+                                                ignore_index = True) 
+                    
+                    fileout = 'SSA_combined_pcsf_access_edges.shp'
+                    folder_out = os.path.join(DATA_AFRICA, 'shapefiles')
+                    if not os.path.exists(folder_out):
+
+                        os.makedirs(folder_out)
+
+                    path_out = os.path.join(folder_out, fileout)
+                    combined_gdf.to_file(path_out, index = False)
+    return None
+
+
 '''for idx, country in countries.iterrows():
         
     if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
@@ -373,11 +374,12 @@ def generate_population_decile():
 
         continue
 
-    generate_demand_metrics(countries['iso3'].loc[idx])
+generate_demand_metrics(countries['iso3'].loc[idx])
 combine_fiber_shapefiles('combined_regional_nodes')
 combine_fiber_shapefiles('combined_regional_edges')
 combine_fiber_shapefiles('combined_access_nodes')
 combine_fiber_shapefiles('combined_access_edges')
 combine_existing_fiber_shapefiles('core_nodes_existing')
 combine_existing_fiber_shapefiles('core_edges_existing')'''
-generate_population_decile()
+#generate_population_decile()
+combine_pcsf_fiber_shapefiles()
