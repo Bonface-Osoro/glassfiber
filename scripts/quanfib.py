@@ -692,7 +692,7 @@ ssa_csv_merger('_tco_results.csv')'''
 #ssa_csv_merger('_total_eolt.csv')
 
 #### Results for decile plots ####
-#ssa_hireachy_emissions('_local_emission_results.csv')
-#ssa_hireachy_emissions('_pcsf_local_emission_results.csv')
-#ssa_hireachy_emissions('_regional_emission_results.csv')
+ssa_hireachy_emissions('_local_emission_results.csv')
+ssa_hireachy_emissions('_pcsf_local_emission_results.csv')
+ssa_hireachy_emissions('_regional_emission_results.csv')
 ssa_hireachy_emissions('_pcsf_regional_emission_results.csv')
