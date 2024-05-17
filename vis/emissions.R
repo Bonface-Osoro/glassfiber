@@ -102,19 +102,19 @@ df = data %>%
   summarize(total_ghgs = sum(total_ghg_emissions_kg)) 
 
 df$decile = factor(df$decile,
-    levels = c('national', 'decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
-    'decile 5', 'decile 4', 'decile 3', 'decile 2', 'decile 1'),
-    labels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
-    'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
-    'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
-    'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
-    'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'))
-
+   levels = c('national', 'decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
+   'decile 5', 'decile 4', 'decile 3', 'decile 2', 'decile 1'),
+   labels = c('National', 'Decile 10 \n(<50 per km²)', 'Decile 9 \n(50 - 75 per km²)', 
+   'Decile 8 \n(75 - 100 per km²)', 'Decile 7 \n(100 - 200 per km²)', 
+   'Decile 6 \n(200 - 300 per km²)', 'Decile 5 \n(300 - 400 per km²)',
+   'Decile 4 \n(400 - 500 per km²)', 'Decile 3 \n(500 - 600 per km²)',
+   'Decile 2 \n(600 - 700 per km²)', 'Decile 1 \n(>700 per km²)'))
+  
 df$strategy <- factor(
   df$strategy,
   levels = c('baseline', 'regional', 'access'),
-  labels = c('Existing \nCore Network', 'New \nRegional Network', 
-             'New \nAccess Network'))
+  labels = c('Existing Core Network', 'New Regional Network', 
+             'New Access Network'))
 
 label_totals <- df %>%
   group_by(decile) %>%
@@ -124,31 +124,31 @@ djikistra_total_emissions <-
   ggplot(df, aes(x = decile, y = total_ghgs/1e9)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = total_value/1e9, 
-  label = sprintf("%.0f", total_value/1e9)), size = 2,
+  label = sprintf("%.0f", total_value/1e9)), size = 3,
   position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
-  labs(colour = NULL, title = "(A) Total GHG Emissions: Dijkstras.",
-       subtitle = "Classified by population deciles and network level.",
+  labs(colour = NULL, title = "Total GHG Emissions.",
+       subtitle = "(a) Fiber design using Dijkstras algorithm.",
        x = NULL, y = bquote("Total GHG Emissions (Mt CO"[2]*" eq.)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
     panel.spacing = unit(0.6, "lines"),
-    plot.title = element_text(size = 9, face = "bold"),
-    plot.subtitle = element_text(size = 8),
-    axis.text.y = element_text(size = 7),
+    plot.title = element_text(size = 10, face = "bold"),
+    plot.subtitle = element_text(size = 10, face = "bold"),
+    axis.text.y = element_text(size = 10),
     axis.title.y = element_markdown(size = 7),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 6),
-    axis.title.x = element_text(size = 7)
+    legend.title = element_text(size = 7),
+    legend.text = element_text(size = 7),
+    axis.title.x = element_text(size = 10)
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 32900))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 33900))
 
-###############################
-##TOTAL EMISSIONS: DIJKSTRAS###
-###############################
+##########################
+##TOTAL EMISSIONS: PCSF###
+##########################
 data1 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_country_baseline_emission.csv'))
 data1$decile <- 'national'
 data1 <- data1[, c('strategy', 'decile', 'total_ghg_emissions_kg')]
@@ -179,20 +179,21 @@ data <- rbind(data1, data2, data3)
 df = data %>%
   group_by(decile, strategy) %>%
   summarize(total_ghgs = sum(total_ghg_emissions_kg)) 
+
 df$decile = factor(df$decile,
   levels = c('national', 'decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
   'decile 5', 'decile 4', 'decile 3', 'decile 2', 'decile 1'),
-  labels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
-  'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
-  'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
-  'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
-  'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'))
+  labels = c('National', 'Decile 10 \n(<50 per km²)', 'Decile 9 \n(50 - 75 per km²)', 
+  'Decile 8 \n(75 - 100 per km²)', 'Decile 7 \n(100 - 200 per km²)', 
+  'Decile 6 \n(200 - 300 per km²)', 'Decile 5 \n(300 - 400 per km²)',
+  'Decile 4 \n(400 - 500 per km²)', 'Decile 3 \n(500 - 600 per km²)',
+  'Decile 2 \n(600 - 700 per km²)', 'Decile 1 \n(>700 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
   levels = c('baseline', 'regional', 'access'),
-  labels = c('Existing \nCore Network', 'New \nRegional Network', 
-             'New \nAccess Network'))
+  labels = c('Existing Core Network', 'New Regional Network', 
+             'New Access Network'))
 
 label_totals <- df %>%
   group_by(decile) %>%
@@ -202,27 +203,27 @@ pcsf_total_emissions <-
   ggplot(df, aes(x = decile, y = total_ghgs/1e9)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = total_value/1e9, 
-  label = sprintf("%.0f", total_value/1e9)), size = 2,
+  label = sprintf("%.0f", total_value/1e9)), size = 3,
   position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
-  labs(colour = NULL, title = "(B) Total GHG Emissions: PCSF.",
-       subtitle = "Classified by population deciles and network level.",
+  labs(colour = NULL, title = ' ',
+       subtitle = "(b) Fiber design using PCSF algorithm.",
        x = NULL, y = bquote("Total GHG Emissions (Mt CO"[2]*" eq.)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
     panel.spacing = unit(0.6, "lines"),
-    plot.title = element_text(size = 9, face = "bold"),
-    plot.subtitle = element_text(size = 8),
-    axis.text.y = element_text(size = 7),
+    plot.title = element_text(size = 10, face = "bold"),
+    plot.subtitle = element_text(size = 10, face = "bold"),
+    axis.text.y = element_text(size = 10),
     axis.title.y = element_markdown(size = 7),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 6),
-    axis.title.x = element_text(size = 7)
+    legend.title = element_text(size = 7),
+    legend.text = element_text(size = 7),
+    axis.title.x = element_text(size = 10)
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 32900))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 33900))
 
 ########################################
 ###### AVERAGE PER USER EMISSIONS ######
@@ -263,19 +264,19 @@ df = data %>%
   summarize(avg_ghgs = mean(emissions_kg_per_subscriber)) 
 
 df$decile = factor(df$decile,
-   levels = c('national', 'decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
-   'decile 5', 'decile 4', 'decile 3', 'decile 2', 'decile 1'),
-   labels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
-   'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
-   'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
-   'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
-   'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'))
+  levels = c('national', 'decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
+  'decile 5', 'decile 4', 'decile 3', 'decile 2', 'decile 1'),
+  labels = c('National', 'Decile 10 \n(<50 per km²)', 'Decile 9 \n(50 - 75 per km²)', 
+  'Decile 8 \n(75 - 100 per km²)', 'Decile 7 \n(100 - 200 per km²)', 
+  'Decile 6 \n(200 - 300 per km²)', 'Decile 5 \n(300 - 400 per km²)',
+  'Decile 4 \n(400 - 500 per km²)', 'Decile 3 \n(500 - 600 per km²)',
+  'Decile 2 \n(600 - 700 per km²)', 'Decile 1 \n(>700 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
   levels = c('baseline', 'regional', 'access'),
-  labels = c('Existing \nCore Network', 'New \nRegional Network', 
-             'New \nAccess Network'))
+  labels = c('Existing Core Network', 'New Regional Network', 
+             'New Access Network'))
 
 label_totals <- df %>%
   group_by(decile) %>%
@@ -285,28 +286,28 @@ djikistra_average_emissions <-
   ggplot(df, aes(x = decile, y = avg_ghgs/1e3)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value/1e3, 
-  label = sprintf("%.0f", mean_value/1e3)), size = 2,
+  label = sprintf("%.0f", mean_value/1e3)), size = 3,
   position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
-  labs(colour = NULL, title = "(C) Average GHG Emissions: Dijkstras.",
-       subtitle = "Classified by population deciles and network level.",
+  labs(colour = NULL, title = "Average GHG Emissions",
+       subtitle = "(c) Fiber design using Dijkstras algorithm.",
        x = NULL, 
-       y = bquote("Average emissions per GHG emissions (t CO"[2]*" eq. per user)")) + 
+       y = bquote("Average GHG emissions (t CO"[2]*" eq. per user)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
     panel.spacing = unit(0.6, "lines"),
-    plot.title = element_text(size = 9, face = "bold"),
-    plot.subtitle = element_text(size = 8),
-    axis.text.y = element_text(size = 7),
+    plot.title = element_text(size = 10, face = "bold"),
+    plot.subtitle = element_text(size = 10, face = "bold"),
+    axis.text.y = element_text(size = 10),
     axis.title.y = element_markdown(size = 7),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 6),
-    axis.title.x = element_text(size = 7)
+    legend.title = element_text(size = 7),
+    legend.text = element_text(size = 7),
+    axis.title.x = element_text(size = 10)
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 7100))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 7500))
 
 ###########################
 ##AVERAGE EMISSIONS: PCSF##
@@ -343,19 +344,19 @@ df = data %>%
   summarize(avg_ghgs = mean(emissions_kg_per_subscriber)) 
 
 df$decile = factor(df$decile,
-   levels = c('national', 'decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
-   'decile 5', 'decile 4', 'decile 3', 'decile 2', 'decile 1'),
-   labels = c('National', 'Decile 10 \n(>700 per km²)', 'Decile 9 \n(600 - 700 per km²)', 
-   'Decile 8 \n(500 - 600 per km²)', 'Decile 7 \n(400 - 500 per km²)', 
-   'Decile 6 \n(300 - 400 per km²)', 'Decile 5 \n(200 - 300 per km²)',
-   'Decile 4 \n(100 - 200 per km²)', 'Decile 3 \n(75 - 100 per km²)',
-   'Decile 2 \n(50 - 75 per km²)', 'Decile 1 \n(<50 per km²)'))
+  levels = c('national', 'decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
+  'decile 5', 'decile 4', 'decile 3', 'decile 2', 'decile 1'),
+  labels = c('National', 'Decile 10 \n(<50 per km²)', 'Decile 9 \n(50 - 75 per km²)', 
+  'Decile 8 \n(75 - 100 per km²)', 'Decile 7 \n(100 - 200 per km²)', 
+  'Decile 6 \n(200 - 300 per km²)', 'Decile 5 \n(300 - 400 per km²)',
+  'Decile 4 \n(400 - 500 per km²)', 'Decile 3 \n(500 - 600 per km²)',
+  'Decile 2 \n(600 - 700 per km²)', 'Decile 1 \n(>700 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
   levels = c('baseline', 'regional', 'access'),
-  labels = c('Existing \nCore Network', 'New \nRegional Network', 
-             'New \nAccess Network'))
+  labels = c('Existing Core Network', 'New Regional Network', 
+             'New Access Network'))
 
 label_totals <- df %>%
   group_by(decile) %>%
@@ -365,28 +366,188 @@ pcsf_average_emissions <-
   ggplot(df, aes(x = decile, y = avg_ghgs/1e3)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value/1e3, 
-    label = sprintf("%.0f", mean_value/1e3)), size = 2,
+    label = sprintf("%.0f", mean_value/1e3)), size = 3,
     position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
-  labs(colour = NULL, title = "(D) Average GHG Emissions: PCSF.",
-       subtitle = "Classified by population deciles and network level.",
+  labs(colour = NULL, title = ' ',
+       subtitle = "(d) Fiber design using PCSF algorithm.",
        x = NULL, 
-       y = bquote("Average emissions per GHG emissions (t CO"[2]*" eq. per user)")) + 
+       y = bquote("Average GHG emissions (t CO"[2]*" eq. per user)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
     panel.spacing = unit(0.6, "lines"),
-    plot.title = element_text(size = 9, face = "bold"),
-    plot.subtitle = element_text(size = 8),
-    axis.text.y = element_text(size = 7),
+    plot.title = element_text(size = 10, face = "bold"),
+    plot.subtitle = element_text(size = 10, face = "bold"),
+    axis.text.y = element_text(size = 10),
     axis.title.y = element_markdown(size = 7),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 6),
-    axis.title.x = element_text(size = 7)
+    legend.title = element_text(size = 7),
+    legend.text = element_text(size = 7),
+    axis.title.x = element_text(size = 10)
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 7100))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 7500))
+
+############################################
+##ANNUALIZED AVERAGE EMISSIONS: DIJKSTRAS###
+############################################
+data1 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_country_baseline_emission.csv'))
+data1$decile <- 'national'
+data1 <- data1[, c('strategy', 'decile', 'emissions_kg_per_subscriber')]
+
+#### Access total emissions ####
+data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
+                            'SSA_local_emission_results.csv'))
+
+## Combine the merged data with deciles
+access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
+                                 'SSA_subregional_population_deciles.csv'))
+data2 <- merge(data2, access_pop, by = "GID_2")
+data2 <- data2[, c('strategy', 'decile', 'emissions_kg_per_subscriber')]
+
+#### Regional manufacturing emissions ####
+data3 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
+                            'SSA_regional_emission_results.csv'))
+
+## Combine the merged data with deciles
+reg_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
+                              'SSA_regional_population_deciles.csv'))
+data3 <- merge(reg_pop, data3, by = "GID_1")
+data3 <- data3[, c('strategy', 'decile', 'emissions_kg_per_subscriber')]
+
+### Combine baseline, regional and access results
+data <- rbind(data1, data2, data3)
+
+df = data %>%
+  group_by(decile, strategy) %>%
+  summarize(avg_ghgs = mean(emissions_kg_per_subscriber/20)) 
+
+df$decile = factor(df$decile,
+   levels = c('national', 'decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
+   'decile 5', 'decile 4', 'decile 3', 'decile 2', 'decile 1'),
+   labels = c('National', 'Decile 10 \n(<50 per km²)', 'Decile 9 \n(50 - 75 per km²)', 
+   'Decile 8 \n(75 - 100 per km²)', 'Decile 7 \n(100 - 200 per km²)', 
+   'Decile 6 \n(200 - 300 per km²)', 'Decile 5 \n(300 - 400 per km²)',
+   'Decile 4 \n(400 - 500 per km²)', 'Decile 3 \n(500 - 600 per km²)',
+   'Decile 2 \n(600 - 700 per km²)', 'Decile 1 \n(>700 per km²)'))
+
+df$strategy <- factor(
+  df$strategy,
+  levels = c('baseline', 'regional', 'access'),
+  labels = c('Existing Core Network', 'New Regional Network', 
+             'New Access Network'))
+
+label_totals <- df %>%
+  group_by(decile) %>%
+  summarize(mean_value = sum(avg_ghgs))
+
+djikistra_annualized_emissions <-
+  ggplot(df, aes(x = decile, y = avg_ghgs/1e3)) +
+  geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
+  geom_text(data = label_totals, aes(x = decile, y = mean_value/1e3, 
+                                     label = sprintf("%.0f", mean_value/1e3)), size = 3,
+            position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
+  scale_fill_brewer(palette = "Dark2") +
+  labs(colour = NULL, title = "Annualized GHG Emissions",
+       subtitle = "(e) Fiber design using Dijkstras algorithm.",
+       x = NULL, 
+       y = bquote("Annualized GHG emissions (t CO"[2]*" eq. per user)")) + 
+  theme(
+    legend.position = 'bottom',
+    axis.text.x = element_text(size = 7),
+    panel.spacing = unit(0.6, "lines"),
+    plot.title = element_text(size = 10, face = "bold"),
+    plot.subtitle = element_text(size = 10, face = "bold"),
+    axis.text.y = element_text(size = 10),
+    axis.title.y = element_markdown(size = 7),
+    legend.title = element_text(size = 7),
+    legend.text = element_text(size = 7),
+    axis.title.x = element_text(size = 10)
+  ) + expand_limits(y = 0) +
+  guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
+  scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 45))
+
+###########################
+##AVERAGE EMISSIONS: PCSF##
+###########################
+data1 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_country_baseline_emission.csv'))
+data1$decile <- 'national'
+data1 <- data1[, c('strategy', 'decile', 'emissions_kg_per_subscriber')]
+
+#### Access total emissions ####
+data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
+                            'SSA_pcsf_local_emission_results.csv'))
+
+## Combine the merged data with deciles
+access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
+                                 'SSA_subregional_population_deciles.csv'))
+data2 <- merge(data2, access_pop, by = "GID_2")
+data2 <- data2[, c('strategy', 'decile', 'emissions_kg_per_subscriber')]
+
+#### Regional manufacturing emissions ####
+data3 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
+                            'SSA_pcsf_regional_emission_results.csv'))
+
+## Combine the merged data with deciles
+reg_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
+                              'SSA_regional_population_deciles.csv'))
+data3 <- merge(reg_pop, data3, by = "GID_1")
+data3 <- data3[, c('strategy', 'decile', 'emissions_kg_per_subscriber')]
+
+### Combine baseline, regional and access results
+data <- rbind(data1, data2, data3)
+
+df = data %>%
+  group_by(decile, strategy) %>%
+  summarize(avg_ghgs = mean(emissions_kg_per_subscriber/20)) 
+
+df$decile = factor(df$decile,
+  levels = c('national', 'decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
+  'decile 5', 'decile 4', 'decile 3', 'decile 2', 'decile 1'),
+  labels = c('National', 'Decile 10 \n(<50 per km²)', 'Decile 9 \n(50 - 75 per km²)', 
+  'Decile 8 \n(75 - 100 per km²)', 'Decile 7 \n(100 - 200 per km²)', 
+  'Decile 6 \n(200 - 300 per km²)', 'Decile 5 \n(300 - 400 per km²)',
+  'Decile 4 \n(400 - 500 per km²)', 'Decile 3 \n(500 - 600 per km²)',
+  'Decile 2 \n(600 - 700 per km²)', 'Decile 1 \n(>700 per km²)'))
+
+df$strategy <- factor(
+  df$strategy,
+  levels = c('baseline', 'regional', 'access'),
+  labels = c('Existing Core Network', 'New Regional Network', 
+             'New Access Network'))
+
+label_totals <- df %>%
+  group_by(decile, strategy) %>%
+  summarize(mean_value = sum(avg_ghgs))
+
+pcsf_annualized_emissions <-
+  ggplot(df, aes(x = decile, y = avg_ghgs/1e3)) +
+  geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
+  geom_text(data = label_totals, aes(x = decile, y = mean_value/1e3, 
+                                     label = sprintf("%.0f", mean_value/1e3)), size = 3,
+            position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
+  scale_fill_brewer(palette = "Dark2") +
+  labs(colour = NULL, title = ' ',
+       subtitle = "(f) Fiber design using PCSF algorithm.",
+       x = NULL, 
+       y = bquote("Annualized GHG emissions (t CO"[2]*" eq. per user)")) + 
+  theme(
+    legend.position = 'bottom',
+    axis.text.x = element_text(size = 7),
+    panel.spacing = unit(0.6, "lines"),
+    plot.title = element_text(size = 10, face = "bold"),
+    plot.subtitle = element_text(size = 10, face = "bold"),
+    axis.text.y = element_text(size = 10),
+    axis.title.y = element_markdown(size = 7),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 10),
+    axis.title.x = element_text(size = 10)
+  ) + expand_limits(y = 0) +
+  guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
+  scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 304))
 
 
 ########################
@@ -397,11 +558,13 @@ aggregate_emissions <- ggarrange(
   pcsf_total_emissions, 
   djikistra_average_emissions,
   pcsf_average_emissions,
-  ncol = 2, nrow = 2, align = c('hv'),
+  djikistra_annualized_emissions,
+  pcsf_annualized_emissions,
+  ncol = 2, nrow = 3, align = c('hv'),
   common.legend = TRUE, legend='bottom') 
 
 path = file.path(folder, 'figures', 'aggregate_emissions.png')
-png(path, units="in", width=10, height=9, res=300)
+png(path, units="in", width=11, height=12, res=300)
 print(aggregate_emissions)
 dev.off()
 
@@ -420,35 +583,33 @@ core_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles',
                                 'SSA_core_edges_existing.shp'))
 core_nodes$Type <- 'Core Nodes'
 core_edges$Type <- 'Core Fiber'
-legend_core_nodes <- guides(fill = guide_legend(title = "Legend"))
 
 core_fiber <- ggplot() +
   geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
   geom_sf(data = core_nodes, color = "tomato", size = 0.5, aes(fill = Type)) + 
   geom_sf(data = core_edges, color = "green4", linewidth = 0.3) + 
-  labs(title = "(A) Existing fiber infrastructure in SSA", 
+  labs(title = "(e) Existing fiber infrastructure in SSA", 
        subtitle = "Only live fiber lines with core nodes are mapped", 
        fill = NULL) + 
+  theme_void() +
   theme(
     strip.text.x = element_blank(),
     panel.border = element_blank(),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     axis.title.y = element_text(size = 6),
-    legend.position = 'right',
-    legend.box = "horizontal", 
-    legend.margin = margin(t = -0.2, unit = "in"),
-    axis.title = element_text(size = 12),
-    legend.title = element_text(size = 8),
-    legend.text = element_text(size = 8),
+    legend.position = 'bottom',
+    axis.title = element_text(size = 8),
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
     legend.key.size = unit(0.6, "lines"),
-    plot.subtitle = element_text(size = 9),
-    plot.title = element_text(size = 11, face = "bold")
+    plot.subtitle = element_text(size = 10),
+    plot.title = element_text(size = 10, face = "bold")
   ) +   annotation_scale(location = "bl", width_hint = 0.5) + 
-  coord_sf(crs = 4326) + legend_core_nodes +
+  coord_sf(crs = 4326) + 
   ggspatial::annotation_north_arrow(
     location = "tr", which_north = "true",
-    pad_x = unit(0.4, "in"), pad_y = unit(0.4, "in"),
+    pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
     style = ggspatial::north_arrow_nautical(
       fill = c("grey40", "white"),
       line_col = "grey20",
@@ -457,9 +618,9 @@ core_fiber <- ggplot() +
   ) 
 
 
-###################################
-##ACCESS FIBER INFRASTRUCTURE MAP##
-###################################
+######################################
+##DJIKISTRA FIBER INFRASTRUCTURE MAP##
+######################################
 access_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
                                   'SSA_combined_access_nodes.shp'))
 access_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
@@ -467,11 +628,11 @@ access_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles',
 access_nodes$Type <- 'Access Nodes'
 access_edges$Type <- 'Access Fiber'
 
-access_fiber <- ggplot() +
+access_djikistra_fiber <- ggplot() +
   geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
   geom_sf(data = access_nodes, color = "gray35", size = 0.002, aes(fill = Type)) + 
   geom_sf(data = access_edges, color = "coral", size = 0.3, linewidth = 0.3) + 
-  labs(title = "(C) Designed access fiber Network for SSA", 
+  labs(title = "(f) Designed access fiber network using Dijkstras algorithm.", 
        subtitle = "Based on settlement points", fill = NULL) + 
   theme_void() +
   theme(
@@ -485,31 +646,71 @@ access_fiber <- ggplot() +
     legend.title = element_text(size = 6),
     legend.text = element_text(size = 6),
     legend.key.size = unit(0.6, "lines"),
-    plot.subtitle = element_text(size = 6),
-    plot.title = element_text(size = 7, face = "bold")
+    plot.subtitle = element_text(size = 10),
+    plot.title = element_text(size = 10, face = "bold")
   )
 
+#################################
+##PCSF FIBER INFRASTRUCTURE MAP##
+#################################
+access_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                  'SSA_combined_pcsf_access_nodes.shp'))
+access_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                  'SSA_combined_pcsf_access_edges.shp'))
+access_nodes$Type <- 'Access Nodes'
+access_edges$Type <- 'Access Fiber'
+
+access_pcsf_fiber <- ggplot() +
+  geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
+  geom_sf(data = access_nodes, color = "darkorange", size = 0.002, aes(fill = Type)) + 
+  geom_sf(data = access_edges, color = "aquamarine4", size = 0.3, linewidth = 0.3) + 
+  labs(title = "(g) Designed access fiber network using PCSF algorithm.", 
+       subtitle = "Based on settlement points", fill = NULL) + 
+  theme_void() +
+  theme(
+    strip.text.x = element_blank(),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title.y = element_text(size = 6),
+    legend.position = 'bottom',
+    axis.title = element_text(size = 8),
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    legend.key.size = unit(0.6, "lines"),
+    plot.subtitle = element_text(size = 10),
+    plot.title = element_text(size = 10, face = "bold")
+  )
 #######################
 ##PANEL FIBER DESIGN ##
 #######################
-emission_panel <- ggarrange(
-  total_emissions, legend = 'bottom',
-  ncol = 1)
+total_emission_panel <- ggarrange(
+  djikistra_total_emissions, 
+  pcsf_total_emissions, 
+ legend = 'none',
+  ncol = 2)
+
+average_emission_panel <- ggarrange(
+  djikistra_average_emissions,
+  pcsf_average_emissions, legend = 'bottom',
+  common.legend = TRUE,
+  ncol = 2)
 
 fiber_nodes <- ggarrange(
   core_fiber, 
-  regional_fiber,
-  access_fiber, align = c('hv'),
+  access_djikistra_fiber,
+  access_pcsf_fiber, align = c('hv'),
   ncol = 3, nrow = 1, legend = 'bottom')
 
 fiber_emission_panel <- ggarrange(
-  emission_panel, 
+  total_emission_panel, 
+  average_emission_panel,
   fiber_nodes,
-  ncol = 1, nrow = 2, 
+  ncol = 1, nrow = 3, 
   common.legend = TRUE, legend='bottom')
 
 path = file.path(folder, 'figures', 'fiber_design_emissions.png')
-png(path, units = "in", width = 11, height = 8, res = 300)
+png(path, units = "in", width = 13, height = 13, res = 300)
 print(fiber_emission_panel)
 dev.off()
 

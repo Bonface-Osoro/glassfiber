@@ -667,42 +667,42 @@ def population_decile(pop_density):
 
     if pop_density >= 700:
 
-        decile = 'decile 10'
+        decile = 'decile 1'
 
     elif pop_density >= 600 and pop_density <= 700:
 
-        decile = 'decile 9'
+        decile = 'decile 2'
 
     elif pop_density >= 500 and pop_density <= 600:
 
-        decile = 'decile 8'
+        decile = 'decile 3'
 
     elif pop_density >= 400 and pop_density <= 500:
 
-        decile = 'decile 7'
+        decile = 'decile 4'
 
     elif pop_density >= 300 and pop_density <= 400:
 
-        decile = 'decile 6'
+        decile = 'decile 5'
 
     elif pop_density >= 200 and pop_density <= 300:
 
-        decile = 'decile 5'
+        decile = 'decile 6'
 
     elif pop_density >= 100 and pop_density <= 200:
 
-        decile = 'decile 4'
+        decile = 'decile 7'
 
     elif pop_density >= 75 and pop_density <= 100:
 
-        decile = 'decile 3'
+        decile = 'decile 8'
 
     elif pop_density >= 50 and pop_density <= 75:
 
-        decile = 'decile 2'
+        decile = 'decile 9'
 
     else:
 
-        decile = 'decile 1'
+        decile = 'decile 10'
 
     return decile 

@@ -13,7 +13,7 @@ parameters = {
         'customer_usd': 200000,
         'other_costs_usd': 300000,
         'discount_rate_percent': 5,
-        'assessment_period_year': 10
+        'assessment_period_year': 20
     },
 }
 
