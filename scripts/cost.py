@@ -306,7 +306,7 @@ def demand(iso3):
     return None            
 
 
-'''if __name__ == '__main__':
+if __name__ == '__main__':
 
     for idx, country in countries.iterrows():
             
@@ -317,4 +317,4 @@ def demand(iso3):
             continue 
         #demand(countries['iso3'].loc[idx])
         #capacity_user(countries['iso3'].loc[idx])
-        ssa_summary(countries['iso3'].loc[idx])'''
+        ssa_summary(countries['iso3'].loc[idx])

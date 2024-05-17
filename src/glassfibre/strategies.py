@@ -92,7 +92,7 @@ def baseline_cost_emissions(iso3):
             'steel_iron_eolt_ghg', 'plastics_eolt_ghg', 'other_metals_eolt_ghg', 
             'concrete_eolt_ghg', 'total_eolt_ghg_kg', 'total_trans_ghg_kg', 
             'total_ops_ghg_kg', 'total_ghg_emissions_kg', 
-            'emissions_kg_per_subscriber']] = ''
+            'emissions_kg_per_subscriber', 'total_ssc_usd', 'ssc_per_user']] = ''
         lca_mfg = lca_manufacturing()
         lca_eot = lca_eolt()
         lca_tran = lca_trans()
@@ -181,23 +181,35 @@ def baseline_cost_emissions(iso3):
                 
                 df1['strategy'].loc[i] = 'baseline'
                 df1['algorithm'].loc[i] = 'none'
+
+                df1['total_ssc_usd'].loc[i] = (
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 185
+                
+                df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
+                                              df1['users_area_sqkm'].loc[i])
         
         df1.rename(columns = {'GID_0': 'iso3'}, inplace = True)
         totat_ghg = df1[['iso3', 'users_area_sqkm', 'total_mfg_ghg_kg', 
                          'total_trans_ghg_kg', 'total_ops_ghg_kg', 
                          'total_eolt_ghg_kg', 'total_ghg_emissions_kg', 
-                         'emissions_kg_per_subscriber', 'strategy', 'algorithm']]
+                         'emissions_kg_per_subscriber', 'total_ssc_usd', 
+                         'ssc_per_user', 'strategy', 'algorithm']]
         
         country_totat_ghg = totat_ghg[['iso3', 'total_ghg_emissions_kg',
-                    'emissions_kg_per_subscriber', 'strategy', 'algorithm']]
+                    'emissions_kg_per_subscriber', 'total_ssc_usd', 
+                    'ssc_per_user', 'strategy', 'algorithm']]
         
         ghg_avg = country_totat_ghg['emissions_kg_per_subscriber'].mean()
+        scc_avg = country_totat_ghg['ssc_per_user'].mean()
 
         country_totat_ghg = pd.DataFrame({'iso3': 
                             [country_totat_ghg['iso3'].iloc[0]], 
                             'total_ghg_emissions_kg': [country_totat_ghg[
                             'total_ghg_emissions_kg'].iloc[0]], 
                             'emissions_kg_per_subscriber': [ghg_avg], 
+                            'total_ssc_usd': [country_totat_ghg[
+                            'total_ssc_usd'].iloc[0]],
+                            'ssc_per_user': [scc_avg], 
                             'strategy': [country_totat_ghg['strategy'].iloc[0]],
                             'algorithm': [country_totat_ghg['algorithm'].iloc[0]]})
 
@@ -281,7 +293,9 @@ def local_cost_emissions(iso3):
             'steel_iron_eolt_ghg', 'plastics_eolt_ghg', 'other_metals_eolt_ghg', 
             'concrete_eolt_ghg', 'total_eolt_ghg_kg', 'total_trans_ghg_kg', 
             'total_ops_ghg_kg', 'total_ghg_emissions_kg', 
-            'emissions_kg_per_subscriber', 'strategy', 'algorithm']] = ''
+            'emissions_kg_per_subscriber', 'total_ssc_usd', 'ssc_per_user', 
+            'strategy', 'algorithm']] = ''
+        
         lca_mfg = lca_manufacturing()
         lca_eot = lca_eolt()
         lca_tran = lca_trans()
@@ -374,21 +388,32 @@ def local_cost_emissions(iso3):
                 df1['strategy'].loc[i] = 'access'
                 df1['algorithm'].loc[i] = 'Dijkstras'
 
+                df1['total_ssc_usd'].loc[i] = (
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 185
+                
+                df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
+                                              df1['users_area_sqkm'].loc[i])
+
         totat_ghg = df1[['iso3', 'GID_2', 'users_area_sqkm', 'total_mfg_ghg_kg', 
                     'total_trans_ghg_kg', 'total_ops_ghg_kg', 'total_eolt_ghg_kg', 
                     'total_ghg_emissions_kg', 'emissions_kg_per_subscriber', 
-                    'strategy', 'algorithm']]
+                    'total_ssc_usd', 'ssc_per_user', 'strategy', 'algorithm']]
         
         country_totat_ghg = totat_ghg[['iso3', 'total_ghg_emissions_kg',
-                    'emissions_kg_per_subscriber', 'strategy', 'algorithm']]
+                    'emissions_kg_per_subscriber', 'total_ssc_usd', 
+                    'ssc_per_user', 'strategy', 'algorithm']]
         
         ghg_avg = country_totat_ghg['emissions_kg_per_subscriber'].mean()
+        scc_avg = country_totat_ghg['ssc_per_user'].mean()
 
         country_totat_ghg = pd.DataFrame({'iso3': 
                             [country_totat_ghg['iso3'].iloc[0]], 
                             'total_ghg_emissions_kg': [country_totat_ghg[
                             'total_ghg_emissions_kg'].iloc[0]], 
                             'emissions_kg_per_subscriber': [ghg_avg], 
+                            'total_ssc_usd': [country_totat_ghg[
+                            'total_ssc_usd'].iloc[0]],
+                            'ssc_per_user': [scc_avg], 
                             'strategy': [country_totat_ghg['strategy'].iloc[0]],
                             'algorithm': [country_totat_ghg['algorithm'].iloc[0]]})
 
@@ -470,7 +495,8 @@ def regional_cost_emissions(iso3):
             'steel_iron_eolt_ghg', 'plastics_eolt_ghg', 'other_metals_eolt_ghg', 
             'concrete_eolt_ghg', 'total_eolt_ghg_kg', 'total_trans_ghg_kg', 
             'total_ops_ghg_kg', 'total_ghg_emissions_kg', 
-            'emissions_kg_per_subscriber', 'algorithm']] = ''
+            'emissions_kg_per_subscriber', 'total_ssc_usd', 'ssc_per_user', 
+            'algorithm']] = ''
         
         lca_mfg = lca_manufacturing()
         lca_eot = lca_eolt()
@@ -560,22 +586,34 @@ def regional_cost_emissions(iso3):
                     df1['users_area_sqkm'].loc[i])
                 
                 df1['algorithm'].loc[i] = 'Dijkstras'
+
+                df1['total_ssc_usd'].loc[i] = (
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 185
+                
+                df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
+                                              df1['users_area_sqkm'].loc[i])
         
         totat_ghg = df1[['iso3', 'GID_1', 'population', 'users_area_sqkm',  
                     'total_mfg_ghg_kg', 'total_trans_ghg_kg', 'total_ops_ghg_kg', 
                     'total_eolt_ghg_kg', 'total_ghg_emissions_kg', 
-                    'emissions_kg_per_subscriber', 'strategy', 'algorithm']]
+                    'emissions_kg_per_subscriber', 'total_ssc_usd', 
+                    'ssc_per_user', 'strategy', 'algorithm']]
         
         country_totat_ghg = totat_ghg[['iso3', 'total_ghg_emissions_kg',
-                    'emissions_kg_per_subscriber', 'strategy', 'algorithm']]
+                    'emissions_kg_per_subscriber', 'total_ssc_usd', 
+                    'ssc_per_user', 'strategy', 'algorithm']]
         
         ghg_avg = country_totat_ghg['emissions_kg_per_subscriber'].mean()
+        scc_avg = country_totat_ghg['ssc_per_user'].mean()
 
         country_totat_ghg = pd.DataFrame({'iso3': 
                             [country_totat_ghg['iso3'].iloc[0]], 
                             'total_ghg_emissions_kg': [country_totat_ghg[
                             'total_ghg_emissions_kg'].iloc[0]], 
                             'emissions_kg_per_subscriber': [ghg_avg], 
+                            'total_ssc_usd': [country_totat_ghg[
+                            'total_ssc_usd'].iloc[0]],
+                            'ssc_per_user': [scc_avg], 
                             'strategy': [country_totat_ghg['strategy'].iloc[0]],
                             'algorithm': [country_totat_ghg['algorithm'].iloc[0]]})
 
@@ -655,7 +693,8 @@ def local_pcsf_cost_emissions(iso3):
             'steel_iron_eolt_ghg', 'plastics_eolt_ghg', 'other_metals_eolt_ghg', 
             'concrete_eolt_ghg', 'total_eolt_ghg_kg', 'total_trans_ghg_kg', 
             'total_ops_ghg_kg', 'total_ghg_emissions_kg', 
-            'emissions_kg_per_subscriber']] = ''
+            'emissions_kg_per_subscriber', 'total_ssc_usd', 'ssc_per_user']] = ''
+        
         lca_mfg = lca_manufacturing()
         lca_eot = lca_eolt()
         lca_tran = lca_trans()
@@ -744,22 +783,33 @@ def local_pcsf_cost_emissions(iso3):
                 df1['emissions_kg_per_subscriber'].loc[i] = (
                     df1['total_ghg_emissions_kg'].loc[i] / 
                     df1['users_area_sqkm'].loc[i])
+                
+                df1['total_ssc_usd'].loc[i] = (
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 185
+                
+                df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
+                                              df1['users_area_sqkm'].loc[i])
 
         totat_ghg = df1[['iso3', 'GID_2', 'users_area_sqkm', 'total_mfg_ghg_kg', 
                     'total_trans_ghg_kg', 'total_ops_ghg_kg', 'total_eolt_ghg_kg', 
                     'total_ghg_emissions_kg', 'emissions_kg_per_subscriber', 
-                    'strategy', 'algorithm']]
+                    'total_ssc_usd', 'ssc_per_user', 'strategy', 'algorithm']]
         
         country_totat_ghg = totat_ghg[['iso3', 'total_ghg_emissions_kg',
-                    'emissions_kg_per_subscriber', 'strategy', 'algorithm']]
+                    'emissions_kg_per_subscriber', 'total_ssc_usd', 
+                    'ssc_per_user', 'strategy', 'algorithm']]
         
         ghg_avg = country_totat_ghg['emissions_kg_per_subscriber'].mean()
+        scc_avg = country_totat_ghg['ssc_per_user'].mean()
 
         country_totat_ghg = pd.DataFrame({'iso3': 
                             [country_totat_ghg['iso3'].iloc[0]], 
                             'total_ghg_emissions_kg': [country_totat_ghg[
                             'total_ghg_emissions_kg'].iloc[0]], 
                             'emissions_kg_per_subscriber': [ghg_avg], 
+                            'total_ssc_usd': [country_totat_ghg[
+                            'total_ssc_usd'].iloc[0]],
+                            'ssc_per_user': [scc_avg], 
                             'strategy': [country_totat_ghg['strategy'].iloc[0]],
                             'algorithm': [country_totat_ghg['algorithm'].iloc[0]]})
 
@@ -841,7 +891,7 @@ def regional_pcsf_cost_emissions(iso3):
             'steel_iron_eolt_ghg', 'plastics_eolt_ghg', 'other_metals_eolt_ghg', 
             'concrete_eolt_ghg', 'total_eolt_ghg_kg', 'total_trans_ghg_kg', 
             'total_ops_ghg_kg', 'total_ghg_emissions_kg', 
-            'emissions_kg_per_subscriber']] = ''
+            'emissions_kg_per_subscriber', 'total_ssc_usd', 'ssc_per_user']] = ''
         
         lca_mfg = lca_manufacturing()
         lca_eot = lca_eolt()
@@ -930,21 +980,33 @@ def regional_pcsf_cost_emissions(iso3):
                     df1['total_ghg_emissions_kg'].loc[i] / 
                     df1['users_area_sqkm'].loc[i])
         
+                df1['total_ssc_usd'].loc[i] = (
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 185
+                
+                df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
+                                              df1['users_area_sqkm'].loc[i])
+
         totat_ghg = df1[['iso3', 'GID_1', 'population', 'users_area_sqkm',  
                     'total_mfg_ghg_kg', 'total_trans_ghg_kg', 'total_ops_ghg_kg', 
                     'total_eolt_ghg_kg', 'total_ghg_emissions_kg', 
-                    'emissions_kg_per_subscriber', 'strategy', 'algorithm']]
+                    'emissions_kg_per_subscriber', 'total_ssc_usd', 
+                    'ssc_per_user', 'strategy', 'algorithm']]
         
         country_totat_ghg = totat_ghg[['iso3', 'total_ghg_emissions_kg',
-                    'emissions_kg_per_subscriber', 'strategy', 'algorithm']]
+                    'emissions_kg_per_subscriber', 'total_ssc_usd', 
+                    'ssc_per_user', 'strategy', 'algorithm']]
         
         ghg_avg = country_totat_ghg['emissions_kg_per_subscriber'].mean()
+        scc_avg = country_totat_ghg['ssc_per_user'].mean()
 
         country_totat_ghg = pd.DataFrame({'iso3': 
                             [country_totat_ghg['iso3'].iloc[0]], 
                             'total_ghg_emissions_kg': [country_totat_ghg[
                             'total_ghg_emissions_kg'].iloc[0]], 
                             'emissions_kg_per_subscriber': [ghg_avg], 
+                            'total_ssc_usd': [country_totat_ghg[
+                            'total_ssc_usd'].iloc[0]],
+                            'ssc_per_user': [scc_avg], 
                             'strategy': [country_totat_ghg['strategy'].iloc[0]],
                             'algorithm': [country_totat_ghg['algorithm'].iloc[0]]})
 
@@ -1000,12 +1062,3 @@ def regional_pcsf_cost_emissions(iso3):
     
     
     return None
-
-
-for idx, country in countries.iterrows():
-        
-    #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
-        
-    if not country['iso3'] == 'RWA':
-
-        continue

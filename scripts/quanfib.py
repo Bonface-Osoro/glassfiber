@@ -88,7 +88,9 @@ def csv_merger(csv_name, source_folder):
                         merged_data = pd.concat([merged_data, df], ignore_index = True)
                         merged_data = merged_data.groupby(['iso3', 'strategy', 
                             'algorithm']).agg({'total_ghg_emissions_kg': 'sum', 
-                            'emissions_kg_per_subscriber': 'sum'}).reset_index()
+                            'emissions_kg_per_subscriber': 'sum',
+                            'total_ssc_usd': 'sum',
+                            'ssc_per_user': 'sum'}).reset_index()
                         
                     if csv_name == '_country_local_emission.csv': 
 
@@ -96,7 +98,9 @@ def csv_merger(csv_name, source_folder):
                         merged_data = pd.concat([merged_data, df], ignore_index = True)
                         merged_data = merged_data.groupby(['iso3', 'strategy', 
                             'algorithm']).agg({'total_ghg_emissions_kg': 'sum', 
-                            'emissions_kg_per_subscriber': 'sum'}).reset_index()
+                            'emissions_kg_per_subscriber': 'sum',
+                            'total_ssc_usd': 'sum',
+                            'ssc_per_user': 'sum'}).reset_index()
                         
                     if csv_name == '_baseline_tco_results.csv':  
 
@@ -120,7 +124,9 @@ def csv_merger(csv_name, source_folder):
                         merged_data = pd.concat([merged_data, df], ignore_index = True)
                         merged_data = merged_data.groupby(['iso3', 'strategy', 
                                     'algorithm']).agg({'total_ghg_emissions_kg': 'mean', 
-                                    'emissions_kg_per_subscriber': 'mean'}).reset_index()   
+                                    'emissions_kg_per_subscriber': 'mean',
+                                    'total_ssc_usd': 'mean',
+                                    'ssc_per_user': 'mean'}).reset_index()   
                       
                     fileout = 'SSA{}'.format(csv_name)
                     folder_out = os.path.join(DATA_RESULTS, '..', 'SSA')
@@ -669,6 +675,7 @@ csv_merger('_regional_tco_results.csv', 'supply')
 csv_merger('_pcsf_local_tco_results.csv', 'supply')
 csv_merger('_pcsf_regional_tco_results.csv', 'supply')
 
+ssa_csv_merger('_tco_results.csv')
 ssa_csv_merger('_tco_results.csv')'''
 
 ############ TOTAL EMISSION TYPES ##############
@@ -692,7 +699,9 @@ ssa_csv_merger('_tco_results.csv')'''
 #ssa_csv_merger('_total_eolt.csv')
 
 #### Results for decile plots ####
-ssa_hireachy_emissions('_local_emission_results.csv')
-ssa_hireachy_emissions('_pcsf_local_emission_results.csv')
-ssa_hireachy_emissions('_regional_emission_results.csv')
+#ssa_hireachy_emissions('_local_emission_results.csv')
+#ssa_hireachy_emissions('_pcsf_local_emission_results.csv')
+#ssa_hireachy_emissions('_regional_emission_results.csv')
 ssa_hireachy_emissions('_pcsf_regional_emission_results.csv')
+#csv_merger('_demand_user.csv', 'demand')
+#csv_merger('_average_demand.csv', 'summary')
