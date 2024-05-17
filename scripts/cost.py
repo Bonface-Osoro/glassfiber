@@ -317,4 +317,4 @@ if __name__ == '__main__':
             continue 
         #demand(countries['iso3'].loc[idx])
         #capacity_user(countries['iso3'].loc[idx])
-        ssa_summary(countries['iso3'].loc[idx])
+        #ssa_summary(countries['iso3'].loc[idx])
