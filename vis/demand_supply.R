@@ -97,33 +97,6 @@ total_area <-
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
   labels = function(y)format(y, scientific = FALSE), limit = c(0, 21))
 
-
-###################
-##DECILE TABLE ####
-###################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 
-                           'SSA_subregional_population_deciles.csv'))
-df = data %>%
-  distinct(decile, population, area, pop_density_sqkm, .keep_all = TRUE) %>%
-  group_by(decile) %>%
-  summarize(total_pops = round(sum(population)/1e6),
-            total_area = round(sum(area)),
-            avg_sqkm = round(mean(pop_density_sqkm)))
-df$decile = factor(df$decile,
-  levels = c('decile 1', 'decile 2', 'decile 3', 'decile 4', 'decile 5',
-  'decile 6', 'decile 7', 'decile 8', 'decile 9', 'decile 10'),
-  labels = c('Decile 1 (>700 per km²)', 'Decile 2 (600 - 700 per km²)', 
-  'Decile 3 (500 - 600 per km²)', 'Decile 4 (400 - 500 per km²)', 
-  'Decile 5 (300 - 400 per km²)', 'Decile 6 (200 - 300 per km²)',
-  'Decile 7 (100 - 200 per km²)', 'Decile 8 (75 - 100 per km²)',
-  'Decile 9 (50 - 75 per km²)', 'Decile 10 (<50 per km²)'))
-
-df <- df[, c("decile", "total_pops", 'total_area', 'avg_sqkm')]
-new_names <- c('Decile', 'Total \nPopulation (millions)', 'Total Area (km²)', 
-               'Average Population \nDensity (persons per km²)')
-colnames(df) <- new_names
-tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
-grid.table(df, theme = tt)
 ################################
 ## CAPACITY DEMAND PANEL PLOT ##
 ################################
@@ -568,7 +541,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = (mean(tco_per_user))/1e3) 
+  summarize(mean_tco = mean(tco_per_user)) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -598,7 +571,7 @@ djikistra_tco <-
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Total Cost of Ownership (TCO) per user.",
        subtitle = "(a) Fiber design using Dijkstras algorithm.",
-       x = NULL, y = bquote("TCO per user ('000' US$/User)")) + 
+       x = NULL, y = bquote("TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
@@ -613,7 +586,7 @@ djikistra_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 114))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 114000))
 
 #######################
 ##TCO PER USER: PCSF###
@@ -643,7 +616,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = mean(tco_per_user)/1e3) 
+  summarize(mean_tco = mean(tco_per_user)) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -673,7 +646,7 @@ pcsf_tco <-
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = " ",
        subtitle = "(b) Fiber design using PCSF algorithm.",
-       x = NULL, y = bquote("TCO per user ('000' US$/User)")) + 
+       x = NULL, y = bquote("TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
@@ -688,7 +661,7 @@ pcsf_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 114))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 30000))
 
 #######################################
 ##ANNUALIZED TCO PER USER: DIJKSTRAS###

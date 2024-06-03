@@ -10,63 +10,6 @@ library(ggmap)
 library(tidyr)
 
 folder <- dirname(rstudioapi::getSourceEditorContext()$path)
-
-####################
-##TOTAL EMISSIONS###
-####################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission.csv'))
-data <- data[data$strategy != "access", ]
-
-df = data %>%
-  group_by(algorithm, strategy) %>%
-  summarize(total_ghgs = sum(total_ghg_emissions_kg)) 
-
-df$strategy <- factor(
-  df$strategy,
-  levels = c('baseline', 'regional'),
-  labels = c('Existing \nCore Network', 'New Network')
-)
-
-df$algorithm <- factor(
-  df$algorithm,
-  levels = c('none', 'Dijkstras', 'pcsf'),
-  labels = c('Unknown', 'Dijkstras', 'PCSF')
-)
-
-label_totals <- df %>%
-  group_by(algorithm, strategy) %>%
-  summarize(total_value = sum(total_ghgs))
-
-total_emissions <-
-  ggplot(df, aes(x = algorithm, y = total_ghgs/1e9)) +
-  geom_bar(stat = "identity", aes(fill = strategy)) + 
-  geom_text(data = label_totals, aes(x = algorithm, y = total_value/1e9, 
-    label = sprintf("%.2f", total_value/1e9)), vjust = -0.5,
-    hjust = 0.5, position = position_stack(), size = 2, color = "black") +
-  scale_fill_brewer(palette = "Dark2") +
-  labs(
-    colour = NULL,
-    title = "(A) Total Greenhouse Gas (GHG) Emissions.",
-    subtitle = "Presented by spatial algorithm used in network design and network hirearchy.",
-    x = 'Spatial Optimization Algorithm', 
-    y = 'Total GHG Emissions (Mt CO<sub>2</sub> eq.)', fill = "Network Level") + 
-  theme(
-    legend.position = 'bottom',
-    axis.text.x = element_text(size = 7),
-    panel.spacing = unit(0.6, "lines"),
-    plot.title = element_text(size = 9, face = "bold"),
-    plot.subtitle = element_text(size = 8),
-    axis.text.y = element_text(size = 7),
-    axis.title.y = element_markdown(size = 7),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 6),
-    axis.title.x = element_text(size = 7)
-  ) +
-  expand_limits(y = 0) +
-  guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
-  scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 160))
-
 ###############################
 ##TOTAL EMISSIONS: DIJKSTRAS###
 ###############################
@@ -295,7 +238,7 @@ djikistra_average_emissions <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 7500))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 34900))
 
 ###########################
 ##AVERAGE EMISSIONS: PCSF##
@@ -371,7 +314,7 @@ pcsf_average_emissions <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 7500))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 34900))
 
 ############################################
 ##ANNUALIZED AVERAGE EMISSIONS: DIJKSTRAS###
@@ -401,7 +344,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(avg_ghgs = mean(emissions_kg_per_subscriber/20)) 
+  summarize(avg_ghgs = mean(emissions_kg_per_subscriber/30)) 
 
 df$decile = factor(df$decile,
    levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -447,7 +390,7 @@ djikistra_annualized_emissions <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 349))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 34900))
 
 ###########################
 ##AVERAGE EMISSIONS: PCSF##
@@ -477,7 +420,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(avg_ghgs = mean(emissions_kg_per_subscriber/20)) 
+  summarize(avg_ghgs = mean(emissions_kg_per_subscriber/30)) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -523,7 +466,7 @@ pcsf_annualized_emissions <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 359))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 34900))
 
 
 ########################
@@ -572,7 +515,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_scc = (mean(ssc_per_user))/1e3) 
+  summarize(mean_scc = mean(ssc_per_user)) 
 
 df$decile = factor(df$decile,
    levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -590,7 +533,7 @@ df$strategy <- factor(
              'New Access Network'))
 
 label_totals <- df %>%
-  group_by(decile) %>%
+  group_by(decile, strategy) %>%
   summarize(mean_value = sum(mean_scc))
 
 djikistra_per_user_scc <-
@@ -602,7 +545,7 @@ djikistra_per_user_scc <-
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Social Carbon Cost (SCC) per User.",
        subtitle = "(a) Fiber design using Dijkstras algorithm.",
-       x = NULL, y = bquote("SCC per user ('000' US$/User)")) + 
+       x = NULL, y = bquote("SCC per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
@@ -617,7 +560,7 @@ djikistra_per_user_scc <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 1349))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0,89000))
 
 ############################################
 ##SOCIAL CARBON COST PER USER: PCSF ###
@@ -647,7 +590,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_scc = (mean(ssc_per_user))/1e3) 
+  summarize(mean_scc = mean(ssc_per_user)) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -677,7 +620,7 @@ pcsf_per_user_scc <-
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = " ",
        subtitle = "(b) Fiber design using PCSF algorithm.",
-       x = NULL, y = bquote("SCC per user ('000' US$/User)")) + 
+       x = NULL, y = bquote("SCC per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
@@ -692,7 +635,7 @@ pcsf_per_user_scc <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 1349))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 89000))
 
 #######################################################
 ##ANNUALIZED SOCIAL CARBON COST PER USER: DIJKSTRAS ###
@@ -722,7 +665,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_scc = ((mean(ssc_per_user)))/20) 
+  summarize(mean_scc = ((mean(ssc_per_user)))/30) 
 
 df$decile = factor(df$decile,
    levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -767,7 +710,7 @@ djikistra_annualized_per_user_scc <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 69100))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 89000))
 
 #######################################################
 ##ANNUALIZED SOCIAL CARBON COST PER USER: PCSF ###
@@ -797,7 +740,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_scc = ((mean(ssc_per_user)))/20) 
+  summarize(mean_scc = ((mean(ssc_per_user)))/30) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -842,7 +785,7 @@ pcsf_annualized_per_user_scc <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 69100))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 89000))
 
 ##############
 ##PANEL SCC ##
@@ -1299,6 +1242,7 @@ djikstras_eolts_emissions <-
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 9),
     axis.title.x = element_text(size = 10)
+    
 #################
 ### PCSF ###
 #################
