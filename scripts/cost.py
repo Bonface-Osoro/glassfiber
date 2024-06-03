@@ -9,8 +9,7 @@ from glassfibre.inputs import parameters
 from glassfibre.preprocessing import (
     lca_manufacturing, lca_eolt, 
     lca_trans, 
-    lca_operations,
-    population_decile)
+    lca_operations, population_decile)
 
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
@@ -45,8 +44,8 @@ def cost_model(length, unit):
     for key, item in parameters.items():
         
         capex = (item['dslam_usd'] + item['civil_usd'] 
-                 + (item['transportation_usd']) 
-                 + (item['installation_usd'] * length)
+                 + (item['transportation_usd'] * length) 
+                 + (item['installation_usd'])
                  + (item['rpu_usd'] * unit) 
                  + (item['mdf_unit_usd'] * unit))
         
@@ -109,7 +108,7 @@ def ssa_summary(iso3):
     iso3 : string
         Country ISO3 code
     """
-    print('Generating geotype characteristics for {}.'.format(iso3))
+    #print('Generating geotype characteristics for {}.'.format(iso3))
     pop_folder = os.path.join(DATA_RESULTS, iso3, 'demand')
     
     for root, _, files in os.walk(pop_folder):
@@ -286,7 +285,7 @@ def demand(iso3):
                                                  * (arpu))
 
             df['geotype'].loc[i] = population_decile(df['pop_den_km'].loc[i])
-            
+                
         df = df[['iso3', 'GID_2', 'area', 'population', 'adoption_scenario',
                  'adoption_value', 'pop_den_km', 'geotype', 'users_area_sqkm', 
                  'revenue_per_area']]
@@ -315,6 +314,7 @@ if __name__ == '__main__':
         #if not country['iso3'] == 'RWA':
             
             continue 
+
         #demand(countries['iso3'].loc[idx])
         #capacity_user(countries['iso3'].loc[idx])
         #ssa_summary(countries['iso3'].loc[idx])

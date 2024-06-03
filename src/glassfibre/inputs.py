@@ -7,13 +7,13 @@ parameters = {
         'rpu_usd': 5000,
         'mdf_unit_usd': 500,
         'rent_usd': 9600, 
-        'staff_usd': 500000,
+        'staff_usd': 20000,
         'power_usd': 500,
         'regulatory_usd': 100000,
-        'customer_usd': 200000,
-        'other_costs_usd': 300000,
+        'customer_usd': 10000,
+        'other_costs_usd': 5000,
         'discount_rate_percent': 5,
-        'assessment_period_year': 20
+        'assessment_period_year': 30
     },
 }
 
@@ -28,7 +28,7 @@ weights = {
         'iron_antenna_kg' : 6.4,
         'steel_antenna_kg' : 23,
         'aluminium_frame_kg' : 69,
-        'concrete_kg' : 24630,
+        'concrete_kg' : 8000,
         'aluminium_device_kg' : 67
     },
     'transportation' : {
