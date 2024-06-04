@@ -2,34 +2,34 @@ parameters = {
     'supply': {
         'dslam_usd' : 11000,
         'civil_usd' : 5000,
-        'transportation_usd' : 5000,
-        'installation_usd' : 66,
+        'transportation_usd' : 10,
+        'installation_usd' : 5000,
         'rpu_usd': 5000,
         'mdf_unit_usd': 500,
-        'rent_usd': 9600, 
+        'rent_usd': 1000, 
         'staff_usd': 20000,
         'power_usd': 500,
         'regulatory_usd': 100000,
         'customer_usd': 10000,
         'other_costs_usd': 5000,
-        'discount_rate_percent': 5,
+        'discount_rate_percent': 8.33,
         'assessment_period_year': 30
     },
 }
 
 weights = {
     'manufacturing' : {
-        'fiber_cable_per_km_kg' : 177,
+        'fiber_cable_per_km_kg' : 96,
         'pcb_kg' : 9,
-        'aluminium_bru_kg' : 36,
-        'copper_antenna_kg' : 23,
+        'aluminium_bru_kg' : 15,
+        'copper_antenna_kg' : 16,
         'aluminium_antenna_kg' : 8.78,
         'pvc_antenna_kg' : 4.2,
         'iron_antenna_kg' : 6.4,
-        'steel_antenna_kg' : 23,
-        'aluminium_frame_kg' : 69,
+        'steel_antenna_kg' : 16,
+        'aluminium_frame_kg' : 20,
         'concrete_kg' : 8000,
-        'aluminium_device_kg' : 67
+        'aluminium_device_kg' : 20
     },
     'transportation' : {
         'onu_router' : 10

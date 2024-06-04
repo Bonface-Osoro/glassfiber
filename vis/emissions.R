@@ -362,7 +362,7 @@ df$strategy <- factor(
              'New Access Network'))
 
 label_totals <- df %>%
-  group_by(decile) %>%
+  group_by(decile, strategy) %>%
   summarize(mean_value = sum(avg_ghgs))
 
 djikistra_annualized_emissions <-

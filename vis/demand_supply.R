@@ -351,7 +351,7 @@ data <- read.csv(file.path(folder, '..', 'results', 'SSA',
 
 df = data %>%
   group_by(algorithm, strategy) %>%
-  summarize(avg_tco_per_user = (mean(tco_per_user)) / 20) 
+  summarize(avg_tco_per_user = (mean(tco_per_user)) / 30) 
 
 df$strategy <- factor(
   df$strategy,
@@ -404,7 +404,7 @@ data <- read.csv(file.path(folder, '..', 'results', 'SSA',
 
 df = data %>%
   group_by(algorithm, strategy) %>%
-  summarize(avg_tco_per_user = (mean(tco_per_user)) / 240) 
+  summarize(avg_tco_per_user = (mean(tco_per_user)) / 360) 
 
 df$strategy <- factor(
   df$strategy,
@@ -691,7 +691,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = (mean(tco_per_user))/20) 
+  summarize(mean_tco = (mean(tco_per_user))/30) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -766,7 +766,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = (mean(tco_per_user))/20) 
+  summarize(mean_tco = (mean(tco_per_user))/30) 
 
 df$decile = factor(df$decile,
    levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -841,7 +841,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = (mean(tco_per_user))/240) 
+  summarize(mean_tco = (mean(tco_per_user))/360) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -916,7 +916,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = (mean(tco_per_user))/240) 
+  summarize(mean_tco = (mean(tco_per_user))/360) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
