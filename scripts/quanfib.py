@@ -699,9 +699,9 @@ csv_merger('_pcsf_regional_total_eolt.csv', 'summary')'''
 ssa_csv_merger('_total_eolt.csv')'''
 
 #### Results for decile plots ####
-ssa_hireachy_emissions('_local_emission_results.csv')
+'''ssa_hireachy_emissions('_local_emission_results.csv')
 ssa_hireachy_emissions('_pcsf_local_emission_results.csv')
 ssa_hireachy_emissions('_regional_emission_results.csv')
 ssa_hireachy_emissions('_pcsf_regional_emission_results.csv')
 csv_merger('_demand_user.csv', 'demand')
-csv_merger('_average_demand.csv', 'summary')
+csv_merger('_average_demand.csv', 'summary')'''

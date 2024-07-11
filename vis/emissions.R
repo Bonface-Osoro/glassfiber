@@ -83,7 +83,7 @@ djikistra_total_emissions <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 34900))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 19900))
 
 ##########################
 ##TOTAL EMISSIONS: PCSF###
@@ -158,7 +158,7 @@ pcsf_total_emissions <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 34900))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 19900))
 
 ########################################
 ###### AVERAGE PER USER EMISSIONS ######
@@ -238,7 +238,7 @@ djikistra_average_emissions <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 34900))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 19900))
 
 ###########################
 ##AVERAGE EMISSIONS: PCSF##
@@ -314,7 +314,7 @@ pcsf_average_emissions <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 34900))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 19900))
 
 ############################################
 ##ANNUALIZED AVERAGE EMISSIONS: DIJKSTRAS###
@@ -362,14 +362,14 @@ df$strategy <- factor(
              'New Access Network'))
 
 label_totals <- df %>%
-  group_by(decile, strategy) %>%
+  group_by(decile) %>%
   summarize(mean_value = sum(avg_ghgs))
 
 djikistra_annualized_emissions <-
   ggplot(df, aes(x = decile, y = avg_ghgs/1e3)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value/1e3, 
-                                     label = sprintf("%.0f", mean_value/1e3)), size = 3,
+                                     label = sprintf("%.2f", mean_value/1e3)), size = 3,
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Annualized GHG Emissions",
@@ -390,7 +390,7 @@ djikistra_annualized_emissions <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 34900))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 19900))
 
 ###########################
 ##AVERAGE EMISSIONS: PCSF##
@@ -466,7 +466,7 @@ pcsf_annualized_emissions <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 34900))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 19900))
 
 
 ########################
@@ -533,7 +533,7 @@ df$strategy <- factor(
              'New Access Network'))
 
 label_totals <- df %>%
-  group_by(decile, strategy) %>%
+  group_by(decile) %>%
   summarize(mean_value = sum(mean_scc))
 
 djikistra_per_user_scc <-
@@ -560,7 +560,7 @@ djikistra_per_user_scc <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0,89000))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0,59000))
 
 ############################################
 ##SOCIAL CARBON COST PER USER: PCSF ###
@@ -635,7 +635,7 @@ pcsf_per_user_scc <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 89000))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 59000))
 
 #######################################################
 ##ANNUALIZED SOCIAL CARBON COST PER USER: DIJKSTRAS ###
@@ -710,7 +710,7 @@ djikistra_annualized_per_user_scc <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 89000))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 59000))
 
 #######################################################
 ##ANNUALIZED SOCIAL CARBON COST PER USER: PCSF ###
@@ -785,7 +785,7 @@ pcsf_annualized_per_user_scc <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 89000))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 59000))
 
 ##############
 ##PANEL SCC ##

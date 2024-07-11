@@ -41,9 +41,9 @@ countries = pd.read_csv(path, encoding = 'utf-8-sig')
 
 for idx, country in countries.iterrows():
         
-    if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
+    #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    #if not country['iso3'] == 'BEN':
+    if not country['iso3'] == 'BEN':
         
         continue 
    
@@ -52,7 +52,7 @@ for idx, country in countries.iterrows():
 
     regions = ProcessRegions(countries['iso3'].loc[idx], 
                              countries['lowest'].loc[idx])
-    #regions.process_regions()
+    regions.process_regions()
     #regions.process_sub_region_boundaries()
 
     populations = ProcessPopulation(path, countries['iso3'].loc[idx], 
@@ -103,9 +103,9 @@ for idx, country in countries.iterrows():
     #generate_pcsf_regional_csv(countries['iso3'].loc[idx])
     #generate_pcsf_access_csv(countries['iso3'].loc[idx])
 
-    baseline_cost_emissions(countries['iso3'].loc[idx])
+    '''baseline_cost_emissions(countries['iso3'].loc[idx])
     local_cost_emissions(countries['iso3'].loc[idx])
     regional_cost_emissions(countries['iso3'].loc[idx])
 
     local_pcsf_cost_emissions(countries['iso3'].loc[idx])
-    regional_pcsf_cost_emissions(countries['iso3'].loc[idx])
+    regional_pcsf_cost_emissions(countries['iso3'].loc[idx])'''
