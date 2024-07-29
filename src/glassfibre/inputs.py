@@ -3,7 +3,7 @@ parameters = {
         'dslam_usd' : 11000,
         'civil_usd' : 5000,
         'transportation_usd' : 10,
-        'installation_usd' : 5000,
+        'installation_usd' : 300,
         'rpu_usd': 5000,
         'mdf_unit_usd': 500,
         'rent_usd': 1000, 

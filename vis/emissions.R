@@ -10,9 +10,9 @@ library(ggmap)
 library(tidyr)
 
 folder <- dirname(rstudioapi::getSourceEditorContext()$path)
-###############################
-##TOTAL EMISSIONS: DIJKSTRAS###
-###############################
+#############################
+##TOTAL EMISSIONS: PRIM'S ###
+#############################
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_local_emission_results.csv'))
@@ -59,7 +59,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(total_value = sum(total_ghgs))
 
-djikistra_total_emissions <-
+prims_total_emissions <-
   ggplot(df, aes(x = decile, y = total_ghgs/1e9)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = total_value/1e9, 
@@ -67,7 +67,7 @@ djikistra_total_emissions <-
   position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Total GHG Emissions.",
-       subtitle = "(a) Fiber design using Dijkstras algorithm.",
+       subtitle = "(a) Fiber design using Prim's algorithm.",
        x = NULL, y = bquote("Total GHG Emissions (Mt CO"[2]*" eq.)")) + 
   theme(
     legend.position = 'bottom',
@@ -86,7 +86,7 @@ djikistra_total_emissions <-
   labels = function(y)format(y, scientific = FALSE), limit = c(0, 19900))
 
 ##########################
-##TOTAL EMISSIONS: PCSF###
+##TOTAL EMISSIONS: PCST###
 ##########################
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
@@ -142,7 +142,7 @@ pcsf_total_emissions <-
   position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = ' ',
-       subtitle = "(b) Fiber design using PCSF algorithm.",
+       subtitle = "(b) Fiber design using PCST algorithm.",
        x = NULL, y = bquote("Total GHG Emissions (Mt CO"[2]*" eq.)")) + 
   theme(
     legend.position = 'bottom',
@@ -213,7 +213,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(avg_ghgs))
 
-djikistra_average_emissions <-
+prims_average_emissions <-
   ggplot(df, aes(x = decile, y = avg_ghgs/1e3)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value/1e3, 
@@ -221,7 +221,7 @@ djikistra_average_emissions <-
   position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Average GHG Emissions",
-       subtitle = "(c) Fiber design using Dijkstras algorithm.",
+       subtitle = "(c) Fiber design using Prim's algorithm.",
        x = NULL, 
        y = bquote("Average GHG emissions (t CO"[2]*" eq. per user)")) + 
   theme(
@@ -241,7 +241,7 @@ djikistra_average_emissions <-
   labels = function(y)format(y, scientific = FALSE), limit = c(0, 19900))
 
 ###########################
-##AVERAGE EMISSIONS: PCSF##
+##AVERAGE EMISSIONS: PCST##
 ###########################
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
@@ -297,7 +297,7 @@ pcsf_average_emissions <-
     position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = ' ',
-       subtitle = "(d) Fiber design using PCSF algorithm.",
+       subtitle = "(d) Fiber design using PCST algorithm.",
        x = NULL, 
        y = bquote("Average GHG emissions (t CO"[2]*" eq. per user)")) + 
   theme(
@@ -316,9 +316,9 @@ pcsf_average_emissions <-
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
   labels = function(y)format(y, scientific = FALSE), limit = c(0, 19900))
 
-############################################
-##ANNUALIZED AVERAGE EMISSIONS: DIJKSTRAS###
-############################################
+##########################################
+##ANNUALIZED AVERAGE EMISSIONS: PRIM'S ###
+##########################################
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_local_emission_results.csv'))
@@ -365,7 +365,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(avg_ghgs))
 
-djikistra_annualized_emissions <-
+prims_annualized_emissions <-
   ggplot(df, aes(x = decile, y = avg_ghgs/1e3)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value/1e3, 
@@ -373,7 +373,7 @@ djikistra_annualized_emissions <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Annualized GHG Emissions",
-       subtitle = "(e) Fiber design using Dijkstras algorithm.",
+       subtitle = "(e) Fiber design using Prim's algorithm.",
        x = NULL, 
        y = bquote("Annualized GHG emissions (t CO"[2]*" eq. per user)")) + 
   theme(
@@ -393,7 +393,7 @@ djikistra_annualized_emissions <-
   labels = function(y)format(y, scientific = FALSE), limit = c(0, 19900))
 
 ###########################
-##AVERAGE EMISSIONS: PCSF##
+##AVERAGE EMISSIONS: PCST##
 ###########################
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
@@ -449,7 +449,7 @@ pcsf_annualized_emissions <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = ' ',
-       subtitle = "(f) Fiber design using PCSF algorithm.",
+       subtitle = "(f) Fiber design using PCST algorithm.",
        x = NULL, 
        y = bquote("Annualized GHG emissions (t CO"[2]*" eq. per user)")) + 
   theme(
@@ -473,11 +473,11 @@ pcsf_annualized_emissions <-
 ##PANEL USER EMISSIONS##
 ########################
 aggregate_emissions <- ggarrange(
-  djikistra_total_emissions, 
+  prims_total_emissions, 
   pcsf_total_emissions, 
-  djikistra_average_emissions,
+  prims_average_emissions,
   pcsf_average_emissions,
-  djikistra_annualized_emissions,
+  prims_annualized_emissions,
   pcsf_annualized_emissions,
   ncol = 2, nrow = 3, align = c('hv'),
   common.legend = TRUE, legend='bottom') 
@@ -487,9 +487,9 @@ png(path, units="in", width=11, height=12, res=300)
 print(aggregate_emissions)
 dev.off()
 
-############################################
-##SOCIAL CARBON COST PER USER: DIJKSTRAS ###
-############################################
+#########################################
+##SOCIAL CARBON COST PER USER: PRIM'S ###
+#########################################
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_local_emission_results.csv'))
@@ -536,7 +536,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(mean_scc))
 
-djikistra_per_user_scc <-
+prims_per_user_scc <-
   ggplot(df, aes(x = decile, y = mean_scc)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value, 
@@ -544,7 +544,7 @@ djikistra_per_user_scc <-
     position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Social Carbon Cost (SCC) per User.",
-       subtitle = "(a) Fiber design using Dijkstras algorithm.",
+       subtitle = "(a) Fiber design using Prim's algorithm.",
        x = NULL, y = bquote("SCC per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -562,9 +562,9 @@ djikistra_per_user_scc <-
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
   labels = function(y)format(y, scientific = FALSE), limit = c(0,59000))
 
-############################################
-##SOCIAL CARBON COST PER USER: PCSF ###
-############################################
+#######################################
+##SOCIAL CARBON COST PER USER: PCST ###
+#######################################
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_pcsf_local_emission_results.csv'))
@@ -619,7 +619,7 @@ pcsf_per_user_scc <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = " ",
-       subtitle = "(b) Fiber design using PCSF algorithm.",
+       subtitle = "(b) Fiber design using PCST algorithm.",
        x = NULL, y = bquote("SCC per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -637,9 +637,9 @@ pcsf_per_user_scc <-
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
   labels = function(y)format(y, scientific = FALSE), limit = c(0, 59000))
 
-#######################################################
-##ANNUALIZED SOCIAL CARBON COST PER USER: DIJKSTRAS ###
-#######################################################
+####################################################
+##ANNUALIZED SOCIAL CARBON COST PER USER: PRIM'S ###
+####################################################
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_local_emission_results.csv'))
@@ -686,7 +686,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(mean_scc))
 
-djikistra_annualized_per_user_scc <-
+prims_annualized_per_user_scc <-
   ggplot(df, aes(x = decile, y = mean_scc)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value, 
@@ -694,7 +694,7 @@ djikistra_annualized_per_user_scc <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Annualized Social Carbon Cost (SCC) per User.",
-       subtitle = "(c) Fiber design using Dijkstras algorithm.",
+       subtitle = "(c) Fiber design using Prim's algorithm.",
        x = NULL, y = bquote("SCC per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -712,9 +712,9 @@ djikistra_annualized_per_user_scc <-
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
   labels = function(y)format(y, scientific = FALSE), limit = c(0, 59000))
 
-#######################################################
-##ANNUALIZED SOCIAL CARBON COST PER USER: PCSF ###
-#######################################################
+##################################################
+##ANNUALIZED SOCIAL CARBON COST PER USER: PCST ###
+##################################################
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_pcsf_local_emission_results.csv'))
@@ -769,7 +769,7 @@ pcsf_annualized_per_user_scc <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = " ",
-       subtitle = "(d) Fiber design using PCSF algorithm.",
+       subtitle = "(d) Fiber design using PCST algorithm.",
        x = NULL, y = bquote("SCC per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -1241,7 +1241,7 @@ djikstras_eolts_emissions <-
     axis.title.y = element_markdown(size = 7),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 9),
-    axis.title.x = element_text(size = 10)
+    axis.title.x = element_text(size = 10))
     
 #################
 ### PCSF ###
@@ -1317,7 +1317,7 @@ pcsf_eolts_emissions <-
     axis.title.y = element_markdown(size = 7),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 9),
-    axis.title.x = element_text(size = 10)
+    axis.title.x = element_text(size = 10))
 
 ########################
 ##PANEL USER EMISSIONS##

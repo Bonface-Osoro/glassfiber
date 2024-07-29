@@ -41,9 +41,9 @@ countries = pd.read_csv(path, encoding = 'utf-8-sig')
 
 for idx, country in countries.iterrows():
         
-    #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
+    if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    if not country['iso3'] == 'BEN':
+    #if not country['iso3'] == 'BEN':
         
         continue 
    
