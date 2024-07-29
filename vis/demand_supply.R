@@ -513,9 +513,9 @@ djikstra_maps <- ggplot() +
     plot.title = element_text(size = 10, face = "bold")
   )
 
-############################
-##TCO PER USER: DIJKSTRAS###
-############################
+##########################
+##TCO PER USER: PRIM'S ###
+##########################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                             'SSA_local_tco_results.csv'))
@@ -562,7 +562,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(mean_tco))
 
-djikistra_tco <-
+prims_tco <-
   ggplot(df, aes(x = decile, y = mean_tco)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value, 
@@ -570,7 +570,7 @@ djikistra_tco <-
     position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Total Cost of Ownership (TCO) per user.",
-       subtitle = "(a) Fiber design using Dijkstras algorithm.",
+       subtitle = "(a) Fiber design using Prim's algorithm.",
        x = NULL, y = bquote("TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -586,10 +586,10 @@ djikistra_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 114000))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
 #######################
-##TCO PER USER: PCSF###
+##TCO PER USER: PCST###
 #######################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
@@ -661,11 +661,11 @@ pcsf_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 30000))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
-#######################################
-##ANNUALIZED TCO PER USER: DIJKSTRAS###
-#######################################
+#####################################
+##ANNUALIZED TCO PER USER: PRIM'S ###
+#####################################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                             'SSA_local_tco_results.csv'))
@@ -712,7 +712,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(mean_tco))
 
-djikistra_annualized_tco <-
+prims_annualized_tco <-
   ggplot(df, aes(x = decile, y = mean_tco)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value, 
@@ -720,7 +720,7 @@ djikistra_annualized_tco <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Annualized TCO per user.",
-       subtitle = "(c) Fiber design using Dijkstras algorithm.",
+       subtitle = "(c) Fiber design using Prim's algorithm.",
        x = NULL, y = bquote("Annualized TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -736,10 +736,10 @@ djikistra_annualized_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 5700))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
 ##################################
-##ANNUALIZED TCO PER USER: PCSF###
+##ANNUALIZED TCO PER USER: PCST###
 ##################################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
@@ -795,7 +795,7 @@ pcsf_annualized_tco <-
   position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = " ",
-       subtitle = "(d) Fiber design using PCSF algorithm.",
+       subtitle = "(d) Fiber design using PCST algorithm.",
        x = NULL, y = bquote("Annualized TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -811,11 +811,11 @@ pcsf_annualized_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 5700))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
-#########################################
-##MEAN MONTHLY TCO PER USER: DIJKSTRAS###
-#########################################
+#######################################
+##MEAN MONTHLY TCO PER USER: PRIM'S ###
+#######################################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                             'SSA_local_tco_results.csv'))
@@ -862,7 +862,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(mean_tco))
 
-djikistra_monthly_tco <-
+prims_monthly_tco <-
   ggplot(df, aes(x = decile, y = mean_tco)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value, 
@@ -870,7 +870,7 @@ djikistra_monthly_tco <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Mean Monthly TCO per user.",
-       subtitle = "(e) Fiber design using Dijkstras algorithm.",
+       subtitle = "(e) Fiber design using Prim's algorithm.",
        x = NULL, y = bquote("Mean Monthly TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -886,10 +886,10 @@ djikistra_monthly_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 459))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
 #####################################
-##MEAN MONTHLY TCO PER USER: PCSF ###
+##MEAN MONTHLY TCO PER USER: PCST ###
 #####################################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
@@ -945,7 +945,7 @@ pcsf_monthly_tco <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = " ",
-       subtitle = "(f) Fiber design using PCSF algorithm.",
+       subtitle = "(f) Fiber design using PCST algorithm.",
        x = NULL, y = bquote("Mean Monthly TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -961,17 +961,17 @@ pcsf_monthly_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 459))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
 #######################
 ##PANEL TCO PER USER ##
 #######################
 aggregate_tco <- ggarrange(
-  djikistra_tco, 
+  prims_tco, 
   pcsf_tco, 
-  djikistra_annualized_tco,
+  prims_annualized_tco,
   pcsf_annualized_tco,
-  djikistra_monthly_tco,
+  prims_monthly_tco,
   pcsf_monthly_tco,
   ncol = 2, nrow = 3, align = c('hv'),
   common.legend = TRUE, legend='bottom') 
