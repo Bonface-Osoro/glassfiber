@@ -645,7 +645,7 @@ pcsf_tco <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = " ",
-       subtitle = "(b) Fiber design using PCSF algorithm.",
+       subtitle = "(b) Fiber design using PCST algorithm.",
        x = NULL, y = bquote("TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
