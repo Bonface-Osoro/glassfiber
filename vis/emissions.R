@@ -164,9 +164,9 @@ pcsf_total_emissions <-
 ###### AVERAGE PER USER EMISSIONS ######
 ########################################
 
-#################################
-##AVERAGE EMISSIONS: DIJKSTRAS###
-#################################
+###############################
+##AVERAGE EMISSIONS: PRIM'S ###
+###############################
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_local_emission_results.csv'))
@@ -420,7 +420,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(avg_ghgs = mean(emissions_kg_per_subscriber/30)) 
+  summarize(avg_ghgs = sum(emissions_kg_per_subscriber/30)) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -439,7 +439,7 @@ df$strategy <- factor(
 
 label_totals <- df %>%
   group_by(decile) %>%
-  summarize(mean_value = sum(avg_ghgs))
+  summarize(mean_value = mean(avg_ghgs))
 
 pcsf_annualized_emissions <-
   ggplot(df, aes(x = decile, y = avg_ghgs/1e3)) +
@@ -791,9 +791,9 @@ pcsf_annualized_per_user_scc <-
 ##PANEL SCC ##
 ##############
 scc_costs <- ggarrange(
-  djikistra_per_user_scc, 
+  prims_per_user_scc, 
   pcsf_per_user_scc, 
-  djikistra_annualized_per_user_scc, 
+  prims_annualized_per_user_scc, 
   pcsf_annualized_per_user_scc, 
   ncol = 2, nrow = 2, align = c('hv'),
   common.legend = TRUE, legend='bottom') 
@@ -853,9 +853,9 @@ core_fiber <- ggplot() +
   ) 
 
 
-######################################
-##DJIKISTRA FIBER INFRASTRUCTURE MAP##
-######################################
+####################################
+##PRIM'S FIBER INFRASTRUCTURE MAP ##
+####################################
 access_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
                                   'SSA_combined_access_nodes.shp'))
 access_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
@@ -863,30 +863,31 @@ access_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles',
 access_nodes$Type <- 'Access Nodes'
 access_edges$Type <- 'Access Fiber'
 
-access_djikistra_fiber <- ggplot() +
+access_prims_fiber <- ggplot() +
   geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
   geom_sf(data = access_nodes, color = "gray35", size = 0.002, aes(fill = Type)) + 
   geom_sf(data = access_edges, color = "coral", size = 0.3, linewidth = 0.3) + 
-  labs(title = "(f) Designed access fiber network using Dijkstras algorithm.", 
-       subtitle = "Based on settlement points", fill = NULL) + 
-  theme_void() +
+  labs(title = "Fixed fiber network design.", 
+       subtitle = "(a) Designed access fiber network using Prim's algorithm.", fill = NULL) + 
   theme(
-    strip.text.x = element_blank(),
-    panel.border = element_blank(),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
     axis.title.y = element_text(size = 6),
-    legend.position = 'bottom',
-    axis.title = element_text(size = 8),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 6),
-    legend.key.size = unit(0.6, "lines"),
-    plot.subtitle = element_text(size = 10),
-    plot.title = element_text(size = 10, face = "bold")
-  )
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(size = 9),
+    axis.text.y = element_text(size = 9),
+    plot.subtitle = element_text(size = 12),
+    plot.title = element_text(size = 13, face = "bold")
+  ) + annotation_scale(location = "bl", width_hint = 0.5) + 
+  coord_sf(crs = 4326) + 
+  ggspatial::annotation_north_arrow(
+    location = "tr", which_north = "true",
+    pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
+    style = ggspatial::north_arrow_nautical(
+      fill = c("grey40", "white"),
+      line_col = "grey20",
+      text_family = "ArcherPro Book")) 
 
 #################################
-##PCSF FIBER INFRASTRUCTURE MAP##
+##PCST FIBER INFRASTRUCTURE MAP##
 #################################
 access_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
                                   'SSA_combined_pcsf_access_nodes.shp'))
@@ -899,54 +900,37 @@ access_pcsf_fiber <- ggplot() +
   geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
   geom_sf(data = access_nodes, color = "darkorange", size = 0.002, aes(fill = Type)) + 
   geom_sf(data = access_edges, color = "aquamarine4", size = 0.3, linewidth = 0.3) + 
-  labs(title = "(g) Designed access fiber network using PCSF algorithm.", 
-       subtitle = "Based on settlement points", fill = NULL) + 
-  theme_void() +
+  labs(title = " ", 
+  subtitle = "(b) Designed access fiber network using PCST algorithm.", fill = NULL) + 
   theme(
-    strip.text.x = element_blank(),
-    panel.border = element_blank(),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
     axis.title.y = element_text(size = 6),
-    legend.position = 'bottom',
-    axis.title = element_text(size = 8),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 6),
-    legend.key.size = unit(0.6, "lines"),
-    plot.subtitle = element_text(size = 10),
-    plot.title = element_text(size = 10, face = "bold")
-  )
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(size = 9),
+    axis.text.y = element_text(size = 9),
+    plot.subtitle = element_text(size = 12),
+    plot.title = element_text(size = 13, face = "bold")
+  ) + annotation_scale(location = "bl", width_hint = 0.5) + 
+  coord_sf(crs = 4326) + 
+  ggspatial::annotation_north_arrow(
+    location = "tr", which_north = "true",
+    pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
+    style = ggspatial::north_arrow_nautical(
+      fill = c("grey40", "white"),
+      line_col = "grey20",
+      text_family = "ArcherPro Book")) 
+
 #######################
 ##PANEL FIBER DESIGN ##
 #######################
-total_emission_panel <- ggarrange(
-  djikistra_total_emissions, 
-  pcsf_total_emissions, 
+fiber_design <- ggarrange(
+  access_prims_fiber, 
+  access_pcsf_fiber, 
  legend = 'none',
   ncol = 2)
 
-average_emission_panel <- ggarrange(
-  djikistra_average_emissions,
-  pcsf_average_emissions, legend = 'bottom',
-  common.legend = TRUE,
-  ncol = 2)
-
-fiber_nodes <- ggarrange(
-  core_fiber, 
-  access_djikistra_fiber,
-  access_pcsf_fiber, align = c('hv'),
-  ncol = 3, nrow = 1, legend = 'bottom')
-
-fiber_emission_panel <- ggarrange(
-  total_emission_panel, 
-  average_emission_panel,
-  fiber_nodes,
-  ncol = 1, nrow = 3, 
-  common.legend = TRUE, legend='bottom')
-
-path = file.path(folder, 'figures', 'fiber_design_emissions.png')
+path = file.path(folder, 'figures', 'fiber_network_design.png')
 png(path, units = "in", width = 13, height = 13, res = 300)
-print(fiber_emission_panel)
+print(fiber_design)
 dev.off()
 
 
@@ -1167,7 +1151,7 @@ pcsf_manufacturing_emissions <-
 ###TOTAL END OF LIFE TREATMENT EMISSIONS###
 ###########################################
 #################
-### DJIKSTRAS ###
+### PRIM'S ###
 #################
 #### Access manufacturing emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_local_total_eolt.csv'))
