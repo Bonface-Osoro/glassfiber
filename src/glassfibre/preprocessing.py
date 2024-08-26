@@ -462,8 +462,7 @@ class ProcessPopulation:
 
 def lca_manufacturing():
     """
-    This function calculates the total 
-    GHG emissions in the manufacturing 
+    This function calculates the total GHG emissions in the manufacturing 
     phase LCA of fiber broadband.
 
     """
@@ -533,8 +532,7 @@ def lca_manufacturing():
 
 def lca_eolt():
     """
-    This function calculates the total 
-    GHG emissions in the end of life 
+    This function calculates the total GHG emissions in the end of life 
     phase LCA of fiber broadband.
 
     """
@@ -633,8 +631,7 @@ def lca_construct(distance):
 
 def lca_trans():
     """
-    This function calculates the total 
-    GHG emissions in the transportation 
+    This function calculates the total GHG emissions in the transportation 
     LCA phase of fiber broadband deployment.
 
     """
@@ -656,9 +653,7 @@ def lca_trans():
 
 def lca_operations():
     """
-    This function calculates 
-    the total GHG emissions 
-    due to operation of the 
+    This function calculates the total GHG emissions due to operation of the 
     fiber broadband
     """
 
