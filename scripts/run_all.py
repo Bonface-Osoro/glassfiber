@@ -6,9 +6,9 @@ from glassfibre.preprocessing import (ProcessCountry, ProcessRegions,
                                       ProcessPopulation)
 
 from glassfibre.fiber_process import FiberProcess
-from glassfibre.strategies import (baseline_cost_emissions, local_cost_emissions, 
-    regional_cost_emissions, local_pcsf_cost_emissions, 
-    regional_pcsf_cost_emissions)
+from glassfibre.strategies import (baseline_cost_emissions, 
+    local_prims_cost_emissions, regional_prims_cost_emissions, 
+    local_pcsf_cost_emissions, regional_pcsf_cost_emissions)
 from glassfibre.netPlanning import(process_regional_settlement_tifs, 
     process_access_settlement_tifs, generate_access_settlement_lut, 
     generate_regional_settlement_lut, generate_agglomeration_lut,
@@ -43,7 +43,7 @@ for idx, country in countries.iterrows():
         
     if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    #if not country['iso3'] == 'BEN':
+    #if not country['iso3'] == 'RWA':
         
         continue 
    
@@ -102,10 +102,3 @@ for idx, country in countries.iterrows():
 
     #generate_pcsf_regional_csv(countries['iso3'].loc[idx])
     #generate_pcsf_access_csv(countries['iso3'].loc[idx])
-
-    '''baseline_cost_emissions(countries['iso3'].loc[idx])
-    local_cost_emissions(countries['iso3'].loc[idx])
-    regional_cost_emissions(countries['iso3'].loc[idx])
-
-    local_pcsf_cost_emissions(countries['iso3'].loc[idx])
-    regional_pcsf_cost_emissions(countries['iso3'].loc[idx])'''
