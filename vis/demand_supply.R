@@ -97,33 +97,6 @@ total_area <-
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
   labels = function(y)format(y, scientific = FALSE), limit = c(0, 21))
 
-
-###################
-##DECILE TABLE ####
-###################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 
-                           'SSA_subregional_population_deciles.csv'))
-df = data %>%
-  distinct(decile, population, area, pop_density_sqkm, .keep_all = TRUE) %>%
-  group_by(decile) %>%
-  summarize(total_pops = round(sum(population)/1e6),
-            total_area = round(sum(area)),
-            avg_sqkm = round(mean(pop_density_sqkm)))
-df$decile = factor(df$decile,
-  levels = c('decile 1', 'decile 2', 'decile 3', 'decile 4', 'decile 5',
-  'decile 6', 'decile 7', 'decile 8', 'decile 9', 'decile 10'),
-  labels = c('Decile 1 (>700 per km²)', 'Decile 2 (600 - 700 per km²)', 
-  'Decile 3 (500 - 600 per km²)', 'Decile 4 (400 - 500 per km²)', 
-  'Decile 5 (300 - 400 per km²)', 'Decile 6 (200 - 300 per km²)',
-  'Decile 7 (100 - 200 per km²)', 'Decile 8 (75 - 100 per km²)',
-  'Decile 9 (50 - 75 per km²)', 'Decile 10 (<50 per km²)'))
-
-df <- df[, c("decile", "total_pops", 'total_area', 'avg_sqkm')]
-new_names <- c('Decile', 'Total \nPopulation (millions)', 'Total Area (km²)', 
-               'Average Population \nDensity (persons per km²)')
-colnames(df) <- new_names
-tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
-grid.table(df, theme = tt)
 ################################
 ## CAPACITY DEMAND PANEL PLOT ##
 ################################
@@ -378,7 +351,7 @@ data <- read.csv(file.path(folder, '..', 'results', 'SSA',
 
 df = data %>%
   group_by(algorithm, strategy) %>%
-  summarize(avg_tco_per_user = (mean(tco_per_user)) / 20) 
+  summarize(avg_tco_per_user = (mean(tco_per_user)) / 30) 
 
 df$strategy <- factor(
   df$strategy,
@@ -431,7 +404,7 @@ data <- read.csv(file.path(folder, '..', 'results', 'SSA',
 
 df = data %>%
   group_by(algorithm, strategy) %>%
-  summarize(avg_tco_per_user = (mean(tco_per_user)) / 240) 
+  summarize(avg_tco_per_user = (mean(tco_per_user)) / 360) 
 
 df$strategy <- factor(
   df$strategy,
@@ -540,9 +513,9 @@ djikstra_maps <- ggplot() +
     plot.title = element_text(size = 10, face = "bold")
   )
 
-############################
-##TCO PER USER: DIJKSTRAS###
-############################
+##########################
+##TCO PER USER: PRIM'S ###
+##########################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                             'SSA_local_tco_results.csv'))
@@ -568,7 +541,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = (mean(tco_per_user))/1e3) 
+  summarize(mean_tco = mean(tco_per_user)) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -589,7 +562,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(mean_tco))
 
-djikistra_tco <-
+prims_tco <-
   ggplot(df, aes(x = decile, y = mean_tco)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value, 
@@ -597,8 +570,8 @@ djikistra_tco <-
     position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Total Cost of Ownership (TCO) per user.",
-       subtitle = "(a) Fiber design using Dijkstras algorithm.",
-       x = NULL, y = bquote("TCO per user ('000' US$/User)")) + 
+       subtitle = "(a) Fiber design using Prim's algorithm.",
+       x = NULL, y = bquote("TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
@@ -613,10 +586,10 @@ djikistra_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 114))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
 #######################
-##TCO PER USER: PCSF###
+##TCO PER USER: PCST###
 #######################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
@@ -643,7 +616,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = mean(tco_per_user)/1e3) 
+  summarize(mean_tco = mean(tco_per_user)) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -672,8 +645,8 @@ pcsf_tco <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = " ",
-       subtitle = "(b) Fiber design using PCSF algorithm.",
-       x = NULL, y = bquote("TCO per user ('000' US$/User)")) + 
+       subtitle = "(b) Fiber design using PCST algorithm.",
+       x = NULL, y = bquote("TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 7),
@@ -688,11 +661,11 @@ pcsf_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 114))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
-#######################################
-##ANNUALIZED TCO PER USER: DIJKSTRAS###
-#######################################
+#####################################
+##ANNUALIZED TCO PER USER: PRIM'S ###
+#####################################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                             'SSA_local_tco_results.csv'))
@@ -718,7 +691,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = (mean(tco_per_user))/20) 
+  summarize(mean_tco = (mean(tco_per_user))/30) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -739,7 +712,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(mean_tco))
 
-djikistra_annualized_tco <-
+prims_annualized_tco <-
   ggplot(df, aes(x = decile, y = mean_tco)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value, 
@@ -747,7 +720,7 @@ djikistra_annualized_tco <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Annualized TCO per user.",
-       subtitle = "(c) Fiber design using Dijkstras algorithm.",
+       subtitle = "(c) Fiber design using Prim's algorithm.",
        x = NULL, y = bquote("Annualized TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -763,10 +736,10 @@ djikistra_annualized_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 5700))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
 ##################################
-##ANNUALIZED TCO PER USER: PCSF###
+##ANNUALIZED TCO PER USER: PCST###
 ##################################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
@@ -793,7 +766,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = (mean(tco_per_user))/20) 
+  summarize(mean_tco = (mean(tco_per_user))/30) 
 
 df$decile = factor(df$decile,
    levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -822,7 +795,7 @@ pcsf_annualized_tco <-
   position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = " ",
-       subtitle = "(d) Fiber design using PCSF algorithm.",
+       subtitle = "(d) Fiber design using PCST algorithm.",
        x = NULL, y = bquote("Annualized TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -838,11 +811,11 @@ pcsf_annualized_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 5700))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
-#########################################
-##MEAN MONTHLY TCO PER USER: DIJKSTRAS###
-#########################################
+#######################################
+##MEAN MONTHLY TCO PER USER: PRIM'S ###
+#######################################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                             'SSA_local_tco_results.csv'))
@@ -868,7 +841,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = (mean(tco_per_user))/240) 
+  summarize(mean_tco = (mean(tco_per_user))/360) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -889,7 +862,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(mean_tco))
 
-djikistra_monthly_tco <-
+prims_monthly_tco <-
   ggplot(df, aes(x = decile, y = mean_tco)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value, 
@@ -897,7 +870,7 @@ djikistra_monthly_tco <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = "Mean Monthly TCO per user.",
-       subtitle = "(e) Fiber design using Dijkstras algorithm.",
+       subtitle = "(e) Fiber design using Prim's algorithm.",
        x = NULL, y = bquote("Mean Monthly TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -913,10 +886,10 @@ djikistra_monthly_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 459))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
 #####################################
-##MEAN MONTHLY TCO PER USER: PCSF ###
+##MEAN MONTHLY TCO PER USER: PCST ###
 #####################################
 #### Access TCO per user ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 
@@ -943,7 +916,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(mean_tco = (mean(tco_per_user))/240) 
+  summarize(mean_tco = (mean(tco_per_user))/360) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -972,7 +945,7 @@ pcsf_monthly_tco <-
             position = position_dodge(0.9), vjust = 0.5, hjust = -0.1) +
   scale_fill_brewer(palette = "Dark2") +
   labs(colour = NULL, title = " ",
-       subtitle = "(f) Fiber design using PCSF algorithm.",
+       subtitle = "(f) Fiber design using PCST algorithm.",
        x = NULL, y = bquote("Mean Monthly TCO per user (US$/User)")) + 
   theme(
     legend.position = 'bottom',
@@ -988,17 +961,17 @@ pcsf_monthly_tco <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 459))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 21900))
 
 #######################
 ##PANEL TCO PER USER ##
 #######################
 aggregate_tco <- ggarrange(
-  djikistra_tco, 
+  prims_tco, 
   pcsf_tco, 
-  djikistra_annualized_tco,
+  prims_annualized_tco,
   pcsf_annualized_tco,
-  djikistra_monthly_tco,
+  prims_monthly_tco,
   pcsf_monthly_tco,
   ncol = 2, nrow = 3, align = c('hv'),
   common.legend = TRUE, legend='bottom') 

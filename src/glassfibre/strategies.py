@@ -175,7 +175,7 @@ def baseline_cost_emissions(iso3):
                 df1['algorithm'].loc[i] = 'none'
 
                 df1['total_ssc_usd'].loc[i] = (
-                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 185
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 14
                 
                 df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
                                               df1['users_area_sqkm'].loc[i])
@@ -376,7 +376,7 @@ def local_prims_cost_emissions(iso3):
                 df1['algorithm'].loc[i] = 'Prims'
 
                 df1['total_ssc_usd'].loc[i] = (
-                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 185
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 14
                 
                 df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
                                               df1['users_area_sqkm'].loc[i])
@@ -567,7 +567,7 @@ def regional_prims_cost_emissions(iso3):
                 df1['algorithm'].loc[i] = 'Prims'
 
                 df1['total_ssc_usd'].loc[i] = (
-                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 185
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 14
                 
                 df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
                                               df1['users_area_sqkm'].loc[i])
@@ -759,7 +759,7 @@ def local_pcsf_cost_emissions(iso3):
                     df1['users_area_sqkm'].loc[i])
                 
                 df1['total_ssc_usd'].loc[i] = (
-                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 185
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 14
                 
                 df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
                                               df1['users_area_sqkm'].loc[i])
@@ -947,7 +947,7 @@ def regional_pcsf_cost_emissions(iso3):
                     df1['users_area_sqkm'].loc[i])
         
                 df1['total_ssc_usd'].loc[i] = (
-                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 185
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 14
                 
                 df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
                                               df1['users_area_sqkm'].loc[i])

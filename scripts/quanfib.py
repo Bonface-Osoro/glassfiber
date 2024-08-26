@@ -624,20 +624,20 @@ if __name__ == '__main__':
 
         try:
 
-            #summations(countries['iso3'].loc[idx], '_baseline_mfg_emission')
-            #summations(countries['iso3'].loc[idx], '_baseline_eolt_emission')
+            '''summations(countries['iso3'].loc[idx], '_baseline_mfg_emission')
+            summations(countries['iso3'].loc[idx], '_baseline_eolt_emission')
 
-            ### Dijkstras algorithm ####
-            #summations(countries['iso3'].loc[idx], '_local_mfg_emission')
-            #summations(countries['iso3'].loc[idx], '_local_eolt_emission')
-            #summations(countries['iso3'].loc[idx], '_regional_mfg_emission')
-            #summations(countries['iso3'].loc[idx], '_regional_eolt_emission')
+            ### Prim's algorithm ####
+            summations(countries['iso3'].loc[idx], '_local_mfg_emission')
+            summations(countries['iso3'].loc[idx], '_local_eolt_emission')
+            summations(countries['iso3'].loc[idx], '_regional_mfg_emission')
+            summations(countries['iso3'].loc[idx], '_regional_eolt_emission')
 
             ### PCSF algorithm ####
-            #summations(countries['iso3'].loc[idx], '_pcsf_local_mfg_emission')
-            #summations(countries['iso3'].loc[idx], '_pcsf_local_eolt_emission')
-            #summations(countries['iso3'].loc[idx], '_pcsf_regional_mfg_emission')
-            #summations(countries['iso3'].loc[idx], '_pcsf_regional_eolt_emission')
+            summations(countries['iso3'].loc[idx], '_pcsf_local_mfg_emission')
+            summations(countries['iso3'].loc[idx], '_pcsf_local_eolt_emission')
+            summations(countries['iso3'].loc[idx], '_pcsf_regional_mfg_emission')
+            summations(countries['iso3'].loc[idx], '_pcsf_regional_eolt_emission')'''
 
             pass
 
@@ -654,20 +654,20 @@ csv_merger('_average_demand.csv', 'summary')'''
 ########## TOTAL BASELINE AND LOCAL EMISSIONS ##########
 '''csv_merger('_country_baseline_emission.csv', 'summary')
 
-### Dijkstras algorithm ####
+### Prim's algorithm ####
 csv_merger('_country_local_emission.csv', 'summary')
 csv_merger('_regional_emission.csv', 'summary')
 
 ### PCSF algorithm ####
 csv_merger('_pcsf_country_local_emission.csv', 'summary')
-csv_merger('_pcsf_regional_emission.csv', 'summary')
+csv_merger('_pcsf_regional_emission.csv', 'summary')'''
 
-ssa_csv_merger('_emission.csv')'''
+#ssa_csv_merger('_emission.csv')
 
 ###### TOTAL TCO AND PER USER TCO EMISSIONS ######
 '''csv_merger('_baseline_tco_results.csv', 'supply')
 
-### Dijkstras algorithm ####
+### Prim's algorithm ####
 csv_merger('_local_tco_results.csv', 'supply')
 csv_merger('_regional_tco_results.csv', 'supply')
 
@@ -680,23 +680,23 @@ ssa_csv_merger('_tco_results.csv')'''
 
 ############ TOTAL EMISSION TYPES ##############
 #run after running summations
-#csv_merger('_baseline_total_mfg.csv', 'summary')
-#csv_merger('_baseline_total_eolt.csv', 'summary')
+'''csv_merger('_baseline_total_mfg.csv', 'summary')
+csv_merger('_baseline_total_eolt.csv', 'summary')
 
-### Dijkstras algorithm ####
+### Prim's algorithm ####
 csv_merger('_local_total_mfg.csv', 'summary')
-#csv_merger('_local_total_eolt.csv', 'summary')
-#csv_merger('_regional_total_mfg.csv', 'summary')
-#csv_merger('_regional_total_eolt.csv', 'summary')
+csv_merger('_local_total_eolt.csv', 'summary')
+csv_merger('_regional_total_mfg.csv', 'summary')
+csv_merger('_regional_total_eolt.csv', 'summary')'''
 
 ### PCSF algorithm ####
-#csv_merger('_pcsf_local_total_mfg.csv', 'summary')
-#csv_merger('_pcsf_local_total_eolt.csv', 'summary')
-#csv_merger('_pcsf_regional_total_mfg.csv', 'summary')
-#csv_merger('_pcsf_regional_total_eolt.csv', 'summary')
+'''csv_merger('_pcsf_local_total_mfg.csv', 'summary')
+csv_merger('_pcsf_local_total_eolt.csv', 'summary')
+csv_merger('_pcsf_regional_total_mfg.csv', 'summary')
+csv_merger('_pcsf_regional_total_eolt.csv', 'summary')
 
-#ssa_csv_merger('_total_mfg.csv')
-#ssa_csv_merger('_total_eolt.csv')
+ssa_csv_merger('_total_mfg.csv')
+ssa_csv_merger('_total_eolt.csv')'''
 
 #### Results for decile plots ####
 '''ssa_hireachy_emissions('_local_emission_results.csv')
