@@ -9,7 +9,7 @@ from rasterstats import zonal_stats
 from shapely.geometry import Polygon
 from shapely.geometry import MultiPolygon
 from tqdm import tqdm
-from glassfibre.inputs import weights, carbon_factors, operations
+from glassfibre.inputs import weights, parameters, carbon_factors, operations
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
@@ -602,6 +602,35 @@ def lca_eolt():
     return eolt_emission_dict
 
 
+def lca_construct(distance):
+    """
+    This function calculates the total GHG emissions in the construction 
+    LCA phase of fiber broadband deployment.
+
+    """
+    cons_emission_dict = {}
+
+    for key, parameter in parameters.items():
+
+        if key == 'construction_emissions':
+
+            diesel_carbon_factor = (parameter['diesel_kg_co2e'])
+            fuel_efficiency = (parameter['fuel_efficiency'])
+            trench_value = (parameter['trench_percent'])
+            trench_hours_km = (parameter['hours_per_km'])
+            trenched_distance = distance * trench_value
+            total_operation_hours = trench_hours_km * trenched_distance
+
+            total_fuel_consumption = (total_operation_hours * fuel_efficiency)
+            construct_ghg = total_fuel_consumption * diesel_carbon_factor
+
+            cons_emission_dict['construction_ghg'] = construct_ghg
+            cons_emission_dict['lca_phase'] = 'construct'
+
+
+    return cons_emission_dict
+
+
 def lca_trans():
     """
     This function calculates the total 
@@ -638,11 +667,11 @@ def lca_operations():
     for key, operation in operations.items():
 
         cpe_power_kwh = operation['cpe_power_kwh']
-        base_station_power_kwh = operation['base_station_pwr_kwh']
+        fiber_point_pwr_kwh = operation['fiber_point_pwr_kwh']
         terminal_unit_pwr_kwh = operation['terminal_unit_pwr_kwh']
 
         ops_emission_dict['cpe_power'] = cpe_power_kwh
-        ops_emission_dict['base_station_power_kwh'] = base_station_power_kwh
+        ops_emission_dict['fiber_point_pwr_kwh'] = fiber_point_pwr_kwh
         ops_emission_dict['terminal_unit_pwr_kwh'] = terminal_unit_pwr_kwh
         ops_emission_dict['lca_phase'] = 'ops'
 
