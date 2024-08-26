@@ -16,7 +16,7 @@ folder <- dirname(rstudioapi::getSourceEditorContext()$path)
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_local_emission_results.csv'))
-
+data2 <- na.omit(data2)
 ## Combine the merged data with deciles
 access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                                  'SSA_subregional_population_deciles.csv'))
@@ -91,7 +91,7 @@ prims_total_emissions <-
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_pcsf_local_emission_results.csv'))
-
+data2 <- na.omit(data2)
 ## Combine the merged data with deciles
 access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                                  'SSA_subregional_population_deciles.csv'))
@@ -170,7 +170,7 @@ pcsf_total_emissions <-
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_local_emission_results.csv'))
-
+data2 <- na.omit(data2)
 ## Combine the merged data with deciles
 access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                                  'SSA_subregional_population_deciles.csv'))
@@ -246,7 +246,7 @@ prims_average_emissions <-
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_pcsf_local_emission_results.csv'))
-
+data2 <- na.omit(data2)
 ## Combine the merged data with deciles
 access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                                  'SSA_subregional_population_deciles.csv'))
@@ -322,7 +322,7 @@ pcsf_average_emissions <-
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_local_emission_results.csv'))
-
+data2 <- na.omit(data2)
 ## Combine the merged data with deciles
 access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                                  'SSA_subregional_population_deciles.csv'))
@@ -398,7 +398,7 @@ prims_annualized_emissions <-
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_pcsf_local_emission_results.csv'))
-
+data2 <- na.omit(data2)
 ## Combine the merged data with deciles
 access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                                  'SSA_subregional_population_deciles.csv'))
@@ -493,7 +493,7 @@ dev.off()
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_local_emission_results.csv'))
-
+data2 <- na.omit(data2)
 ## Combine the merged data with deciles
 access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                                  'SSA_subregional_population_deciles.csv'))
@@ -568,7 +568,7 @@ prims_per_user_scc <-
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_pcsf_local_emission_results.csv'))
-
+data2 <- na.omit(data2)
 ## Combine the merged data with deciles
 access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                                  'SSA_subregional_population_deciles.csv'))
@@ -643,7 +643,7 @@ pcsf_per_user_scc <-
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_local_emission_results.csv'))
-
+data2 <- na.omit(data2)
 ## Combine the merged data with deciles
 access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                                  'SSA_subregional_population_deciles.csv'))
@@ -718,7 +718,7 @@ prims_annualized_per_user_scc <-
 #### Access total emissions ####
 data2 <- read.csv(file.path(folder, '..', 'results', 'SSA', 'fiber_levels', 
                             'SSA_pcsf_local_emission_results.csv'))
-
+data2 <- na.omit(data2)
 ## Combine the merged data with deciles
 access_pop <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                                  'SSA_subregional_population_deciles.csv'))
