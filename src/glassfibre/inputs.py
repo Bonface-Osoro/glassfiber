@@ -2,34 +2,40 @@ parameters = {
     'supply': {
         'dslam_usd' : 11000,
         'civil_usd' : 5000,
-        'transportation_usd' : 10,
-        'installation_usd' : 300,
+        'transportation_usd' : 1000,
+        'installation_usd' : 66,
         'rpu_usd': 5000,
         'mdf_unit_usd': 500,
-        'rent_usd': 1000, 
-        'staff_usd': 20000,
+        'rent_usd': 5000, 
+        'staff_usd': 500000,
         'power_usd': 500,
-        'regulatory_usd': 100000,
-        'customer_usd': 10000,
-        'other_costs_usd': 5000,
-        'discount_rate_percent': 8.33,
+        'regulatory_usd': 50000,
+        'customer_usd': 100000,
+        'other_costs_usd': 300000,
+        'discount_rate_percent': 5,
         'assessment_period_year': 30
+    },
+    'construction_emissions' : {
+        'diesel_kg_co2e' : 2.68,
+        'fuel_efficiency' : 24.23,
+        'trench_percent' : 0.01,
+        'hours_per_km' : 1,
     },
 }
 
 weights = {
     'manufacturing' : {
-        'fiber_cable_per_km_kg' : 96,
-        'pcb_kg' : 9,
-        'aluminium_bru_kg' : 15,
-        'copper_antenna_kg' : 16,
-        'aluminium_antenna_kg' : 8.78,
-        'pvc_antenna_kg' : 4.2,
-        'iron_antenna_kg' : 6.4,
-        'steel_antenna_kg' : 16,
-        'aluminium_frame_kg' : 20,
-        'concrete_kg' : 8000,
-        'aluminium_device_kg' : 20
+        'fiber_cable_per_km_kg' : 70,
+        'pcb_kg' : 0.5,
+        'aluminium_bru_kg' : 0,
+        'copper_antenna_kg' : 0,
+        'aluminium_antenna_kg' : 0,
+        'pvc_antenna_kg' : 1,
+        'iron_antenna_kg' : 0,
+        'steel_antenna_kg' : 0,
+        'aluminium_frame_kg' : 1,
+        'concrete_kg' : 17,
+        'aluminium_device_kg' : 0
     },
     'transportation' : {
         'onu_router' : 10
@@ -67,7 +73,7 @@ carbon_factors = {
 operations = {
    'power_consumption' : {
        'cpe_power_kwh' : 0.0132,
-       'base_station_pwr_kwh' : 4,
+       'fiber_point_pwr_kwh' : 5,
        'terminal_unit_pwr_kwh' : 0.5
    }
 }

@@ -1027,11 +1027,11 @@ def regional_pcsf_cost_emissions(iso3):
     
     return None
 
-'''for idx, country in countries.iterrows():
+for idx, country in countries.iterrows():
         
-    #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
+    if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
-    if not country['iso3'] == 'RWA':
+    #if not country['iso3'] == 'RWA':
 
         continue
 
@@ -1039,4 +1039,4 @@ def regional_pcsf_cost_emissions(iso3):
     #local_prims_cost_emissions(countries['iso3'].loc[idx])
     #regional_prims_cost_emissions(countries['iso3'].loc[idx])
     #local_pcsf_cost_emissions(countries['iso3'].loc[idx])
-    #regional_pcsf_cost_emissions(countries['iso3'].loc[idx])'''
+    regional_pcsf_cost_emissions(countries['iso3'].loc[idx])
