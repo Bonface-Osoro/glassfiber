@@ -2,17 +2,17 @@ parameters = {
     'supply': {
         'dslam_usd' : 11000,
         'civil_usd' : 5000,
-        'transportation_usd' : 1000,
-        'installation_usd' : 66,
+        'transportation_usd' : 100,
+        'installation_usd' : 300,
         'rpu_usd': 5000,
         'mdf_unit_usd': 500,
-        'rent_usd': 5000, 
-        'staff_usd': 500000,
+        'rent_usd': 1000, 
+        'staff_usd': 100000,
         'power_usd': 500,
         'regulatory_usd': 50000,
         'customer_usd': 100000,
-        'other_costs_usd': 300000,
-        'discount_rate_percent': 5,
+        'other_costs_usd': 5000,
+        'discount_rate_percent': 8.33,
         'assessment_period_year': 30
     },
     'construction_emissions' : {

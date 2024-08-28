@@ -134,7 +134,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(total_value = sum(total_ghgs))
 
-pcsf_total_emissions <-
+pcst_total_emissions <-
   ggplot(df, aes(x = decile, y = total_ghgs/1e9)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = total_value/1e9, 
@@ -289,7 +289,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(avg_ghgs))
 
-pcsf_average_emissions <-
+pcst_average_emissions <-
   ggplot(df, aes(x = decile, y = avg_ghgs/1e3)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value/1e3, 
@@ -420,7 +420,7 @@ data <- rbind(data2, data3)
 
 df = data %>%
   group_by(decile, strategy) %>%
-  summarize(avg_ghgs = sum(emissions_kg_per_subscriber/30)) 
+  summarize(avg_ghgs = mean(emissions_kg_per_subscriber/30)) 
 
 df$decile = factor(df$decile,
   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
@@ -441,7 +441,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = mean(avg_ghgs))
 
-pcsf_annualized_emissions <-
+pcst_annualized_emissions <-
   ggplot(df, aes(x = decile, y = avg_ghgs/1e3)) +
   geom_bar(stat = "identity", aes(fill = strategy)) + coord_flip() + 
   geom_text(data = label_totals, aes(x = decile, y = mean_value/1e3, 
@@ -474,11 +474,11 @@ pcsf_annualized_emissions <-
 ########################
 aggregate_emissions <- ggarrange(
   prims_total_emissions, 
-  pcsf_total_emissions, 
+  pcst_total_emissions, 
   prims_average_emissions,
-  pcsf_average_emissions,
+  pcst_average_emissions,
   prims_annualized_emissions,
-  pcsf_annualized_emissions,
+  pcst_annualized_emissions,
   ncol = 2, nrow = 3, align = c('hv'),
   common.legend = TRUE, legend='bottom') 
 
