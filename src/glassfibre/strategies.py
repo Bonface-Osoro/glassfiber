@@ -169,16 +169,16 @@ def baseline_cost_emissions(iso3):
                                             + df1['total_eolt_ghg_kg'].loc[i])
                 df1['emissions_kg_per_subscriber'].loc[i] = (
                     df1['total_ghg_emissions_kg'].loc[i] / 
-                    df1['population'].loc[i]) 
+                    df1['users_area_sqkm'].loc[i]) 
                 
                 df1['strategy'].loc[i] = 'baseline'
                 df1['algorithm'].loc[i] = 'none'
 
                 df1['total_ssc_usd'].loc[i] = (
-                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 14
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 75
                 
                 df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
-                                              df1['population'].loc[i])
+                                              df1['users_area_sqkm'].loc[i])
         
         df1.rename(columns = {'GID_0': 'iso3'}, inplace = True)
         totat_ghg = df1[['iso3', 'users_area_sqkm', 'total_mfg_ghg_kg', 
@@ -370,16 +370,16 @@ def local_prims_cost_emissions(iso3):
                                                 + df1['total_eolt_ghg_kg'].loc[i])
                 df1['emissions_kg_per_subscriber'].loc[i] = (
                     df1['total_ghg_emissions_kg'].loc[i] / 
-                    df1['population'].loc[i])
+                    df1['users_area_sqkm'].loc[i])
                 
                 df1['strategy'].loc[i] = 'access'
                 df1['algorithm'].loc[i] = 'Prims'
 
                 df1['total_ssc_usd'].loc[i] = (
-                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 14
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 75
                 
                 df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
-                                              df1['population'].loc[i])
+                                              df1['users_area_sqkm'].loc[i])
 
         totat_ghg = df1[['iso3', 'GID_2', 'users_area_sqkm', 'total_mfg_ghg_kg', 
                     'total_trans_ghg_kg', 'total_construction_ghg', 
@@ -562,15 +562,15 @@ def regional_prims_cost_emissions(iso3):
                                             + df1['total_eolt_ghg_kg'].loc[i])
                 df1['emissions_kg_per_subscriber'].loc[i] = (
                     df1['total_ghg_emissions_kg'].loc[i] / 
-                    df1['population'].loc[i])
+                    df1['users_area_sqkm'].loc[i])
                 
                 df1['algorithm'].loc[i] = 'Prims'
 
                 df1['total_ssc_usd'].loc[i] = (
-                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 14
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 75
                 
                 df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
-                                              df1['population'].loc[i])
+                                              df1['users_area_sqkm'].loc[i])
         
         totat_ghg = df1[['iso3', 'GID_1', 'population', 'users_area_sqkm',  
                     'total_mfg_ghg_kg', 'total_trans_ghg_kg', 
@@ -756,13 +756,13 @@ def local_pcsf_cost_emissions(iso3):
                                                 + df1['total_eolt_ghg_kg'].loc[i])
                 df1['emissions_kg_per_subscriber'].loc[i] = (
                     df1['total_ghg_emissions_kg'].loc[i] / 
-                    df1['population'].loc[i])
+                    df1['users_area_sqkm'].loc[i])
                 
                 df1['total_ssc_usd'].loc[i] = (
-                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 14
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 75
                 
                 df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
-                                              df1['population'].loc[i])
+                                              df1['users_area_sqkm'].loc[i])
 
         totat_ghg = df1[['iso3', 'GID_2', 'users_area_sqkm', 'total_mfg_ghg_kg', 
                     'total_trans_ghg_kg', 'total_construction_ghg', 
@@ -944,13 +944,13 @@ def regional_pcsf_cost_emissions(iso3):
                                             + df1['total_eolt_ghg_kg'].loc[i])
                 df1['emissions_kg_per_subscriber'].loc[i] = (
                     df1['total_ghg_emissions_kg'].loc[i] / 
-                    df1['population'].loc[i])
+                    df1['users_area_sqkm'].loc[i])
         
                 df1['total_ssc_usd'].loc[i] = (
-                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 14
+                    df1['total_ghg_emissions_kg'].loc[i] / 1000) * 75
                 
                 df1['ssc_per_user'].loc[i] = (df1['total_ssc_usd'].loc[i] / 
-                                              df1['population'].loc[i])
+                                              df1['users_area_sqkm'].loc[i])
 
         totat_ghg = df1[['iso3', 'GID_1', 'population', 'users_area_sqkm',  
                     'total_mfg_ghg_kg', 'total_trans_ghg_kg', 

@@ -10,6 +10,95 @@ library(ggmap)
 library(tidyr)
 
 folder <- dirname(rstudioapi::getSourceEditorContext()$path)
+#######################
+##TOTAL POPULATION ####
+#######################
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 
+                           'SSA_subregional_population_deciles.csv'))
+df = data %>%
+  distinct(decile, population, .keep_all = TRUE) %>%
+  group_by(decile) %>%
+  summarize(total_pops = round(sum(population)))
+
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
+
+total_population <- 
+  ggplot(df, aes(x = decile, y = total_pops, fill = decile)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) + coord_flip() +
+  geom_text(aes(label = as.character(signif(total_pops, 3))), size = 2.5, 
+            position = position_dodge(0.9), vjust = 0.05, hjust = -0.1) +
+  labs(colour = NULL, title = '(a) Population decile classification of SSA.',
+       subtitle = 'Based on population geotypes.',
+       x = NULL, y = "Population (millions)") + 
+  scale_fill_brewer(palette = "Spectral") +
+  theme(
+    legend.position = 'none',
+    axis.text.x = element_text(size = 7),
+    panel.spacing = unit(0.6, "lines"),
+    plot.title = element_text(size = 11, face = "bold"),
+    plot.subtitle = element_text(size = 9),
+    axis.text.y = element_text(size = 8),
+    axis.title.y = element_markdown(size = 7),
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    axis.title.x = element_text(size = 7)
+  ) +
+  expand_limits(y = 0) +
+  guides(fill = guide_legend(ncol = 6, title = 'Demand Scenario')) +
+  scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 280))
+
+#################
+##TOTAL AREA ####
+#################
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 
+                           'SSA_subregional_population_deciles.csv'))
+df = data %>%
+  distinct(decile, area, .keep_all = TRUE) %>%
+  group_by(decile) %>%
+  summarize(total_area = round(sum(area)))
+
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
+
+total_area <- 
+  ggplot(df, aes(x = decile, y = total_area, fill = decile)) +
+  geom_bar(stat = "identity", position = position_dodge(0.9)) + coord_flip() +
+  geom_text(aes(label = as.character(signif(total_area, 3))), size = 2.5, 
+            position = position_dodge(0.9), vjust = 0.05, hjust = -0.1) +
+  labs(colour = NULL, title = '(b) Area decile classification of SSA.',
+       subtitle = 'Based on population geotypes.',
+       x = NULL, y = "Area (km²)") + 
+  scale_fill_brewer(palette = "Spectral") +
+  theme(
+    legend.position = 'none',
+    axis.text.x = element_text(size = 7),
+    panel.spacing = unit(0.6, "lines"),
+    plot.title = element_text(size = 11, face = "bold"),
+    plot.subtitle = element_text(size = 9),
+    axis.text.y = element_text(size = 8),
+    axis.title.y = element_markdown(size = 7),
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    axis.title.x = element_text(size = 7)
+  ) +
+  expand_limits(y = 0) +
+  guides(fill = guide_legend(ncol = 6, title = 'Demand Scenario')) +
+  scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 58000000))
 
 #############################
 ##TOTAL EMISSIONS: PRIM'S ###
@@ -47,8 +136,11 @@ df = data %>%
 df$decile = factor(df$decile,
    levels = c('Decile 1', 'Decile 2', 'Decile 3', 'Decile 4', 'Decile 5',
    'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 'Decile 10'),
-   labels = c('Decile 1 \n(<50 per km²)', 'Decile 2', 'Decile 3', 'Decile 4', 'Decile 5',
-              'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 'Decile 10'))
+   labels = c('Decile 1 \n(>958 per km²)', 'Decile 2 \n(456 - 957 per km²)', 
+              'Decile 3 \n(273 - 455 per km²)', 'Decile 4 \n(172 - 272 per km²)', 
+              'Decile 5 \n(107 - 171 per km²)', 'Decile 6 \n(64 - 106 per km²)', 
+              'Decile 7 \n(40 - 63 per km²)', 'Decile 8 \n(22 - 39 per km²)', 
+              'Decile 9 \n(10 - 21 per km²)', 'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(df$strategy, levels = c('baseline', 'regional', 'access'),
   labels = c('Existing Core Network', 'New Regional Network', 
@@ -116,14 +208,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(total_ghgs = sum(total_ghg_emissions_kg)) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-    'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-    'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-    'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-    'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-    'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-    'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-    'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(108 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -203,13 +295,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(avg_ghgs = mean(emissions_kg_per_subscriber)) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-   'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-   'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 'Decile 9 \n(50 - 75 per km²)', 
-   'Decile 8 \n(75 - 100 per km²)', 'Decile 7 \n(100 - 200 per km²)', 
-   'Decile 6 \n(200 - 300 per km²)', 'Decile 5 \n(300 - 400 per km²)',
-   'Decile 4 \n(400 - 500 per km²)', 'Decile 3 \n(500 - 600 per km²)',
-   'Decile 2 \n(600 - 700 per km²)', 'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -221,7 +314,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(avg_ghgs))
 
-prims_average_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3, 
+prims_average_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs, 
   fill = strategy)) + geom_bar(stat = 'identity', position = 
   position_dodge(0.9)) + geom_text(aes(label = formatC(signif(after_stat(y), 3), 
   digits = 3, format = "fg", flag = "#")), size = 3, position = 
@@ -230,7 +323,7 @@ prims_average_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3,
   labs(colour = NULL, title = "Average GHG Emissions",
        subtitle = "(a) Fiber design using Prim's algorithm.",
        x = NULL, 
-       y = bquote("Average emissions \n(t CO2 eq. per user)")) + 
+       y = bquote("Average emissions \n(kg CO2 eq. per user)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 10, angle = 15),
@@ -245,7 +338,7 @@ prims_average_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3,
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 350))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 37999))
 
 ###########################
 ##AVERAGE EMISSIONS: PCST##
@@ -280,14 +373,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(avg_ghgs = mean(emissions_kg_per_subscriber)) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-   'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-   'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-   'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-   'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-   'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-   'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-   'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+    'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+    'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+    'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+    'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+    'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+    'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+    'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -299,7 +392,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(avg_ghgs))
 
-pcst_average_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3, 
+pcst_average_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs, 
   fill = strategy)) + geom_bar(stat = 'identity', position = 
   position_dodge(0.9)) + geom_text(aes(label = formatC(signif(after_stat(y), 3), 
   digits = 3, format = "fg", flag = "#")), size = 3, position = 
@@ -308,7 +401,7 @@ pcst_average_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3,
   labs(colour = NULL, title = ' ',
        subtitle = "(b) Fiber design using PCST algorithm.",
        x = NULL, 
-       y = bquote("Average emissions \n(t CO2 eq. per user)")) + 
+       y = bquote("Average emissions \n(kg CO2 eq. per user)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 10, angle = 15),
@@ -323,7 +416,7 @@ pcst_average_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3,
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 2000))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 37999))
 
 average_emissions <- ggarrange(prims_average_emissions, pcst_average_emissions, 
   ncol = 1, nrow = 2, align = c('hv'),
@@ -363,14 +456,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(avg_ghgs = mean(emissions_kg_per_subscriber/30)) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-    'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-    'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-    'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-    'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-    'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-    'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-    'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -382,7 +475,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = sum(avg_ghgs))
 
-prims_annualized_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3, 
+prims_annualized_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs, 
   fill = strategy)) + geom_bar(stat = 'identity', position = 
   position_dodge(0.9)) + geom_text(aes(label = formatC(signif(after_stat(y), 3), 
   digits = 3, format = "fg", flag = "#")), size = 3, position = 
@@ -391,7 +484,7 @@ prims_annualized_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3,
   labs(colour = NULL, title = "Annualized GHG Emissions",
        subtitle = "(c) Fiber design using Prim's algorithm.",
        x = NULL, 
-       y = bquote("Annualized Emissions \n(t CO2 eq. per user)")) + 
+       y = bquote("Annualized Emissions \n(kg CO2 eq. per user)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 10, angle = 15),
@@ -406,7 +499,7 @@ prims_annualized_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3,
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 13))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 1249))
 
 
 ###########################
@@ -442,14 +535,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(avg_ghgs = mean(emissions_kg_per_subscriber/30)) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-    'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-    'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-    'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-    'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-    'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-    'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-    'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -461,7 +554,7 @@ label_totals <- df %>%
   group_by(decile) %>%
   summarize(mean_value = mean(avg_ghgs))
 
-pcst_annualized_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3, 
+pcst_annualized_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs, 
   fill = strategy)) + geom_bar(stat = 'identity', position = 
   position_dodge(0.9)) + geom_text(aes(label = formatC(signif(after_stat(y), 3), 
   digits = 3, format = "fg", flag = "#")), size = 3, position = 
@@ -470,7 +563,7 @@ pcst_annualized_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3,
   labs(colour = NULL, title = ' ',
        subtitle = "(d) Fiber design using PCST algorithm.",
        x = NULL, 
-       y = bquote("Annualized emissions\n(t CO2 eq. per user)")) + 
+       y = bquote("Annualized emissions\n(kg CO2 eq. per user)")) + 
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 10, angle = 15),
@@ -485,7 +578,7 @@ pcst_annualized_emissions <- ggplot(df,  aes(x = decile, y = avg_ghgs/1e3,
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 65))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 1249))
 
 annualized_emissions <- ggarrange(prims_annualized_emissions, 
     pcst_annualized_emissions, ncol = 1, nrow = 2, align = c('hv'), 
@@ -536,14 +629,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(mean_tco = (mean(tco_per_user))/30) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-    'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-    'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-    'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-    'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-    'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-    'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-    'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -578,7 +671,7 @@ prims_annualized_tco <- ggplot(df,  aes(x = decile, y = mean_tco,
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 700))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 849))
 
 ##################################
 ##ANNUALIZED TCO PER USER: PCST###
@@ -613,14 +706,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(mean_tco = (mean(tco_per_user))/30) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-   'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-   'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-   'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-   'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-   'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-   'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-   'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+    'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+    'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+    'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+    'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+    'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+    'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+    'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -655,7 +748,7 @@ pcsf_annualized_tco <- ggplot(df,  aes(x = decile, y = mean_tco,
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 700))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 849))
 
 average_tco <- ggarrange(prims_annualized_tco, pcsf_annualized_tco, 
     ncol = 1, nrow = 2, align = c('hv'), common.legend = TRUE, legend='none') 
@@ -693,14 +786,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(mean_tco = (mean(tco_per_user))/360) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-    'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-    'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-    'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-    'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-    'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-    'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-    'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -735,7 +828,7 @@ prims_monthly_tco <- ggplot(df,  aes(x = decile, y = mean_tco,
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 54))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 69))
 
 #####################################
 ##MEAN MONTHLY TCO PER USER: PCST ###
@@ -770,14 +863,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(mean_tco = (mean(tco_per_user))/360) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-    'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-    'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-    'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-    'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-    'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-    'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-    'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -812,7 +905,7 @@ pcsf_monthly_tco <- ggplot(df,  aes(x = decile, y = mean_tco,
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 54))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 69))
 
 monthly_tco <- ggarrange(prims_monthly_tco, pcsf_monthly_tco, 
     ncol = 1, nrow = 2, align = c('hv'), common.legend = TRUE, legend='bottom')
@@ -867,14 +960,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(mean_scc = mean(ssc_per_user)) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-    'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-    'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-    'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-    'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-    'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-    'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-    'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -910,7 +1003,7 @@ prims_per_user_scc <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0,3000))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 2600))
 
 
 #######################################
@@ -948,14 +1041,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(mean_scc = mean(ssc_per_user)) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-   'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-   'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-   'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-   'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-   'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-   'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-   'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -990,7 +1083,7 @@ pcsf_per_user_scc <- ggplot(df,  aes(x = decile, y = mean_scc, fill = strategy))
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 16999))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 2600))
 
 average_scc <- ggarrange(prims_per_user_scc, pcsf_per_user_scc, 
     ncol = 1, nrow = 2, align = c('hv'), common.legend = TRUE, legend='none') 
@@ -1029,14 +1122,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(mean_scc = ((mean(ssc_per_user)))/30) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-    'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-    'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-    'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-    'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-    'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-    'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-    'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+   'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -1072,7 +1165,7 @@ prims_annualized_per_user_scc <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 599))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 89))
 
 ##################################################
 ##ANNUALIZED SOCIAL CARBON COST PER USER: PCST ###
@@ -1108,14 +1201,14 @@ df = data %>%
   group_by(decile, strategy) %>%
   summarize(mean_scc = ((mean(ssc_per_user)))/30) 
 
-df$decile = factor(df$decile, levels = c('decile 10', 'decile 9', 'decile 8', 
-    'decile 7', 'decile 6', 'decile 5', 'decile 4', 'decile 3', 'decile 2', 
-    'decile 1'), labels = c('Decile 10 \n(<50 per km²)', 
-    'Decile 9 \n(50 - 75 per km²)', 'Decile 8 \n(75 - 100 per km²)', 
-    'Decile 7 \n(100 - 200 per km²)', 'Decile 6 \n(200 - 300 per km²)', 
-    'Decile 5 \n(300 - 400 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-    'Decile 3 \n(500 - 600 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-    'Decile 1 \n(>700 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+    'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+    'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+    'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+    'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+    'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+    'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+    'Decile 10 \n(<9 per km²)'))
 
 df$strategy <- factor(
   df$strategy,
@@ -1151,7 +1244,7 @@ pcsf_annualized_per_user_scc <-
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
   scale_x_discrete(expand = c(0, 0.15)) + scale_y_continuous(expand = c(0, 0),
-  labels = function(y)format(y, scientific = FALSE), limit = c(0, 599))
+  labels = function(y)format(y, scientific = FALSE), limit = c(0, 89))
 
 annualized_scc <- ggarrange(prims_annualized_per_user_scc, 
     pcsf_annualized_per_user_scc, ncol = 1, nrow = 2, 
