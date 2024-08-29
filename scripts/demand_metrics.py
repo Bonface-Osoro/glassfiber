@@ -328,8 +328,8 @@ def generate_population_decile():
     
     subregion_data = pd.concat([subregion_data, df1], ignore_index = True) 
 
-    filename = 'SSA_subregional_population_deciles.csv'
-    filename_1 = 'SSA_regional_population_deciles.csv'
+    filename = 'SSA_regional_population_deciles.csv'
+    filename_1 = 'SSA_subregional_population_deciles.csv'
 
     if not os.path.exists(folder_out):
 

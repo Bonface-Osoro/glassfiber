@@ -18,14 +18,14 @@ df = data %>%
   group_by(decile) %>%
   summarize(total_pops = round(sum(population)/1e6))
 
-df$decile = factor(df$decile,
-  levels = c('decile 1', 'decile 2', 'decile 3', 'decile 4', 'decile 5',
-  'decile 6', 'decile 7', 'decile 8', 'decile 9', 'decile 10'),
-  labels = c('Decile 1 \n(>700 per km²)', 'Decile 2 \n(600 - 700 per km²)', 
-  'Decile 3 \n(500 - 600 per km²)', 'Decile 4 \n(400 - 500 per km²)', 
-  'Decile 5 \n(300 - 400 per km²)', 'Decile 6 \n(200 - 300 per km²)',
-  'Decile 7 \n(100 - 200 per km²)', 'Decile 8 \n(75 - 100 per km²)',
-  'Decile 9 \n(50 - 75 per km²)', 'Decile 10 \n(<50 per km²)'))
+df$decile = factor(df$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+    'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+    'Decile 10'), labels = c('Decile 1 \n(>958 per km²)', 
+    'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)', 
+    'Decile 4 \n(108 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)', 
+    'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)', 
+    'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)', 
+    'Decile 10 \n(<9 per km²)'))
 
 total_population <- 
   ggplot(df, aes(x = decile, y = total_pops, fill = decile)) +

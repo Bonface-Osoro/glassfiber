@@ -45,13 +45,13 @@ weights = {
 
 carbon_factors = {
     'mfg_emissions' : {
-        'glass_kg_co2e' : 1403,
-        'pcb_kg_co2e' : 29760,
-        'aluminium_kg_co2e' : 19400,
-        'copper_kg_co2e' : 4910,
-        'pvc_kg_co2e' : 3413,
-        'iron_kg_co2e' : 2140,
-        'steel_kg_co2e' : 2560,
+        'glass_kg_co2e' : 1.403,
+        'pcb_kg_co2e' : 29.760,
+        'aluminium_kg_co2e' : 19.400,
+        'copper_kg_co2e' : 4.910,
+        'pvc_kg_co2e' : 3.413,
+        'iron_kg_co2e' : 2.140,
+        'steel_kg_co2e' : 2.560,
         'concrete_kg_co2e' : 120,
         'olnu_kg_co2e' : 0.3234,
         'electricity_kg_co2e' : 0.19338
