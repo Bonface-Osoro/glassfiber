@@ -267,37 +267,24 @@ def generate_population_decile():
                                 '{}_population_results.csv'.format(iso3))
                     df = pd.read_csv(file_path)
                     df['pop_density_sqkm'] = df['population'] / df['area']
-                    df['decile'] = ''
 
                     df1 = pd.read_csv(file_path)
                     df1 = df1.groupby(['iso3', 'GID_1']).agg({'population': 
                                         'sum', 'area': 'sum'}).reset_index()
                                                                   
                     df1['pop_density_sqkm'] = df1['population'] / df1['area']
-                    df1['decile'] = ''
-
-                    for i in range(len(df)):
-
-                        df['decile'].loc[i] = population_decile(
-                            df['pop_density_sqkm'].loc[i])
-                        
-                    for i in range(len(df1)):
-
-                        df1['decile'].loc[i] = population_decile(
-                            df1['pop_density_sqkm'].loc[i])
 
                     df = df[['iso3', 'GID_1', 'GID_2', 'area', 'population', 
-                             'pop_density_sqkm', 'decile']]
+                             'pop_density_sqkm']]
                     df1 = df1[['iso3', 'GID_1', 'area', 'population', 
-                               'pop_density_sqkm', 'decile']]
+                               'pop_density_sqkm']]
                     merged_data = pd.concat([merged_data, df], 
                                             ignore_index = True)
                     merged_data_1 = pd.concat([merged_data_1, df1], 
-                                              ignore_index = True)
-
-
-                fileout = 'SSA_subregional_population_deciles.csv'
-                fileout_1 = 'SSA_regional_population_deciles.csv'
+                                              ignore_index = True)            
+                    
+                fileout = 'subregional_population_deciles.csv'
+                fileout_1 = 'regional_population_deciles.csv'
                 folder_out = os.path.join(DATA_RESULTS, '..', 'SSA')
 
                 if not os.path.exists(folder_out):
@@ -308,8 +295,52 @@ def generate_population_decile():
                 path_out_1 = os.path.join(folder_out, fileout_1)
                 merged_data.to_csv(path_out, index = False)
                 merged_data_1.to_csv(path_out_1, index = False)
-
     
+    reg_data = pd.DataFrame()
+    subregion_data = pd.DataFrame()
+
+    pop_folder = os.path.join(DATA_RESULTS, '..', 'SSA')
+    regional_population = os.path.join(pop_folder, 
+                          'regional_population_deciles.csv')
+    subregion_population = os.path.join(pop_folder, 
+                          'subregional_population_deciles.csv')
+    df = pd.read_csv(regional_population)
+    df1 = pd.read_csv(subregion_population)
+    df = df.sort_values(by = 'pop_density_sqkm', ascending = True)                   
+    df['decile_value'] = pd.qcut(df['pop_density_sqkm'], 10, 
+                                    labels = False) + 1
+    df['decile'] = ""
+
+    df1 = df1.sort_values(by = 'pop_density_sqkm', ascending = True)
+    df1['decile_value'] = pd.qcut(df1['pop_density_sqkm'], 10, 
+                                    labels = False) + 1
+    df1['decile'] = ""
+
+    for i in range(len(df)):
+
+        df['decile'].loc[i] = population_decile(df['decile_value'].loc[i])
+
+    reg_data = pd.concat([reg_data, df], ignore_index = True)  
+
+    for i in range(len(df1)):
+
+        df1['decile'].loc[i] = population_decile(df1['decile_value'].loc[i])
+    
+    subregion_data = pd.concat([subregion_data, df1], ignore_index = True) 
+
+    filename = 'SSA_subregional_population_deciles.csv'
+    filename_1 = 'SSA_regional_population_deciles.csv'
+
+    if not os.path.exists(folder_out):
+
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, filename)
+    path_out_1 = os.path.join(folder_out, filename_1)
+    reg_data.to_csv(path_out, index = False)
+    subregion_data.to_csv(path_out_1, index = False)
+
+
     return None
 
 
@@ -392,7 +423,7 @@ def combine_pcsf_fiber_nodes():
                     combined_gdf.to_file(path_out, index = False)
     return None
 
-'''for idx, country in countries.iterrows():
+for idx, country in countries.iterrows():
         
     if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:
         
@@ -400,13 +431,13 @@ def combine_pcsf_fiber_nodes():
 
         continue
 
-generate_demand_metrics(countries['iso3'].loc[idx])
+'''generate_demand_metrics(countries['iso3'].loc[idx])
 combine_fiber_shapefiles('combined_regional_nodes')
 combine_fiber_shapefiles('combined_regional_edges')
 combine_fiber_shapefiles('combined_access_nodes')
 combine_fiber_shapefiles('combined_access_edges')
 combine_existing_fiber_shapefiles('core_nodes_existing')
-combine_existing_fiber_shapefiles('core_edges_existing')
+combine_existing_fiber_shapefiles('core_edges_existing')'''
 generate_population_decile()
-combine_pcsf_fiber_lines()
-combine_pcsf_fiber_nodes()'''
+#combine_pcsf_fiber_lines()
+#combine_pcsf_fiber_nodes()
