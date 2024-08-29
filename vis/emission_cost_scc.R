@@ -45,13 +45,10 @@ df = data %>%
   summarize(total_ghgs = sum(total_ghg_emissions_kg)) 
 
 df$decile = factor(df$decile,
-   levels = c('decile 10', 'decile 9', 'decile 8', 'decile 7', 'decile 6',
-   'decile 5', 'decile 4', 'decile 3', 'decile 2', 'decile 1'),
-   labels = c('Decile 10 \n(<50 per km²)', 'Decile 9 \n(50 - 75 per km²)', 
-   'Decile 8 \n(75 - 100 per km²)', 'Decile 7 \n(100 - 200 per km²)', 
-   'Decile 6 \n(200 - 300 per km²)', 'Decile 5 \n(300 - 400 per km²)',
-   'Decile 4 \n(400 - 500 per km²)', 'Decile 3 \n(500 - 600 per km²)',
-   'Decile 2 \n(600 - 700 per km²)', 'Decile 1 \n(>700 per km²)'))
+   levels = c('Decile 1', 'Decile 2', 'Decile 3', 'Decile 4', 'Decile 5',
+   'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 'Decile 10'),
+   labels = c('Decile 1 \n(<50 per km²)', 'Decile 2', 'Decile 3', 'Decile 4', 'Decile 5',
+              'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 'Decile 10'))
 
 df$strategy <- factor(df$strategy, levels = c('baseline', 'regional', 'access'),
   labels = c('Existing Core Network', 'New Regional Network', 

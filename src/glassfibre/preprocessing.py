@@ -673,15 +673,15 @@ def lca_operations():
     return ops_emission_dict
 
 
-def population_decile(pop_density):
+def population_decile(decile_value):
 
     """
     This function determines the population decile
 
     Parameters
     ----------
-    pop_density : float
-        Population density of an area
+    decile_value : Integer
+        Decile categorization value
 
     Returns
     -------
@@ -689,44 +689,44 @@ def population_decile(pop_density):
         Population decile category where the region belongs
     """
 
-    if pop_density >= 700:
+    if decile_value == 1:
 
-        decile = 'decile 1'
+        decile = 'Decile 10'
 
-    elif pop_density >= 600 and pop_density <= 700:
+    elif decile_value == 2:
 
-        decile = 'decile 2'
+        decile = 'Decile 9'
 
-    elif pop_density >= 500 and pop_density <= 600:
+    elif decile_value == 3:
 
-        decile = 'decile 3'
+        decile = 'Decile 8'
 
-    elif pop_density >= 400 and pop_density <= 500:
+    elif decile_value == 4:
 
-        decile = 'decile 4'
+        decile = 'Decile 7'
 
-    elif pop_density >= 300 and pop_density <= 400:
+    elif decile_value == 5:
 
-        decile = 'decile 5'
+        decile = 'Decile 6'
 
-    elif pop_density >= 200 and pop_density <= 300:
+    elif decile_value == 6:
 
-        decile = 'decile 6'
+        decile = 'Decile 5'
 
-    elif pop_density >= 100 and pop_density <= 200:
+    elif decile_value == 7:
 
-        decile = 'decile 7'
+        decile = 'Decile 4'
 
-    elif pop_density >= 75 and pop_density <= 100:
+    elif decile_value == 8:
 
-        decile = 'decile 8'
+        decile = 'Decile 3'
 
-    elif pop_density >= 50 and pop_density <= 75:
+    elif decile_value == 9:
 
-        decile = 'decile 9'
+        decile = 'Decile 2'
 
     else:
 
-        decile = 'decile 10'
+        decile = 'Decile 1'
 
     return decile 
