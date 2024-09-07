@@ -1035,8 +1035,8 @@ for idx, country in countries.iterrows():
 
         continue
 
-    baseline_cost_emissions(countries['iso3'].loc[idx])
+    '''baseline_cost_emissions(countries['iso3'].loc[idx])
     local_prims_cost_emissions(countries['iso3'].loc[idx])
     regional_prims_cost_emissions(countries['iso3'].loc[idx])
     local_pcsf_cost_emissions(countries['iso3'].loc[idx])
-    regional_pcsf_cost_emissions(countries['iso3'].loc[idx])
+    regional_pcsf_cost_emissions(countries['iso3'].loc[idx])'''
