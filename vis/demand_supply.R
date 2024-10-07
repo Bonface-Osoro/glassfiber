@@ -14,7 +14,6 @@ folder <- dirname(rstudioapi::getSourceEditorContext()$path)
 data <- read.csv(file.path(folder, '..', 'results', 'SSA', 
                            'SSA_subregional_population_deciles.csv'))
 df = data %>%
-  distinct(decile, population, .keep_all = TRUE) %>%
   group_by(decile) %>%
   summarize(total_pops = round(sum(population)/1e6))
 
