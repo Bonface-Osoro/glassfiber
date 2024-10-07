@@ -15,7 +15,7 @@ The method (see `Figure 1`) .....
 
 #### Figure 1 Proposed Method.
 <p align="center">
-  <img src="/docs/method.png" />
+  <img src="/docs/method_box.png" />
 </p>
 
 Results
@@ -23,7 +23,7 @@ Results
 `Figure 2` shows the spatial distribution of the targeted population for fixed broadband service.
 #### Figure 2 Demand Results.
 <p align="center">
-  <img src="/docs/population_demand_metrics.png" />
+  <img src="/docs/population_point_demand_metrics.png" />
 </p>
 
 In `Figure 3`, the quantitative emission results for different fiber network design approach is presented.
@@ -53,5 +53,3 @@ python src/glassfibre/pcst.py
 [2]	GADM, “Global Administrative Areas Boundaries.” https://gadm.org/download_world.html (accessed Sep. 14, 2022).
 
 [3] Country metadafile. Contained in `/data/countries.csv`
-
-
