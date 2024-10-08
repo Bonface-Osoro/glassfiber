@@ -748,8 +748,10 @@ def process_fiber_metrics():
         try:
         
             df = pd.read_csv(access_mst)
+            df['algorithm'] = df['algorithm'].replace('Dijkstras', 'prims')
             df1 = pd.read_csv(access_pcst)
             df2 = pd.read_csv(regional_mst)
+            df2['algorithm'] = df2['algorithm'].replace('Dijkstras', 'prims')
             df3 = pd.read_csv(regional_pcst)
 
             df = df.groupby(['GID_2', 'strategy', 'algorithm']).agg(
@@ -826,11 +828,13 @@ def process_fiber_deciles():
         total_population = ('total_population', 'mean'),
         mean_distance_km = ('mean_distance_km', 'mean'),
         nodes = ('nodes', 'mean'),).reset_index()
+    df['nodes'] = df['nodes'].round(0).astype(int)
     
     df1 = df1.groupby(['decile', 'strategy', 'algorithm']).agg(
         total_population = ('total_population', 'mean'),
         mean_distance_km = ('mean_distance_km', 'mean'),
         nodes = ('nodes', 'mean'),).reset_index()
+    df1['nodes'] = df1['nodes'].round(0).astype(int)
     
     df2 = pd.concat([df, df1], ignore_index = True)
 
