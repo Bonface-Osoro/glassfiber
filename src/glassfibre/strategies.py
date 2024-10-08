@@ -9,7 +9,7 @@ import geopandas as gpd
 from shapely.geometry import LineString
 from functools import partial
 from shapely.ops import transform
-from glassfibre.inputs import parameters
+from scripts.inputs import parameters
 from glassfibre.preprocessing import (lca_manufacturing, lca_construct, 
                                       lca_eolt, lca_trans, lca_operations)
 

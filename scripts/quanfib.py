@@ -12,6 +12,7 @@ CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
 DATA_RAW = os.path.join(BASE_PATH, 'raw')
 DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
+DATA_SSA = os.path.join(BASE_PATH, '..', 'results', 'SSA')
 
 path = os.path.join(DATA_RAW, 'countries.csv')
 countries = pd.read_csv(path, encoding = 'utf-8-sig')
@@ -711,3 +712,136 @@ ssa_hireachy_emissions('_regional_emission_results.csv')
 ssa_hireachy_emissions('_pcsf_regional_emission_results.csv')
 csv_merger('_demand_user.csv', 'demand')
 csv_merger('_average_demand.csv', 'summary')'''
+
+
+def process_fiber_metrics():
+    """
+    This is summarizes the population and distance covered by fiber cable at 
+    access and regional network for both Prim's and PCST algorithms.
+
+    """
+    isos = os.listdir(DATA_RESULTS)
+
+    merged_access = pd.DataFrame()
+    merged_regional = pd.DataFrame()
+    sub_dec = os.path.join(DATA_SSA, 'SSA_subregional_population_deciles.csv')
+    reg_dec = os.path.join(DATA_SSA, 'SSA_regional_population_deciles.csv')
+    dec = pd.read_csv(sub_dec)
+    dec = dec[['GID_2', 'decile']]
+    dec1 = pd.read_csv(reg_dec)
+    dec1 = dec1[['GID_1', 'decile']]
+
+    for iso3 in isos:
+
+        print('Merging {} csv files'. format(iso3))
+        path_in = os.path.join(DATA_RESULTS, iso3, 'fiber_design')
+
+        access_mst = os.path.join(path_in, '{}_fiber_access.csv'.format(iso3))
+        access_pcst = os.path.join(path_in, 
+                                   '{}_fiber_pcsf_access.csv'.format(iso3))
+
+        regional_mst = os.path.join(path_in, 
+                                    '{}_fiber_regional.csv'.format(iso3))
+        regional_pcst = os.path.join(path_in, 
+                                     '{}_fiber_pcsf_regional.csv'.format(iso3))
+
+        try:
+        
+            df = pd.read_csv(access_mst)
+            df1 = pd.read_csv(access_pcst)
+            df2 = pd.read_csv(regional_mst)
+            df3 = pd.read_csv(regional_pcst)
+
+            df = df.groupby(['GID_2', 'strategy', 'algorithm']).agg(
+                total_population = ('population', 'sum'),
+                mean_distance_km = ('length_km', 'mean'), nodes = 
+                ('iso3', 'count')).reset_index()
+
+            df1 = df1.groupby(['GID_2', 'strategy', 'algorithm']).agg(
+                total_population = ('population', 'sum'),
+                mean_distance_km = ('length_km', 'mean'), nodes = 
+                ('iso3', 'count')).reset_index()
+
+            df2 = df2.groupby(['GID_1', 'strategy', 'algorithm']).agg(
+                total_population = ('population', 'sum'),
+                mean_distance_km = ('length_km', 'mean'), nodes = 
+                ('iso3', 'count')).reset_index()
+
+            df3 = df3.groupby(['GID_1', 'strategy', 'algorithm']).agg(
+                total_population = ('population', 'sum'),
+                mean_distance_km = ('length_km', 'mean'), nodes = 
+                ('iso3', 'count')).reset_index()
+
+            access_df = pd.concat([df, df1], ignore_index = True)
+            merged_access = pd.concat([merged_access, access_df], 
+                                      ignore_index = True)
+            regional_df = pd.concat([df2, df3], ignore_index = True)
+            merged_regional = pd.concat([merged_regional, regional_df], 
+                                        ignore_index = True)
+
+            fileout = 'SSA_fiber_access.csv'
+            fileout_1 = 'SSA_fiber_regional.csv'
+            folder_out = os.path.join(DATA_RESULTS, '..', 'SSA', 
+                                        'fiber_levels')
+
+            if not os.path.exists(folder_out):
+
+                os.makedirs(folder_out)
+
+            path_out = os.path.join(folder_out, fileout)
+            path_out_2 = os.path.join(folder_out, fileout_1)
+            merged_access = pd.merge(merged_access, dec, on = 'GID_2', 
+                                     how = 'inner')
+            merged_access = merged_access[['GID_2', 'total_population', 
+                                           'mean_distance_km', 'nodes', 
+                                           'strategy', 'algorithm', 'decile']]
+            merged_access.to_csv(path_out, index = False)
+            merged_regional = pd.merge(merged_regional, dec1, on = 'GID_1', 
+                                     how = 'inner')
+            merged_regional = merged_regional[['GID_1', 'total_population', 
+                                           'mean_distance_km', 'nodes', 
+                                           'strategy', 'algorithm', 'decile']]
+            merged_regional.to_csv(path_out_2, index = False)
+
+        except:
+
+            pass
+
+
+    return None
+
+
+def process_fiber_deciles():
+    """
+    This is summarizes the population and distance covered by fiber cable at 
+    decile level.
+
+    """
+    sub_dec = os.path.join(DATA_SSA, 'fiber_levels', 'SSA_fiber_access.csv')
+    reg_dec = os.path.join(DATA_SSA, 'fiber_levels', 'SSA_fiber_regional.csv')
+    df = pd.read_csv(sub_dec)
+    df1 = pd.read_csv(reg_dec)
+
+    df = df.groupby(['decile', 'strategy', 'algorithm']).agg(
+        total_population = ('total_population', 'mean'),
+        mean_distance_km = ('mean_distance_km', 'mean'),
+        nodes = ('nodes', 'mean'),).reset_index()
+    
+    df1 = df1.groupby(['decile', 'strategy', 'algorithm']).agg(
+        total_population = ('total_population', 'mean'),
+        mean_distance_km = ('mean_distance_km', 'mean'),
+        nodes = ('nodes', 'mean'),).reset_index()
+    
+    df2 = pd.concat([df, df1], ignore_index = True)
+
+    fileout = 'population_connected_fiber.csv'
+    folder_out = os.path.join(DATA_RESULTS, '..', 'SSA')
+    if not os.path.exists(folder_out):
+
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+    df2.to_csv(path_out, index = False)
+
+
+    return None

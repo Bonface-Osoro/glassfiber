@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import geopandas as gpd
 import tqdm
-from glassfibre.inputs import parameters
+from scripts.inputs import parameters
 from glassfibre.preprocessing import (
     lca_manufacturing, lca_eolt, 
     lca_trans, 
