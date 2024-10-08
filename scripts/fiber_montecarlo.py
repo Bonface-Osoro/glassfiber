@@ -58,7 +58,7 @@ def multinetwork_fiber_costs(i, fiber_params):
         installation_usd = random.randint(fiber_params['installation_low_usd'], 
                                 fiber_params['installation_high_usd'])
         
-        rpu_low_usd = random.randint(fiber_params['rpu_low_usd'], 
+        rpu_usd = random.randint(fiber_params['rpu_low_usd'], 
                                 fiber_params['rpu_high_usd'])
         
         odf_unit_usd = random.randint(fiber_params['odf_unit_low_usd'], 
@@ -83,12 +83,11 @@ def multinetwork_fiber_costs(i, fiber_params):
                                 fiber_params['other_high_costs_usd'])
         
         output.append({
-            'network_level' : fiber_params['network_level'],
             'olt_usd' : olt_usd,
             'civil_usd' : civil_usd,
             'transportation_usd' : transportation_usd,
             'installation_usd' : installation_usd,
-            'rpu_low_usd' : rpu_low_usd,
+            'rpu_usd' : rpu_usd,
             'odf_unit_usd' : odf_unit_usd,
             'rent_usd' : rent_usd,
             'staff_usd' : staff_usd,
@@ -122,7 +121,7 @@ def uq_inputs_costs(parameters):
 
         for i in range(0, fiber_params['iterations']):
 
-            if key in ['regional', 'access']:
+            if key in ['regional']:
                 
                 data = multinetwork_fiber_costs(i, fiber_params)
 
@@ -131,7 +130,7 @@ def uq_inputs_costs(parameters):
     df = pd.DataFrame.from_dict(iterations)
 
     # Import user data
-    pop_path = os.path.join(DATA_SSA, 'SSA_decile_summary_stats.csv') 
+    pop_path = os.path.join(DATA_SSA, 'population_connected_fiber.csv') 
     df1 = pd.read_csv(pop_path)
 
     filename = 'uq_parameters_cost.csv'
@@ -195,8 +194,6 @@ def multinetwork_fiber_emissions(i, fiber_params):
             fiber_params['fiber_point_pwr_high_kwh'])
         
         output.append({
-            'iteration' : i,
-            'network_level' : fiber_params['network_level'],
             'pcb_kg' : pcb_kg,
             'pvc_kg' : pvc_kg,
             'aluminium_kg' : aluminium_kg,
@@ -241,7 +238,7 @@ def uq_inputs_emissions(parameters):
 
         for i in range(0, mobile_params['iterations']):
 
-            if key in ['regional', 'access']:
+            if key in ['regional']:
                 
                 data = multinetwork_fiber_emissions(i, mobile_params)
 
@@ -250,7 +247,7 @@ def uq_inputs_emissions(parameters):
     df = pd.DataFrame.from_dict(iterations)
 
     # Import user data
-    pop_path = os.path.join(DATA_SSA, 'SSA_decile_summary_stats.csv') 
+    pop_path = os.path.join(DATA_SSA, 'population_connected_fiber.csv') 
     df1 = pd.read_csv(pop_path)
 
     filename = 'uq_parameters_emission.csv'
@@ -274,7 +271,7 @@ if __name__ == '__main__':
     random.seed(10)
 
     #print('Running uq_cost_inputs_generator()')
-    #uq_inputs_costs(parameters)
+    uq_inputs_costs(parameters)
 
     print('Running uq_inputs_emissions_generator()')
     uq_inputs_emissions(parameters)
