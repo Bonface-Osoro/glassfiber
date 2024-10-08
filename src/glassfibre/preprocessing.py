@@ -9,7 +9,7 @@ from rasterstats import zonal_stats
 from shapely.geometry import Polygon
 from shapely.geometry import MultiPolygon
 from tqdm import tqdm
-from glassfibre.inputs import weights, parameters, carbon_factors, operations
+from scripts.inputs import weights, parameters, carbon_factors, operations
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
