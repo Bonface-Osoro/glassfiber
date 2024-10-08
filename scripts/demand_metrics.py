@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import geopandas as gpd
 
-from glassfibre.preprocessing import (population_decile)
+from glassfibre.preprocessing import population_decile
 
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
@@ -32,6 +32,96 @@ eastern = ['BDI', 'COM', 'DJI', 'ERI', 'ETH', 'SWZ', 'MDG',
 west = ['BEN', 'BFA', 'CPV', 'CIV', 'GMB', 'GHA', 'GIN', 
         'GNB', 'LBR', 'MLI', 'MRT', 'NER', 'NGA', 'SEN', 
         'SLE', 'TGO']
+
+def demand(iso3):
+    """
+    This function generate demand results for each country.
+    
+    Parameters
+    ----------
+    iso3 : string
+        Country ISO3 code
+    """
+    print('Generating demand results for {} csv'.format(iso3))
+    demand_folder = os.path.join(DATA_RESULTS, iso3, 'population', 
+                 '{}_demand_metrics.shp'.format(iso3))
+    df = gpd.read_file(demand_folder)
+    df = df[['GID_2', 'area', 'population']]
+    df = df.groupby(['GID_2', 'area'])['population'].sum().reset_index()
+    df[['iso3', 'pop_den_km']] = ''
+
+    for i in range(len(df)):
+
+        df['iso3'].loc[i] = iso3
+        df['pop_den_km'].loc[i] = df['population'].loc[i] / df['area'].loc[i] 
+
+    for idx, country in countries.iterrows():
+            
+        if not country['iso3'] == iso3:
+
+            continue
+
+        arpu = countries['arpu'].loc[idx]
+        adoption_low = round(countries['adoption_low'].loc[idx], 0)
+        df[['low', 'baseline', 'high']] = ''
+        df['low_adoption'] = 'low'
+        df['baseline_adoption'] = 'baseline'
+        df['high_adoption'] = 'high'
+        df = pd.melt(df, id_vars = ['iso3', 'GID_2', 'area', 'population', 
+            'pop_den_km', ], var_name = 'adoption_scenario', value_vars = 
+            ['low', 'baseline', 'high'])
+        df = df.drop(columns = ['value'])
+        df[['adoption_value', 'users_area_sqkm', 'revenue_per_area', 'geotype']] = ''
+        df['pop_den_km'] = df['pop_den_km'].astype(float)
+
+        for i in range(len(df)):
+
+            if df['adoption_scenario'].loc[i] == 'low':
+
+                df['adoption_value'].loc[i] = round((adoption_low / 100), 4)
+                df['users_area_sqkm'].loc[i] = (df['adoption_value'].loc[i] 
+                                                * df['pop_den_km'].loc[i])
+                df['revenue_per_area'].loc[i] = ((df['users_area_sqkm'].loc[i]) 
+                                                 * (arpu))
+                
+            elif df['adoption_scenario'].loc[i] == 'baseline':
+
+                df['adoption_value'].loc[i] = round((adoption_low / 100) + (0.1 
+                                              * ((adoption_low / 100))), 4)
+                df['users_area_sqkm'].loc[i] = (df['adoption_value'].loc[i] 
+                                                * df['pop_den_km'].loc[i])
+                df['revenue_per_area'].loc[i] = ((df['users_area_sqkm'].loc[i]) 
+                                                 * (arpu))
+                
+            else:
+
+                df['adoption_value'].loc[i] = round((adoption_low / 100) + (0.2 
+                                              * ((adoption_low / 100))), 4)
+                df['users_area_sqkm'].loc[i] = (df['adoption_value'].loc[i] 
+                                                * df['pop_den_km'].loc[i])
+                df['revenue_per_area'].loc[i] = ((df['users_area_sqkm'].loc[i]) 
+                                                 * (arpu))
+
+            df['geotype'].loc[i] = population_decile(df['pop_den_km'].loc[i])
+                
+        df = df[['iso3', 'GID_2', 'area', 'population', 'adoption_scenario',
+                 'adoption_value', 'pop_den_km', 'geotype', 'users_area_sqkm', 
+                 'revenue_per_area']]
+
+    fileout = '{}_demand_results.csv'.format(iso3)
+    folder_out = os.path.join(DATA_RESULTS, iso3, 'demand')
+
+    if not os.path.exists(folder_out):
+
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+
+    df.to_csv(path_out, index = False)
+    
+
+    return None         
+
 
 def generate_demand_metrics(iso3):
     """
@@ -438,6 +528,6 @@ combine_fiber_shapefiles('combined_access_nodes')
 combine_fiber_shapefiles('combined_access_edges')
 combine_existing_fiber_shapefiles('core_nodes_existing')
 combine_existing_fiber_shapefiles('core_edges_existing')'''
-generate_population_decile()
+#generate_population_decile()
 #combine_pcsf_fiber_lines()
 #combine_pcsf_fiber_nodes()

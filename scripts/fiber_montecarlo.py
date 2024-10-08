@@ -169,6 +169,10 @@ def multinetwork_fiber_emissions(i, fiber_params):
 
     for decile in deciles:
 
+        fiber_cable_kg_per_km = random.randint(
+            fiber_params['fiber_cable_low_kg_per_km'], 
+            fiber_params['fiber_cable_high_kg_per_km'])
+
         pcb_kg = random.uniform(fiber_params['pcb_low_kg'], 
             fiber_params['pcb_high_kg'])
         
@@ -194,18 +198,20 @@ def multinetwork_fiber_emissions(i, fiber_params):
             fiber_params['fiber_point_pwr_high_kwh'])
         
         output.append({
+            'fiber_cable_kg_per_km' : fiber_cable_kg_per_km,
             'pcb_kg' : pcb_kg,
             'pvc_kg' : pvc_kg,
             'aluminium_kg' : aluminium_kg,
             'concrete_kg' : concrete_kg,
             'router' : router,
+            'glass_kg_co2e' : fiber_params['glass_kg_co2e'],
             'pcb_kg_co2e' : fiber_params['pcb_kg_co2e'],
             'aluminium_kg_co2e' : fiber_params['aluminium_kg_co2e'],
-            'copper_kg_co2e' : fiber_params['copper_kg_co2e'],
             'pvc_kg_co2e' : fiber_params['pvc_kg_co2e'],
             'concrete_kg_co2e' : fiber_params['concrete_kg_co2e'],
             'router_kg_co2e' : fiber_params['olnu_kg_co2e'],
             'electricity_kg_co2e' : fiber_params['electricity_kg_co2e'],
+            'glass_eolt_kg_co2e' : fiber_params['glass_eolt_kg_co2e'],
             'plastics_factor_kgco2e' : fiber_params['plastics_factor_kgco2'],
             'metals_factor_kgco2e' : fiber_params['metals_factor_kgco2'],
             'diesel_factor_kgco2e' : fiber_params['diesel_factor_kgco2e'],
@@ -234,19 +240,17 @@ def uq_inputs_emissions(parameters):
     """
     iterations = []
 
-    for key, mobile_params in parameters.items():
+    for key, fiber_params in parameters.items():
 
-        for i in range(0, mobile_params['iterations']):
+        for i in range(0, fiber_params['iterations']):
 
             if key in ['regional']:
                 
-                data = multinetwork_fiber_emissions(i, mobile_params)
+                data = multinetwork_fiber_emissions(i, fiber_params)
 
             iterations = iterations + data
 
     df = pd.DataFrame.from_dict(iterations)
-
-    # Import user data
     pop_path = os.path.join(DATA_SSA, 'population_connected_fiber.csv') 
     df1 = pd.read_csv(pop_path)
 
@@ -262,7 +266,7 @@ def uq_inputs_emissions(parameters):
     merged_df.to_csv(path_out, index = False)
 
 
-    return
+    return None
 
 
 if __name__ == '__main__':
@@ -270,8 +274,8 @@ if __name__ == '__main__':
     print('Setting seed for consistent results')
     random.seed(10)
 
-    #print('Running uq_cost_inputs_generator()')
+    print('Running uq_cost_inputs_generator()')
     uq_inputs_costs(parameters)
 
     print('Running uq_inputs_emissions_generator()')
-    uq_inputs_emissions(parameters)
+    #uq_inputs_emissions(parameters)

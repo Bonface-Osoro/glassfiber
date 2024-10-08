@@ -19,6 +19,7 @@ CONFIG = configparser.ConfigParser()
 CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
 RESULTS = os.path.join(BASE_PATH, '..', 'results', 'fiber')
+SSA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'SSA')
 
 def run_uq_processing_cost():
     """
@@ -51,27 +52,31 @@ def run_uq_processing_cost():
         total_cost_ownership = fb.total_cost_ownership(capex_cost_usd, 
                 opex_cost_usd, item['discount_rate'], item['assessment_years'])
         
+        per_user_tco = (total_cost_ownership / item['total_population'])
+
+        per_user_annualized_usd = (per_user_tco / item['assessment_years'])
+        
         
         results.append({
-            'strategy' : item['strategy'],
-            'algorithm' : item['algorithm'],
             'capex_cost_usd' : capex_cost_usd,
             'opex_cost_usd' : opex_cost_usd,
             'total_cost_ownership' : total_cost_ownership,
             'mean_connected' : item['total_population'],
-            'assessment_years' : item['assessment_years'],
+            'per_user_tco' : per_user_tco,
+            'per_user_annualized_usd' : per_user_annualized_usd,
+            'algorithm' : item['algorithm'],
+            'strategy' : item['strategy'],
             'decile' : item['decile']
         })
 
         df = pd.DataFrame.from_dict(results)
 
-        filename = 'fiber_cost_results.csv'
-        
-        if not os.path.exists(RESULTS):
+        filename = 'SSA_fiber_cost_results.csv' 
+        if not os.path.exists(SSA_RESULTS):
 
-            os.makedirs(RESULTS)
+            os.makedirs(SSA_RESULTS)
 
-        path_out = os.path.join(RESULTS, filename)
+        path_out = os.path.join(SSA_RESULTS, filename)
         df.to_csv(path_out, index = False)
 
 
@@ -95,11 +100,12 @@ def run_uq_processing_emission():
 
     for item in tqdm(df, desc = "Processing uncertainty fiber results"):
 
-        lca_mfg = fb.lca_manufacturing(item['pcb_kg'], item['pvc_kg'], 
-                    item['aluminium_kg'], item['concrete_kg'], item['router'],
+        lca_mfg = fb.lca_manufacturing(item['fiber_cable_kg_per_km'], 
+                    item['pcb_kg'], item['pvc_kg'], item['aluminium_kg'], 
+                    item['concrete_kg'], item['router'], item['glass_kg_co2e'],
                     item['pcb_kg_co2e'], item['aluminium_kg_co2e'], 
                     item['pvc_kg_co2e'], item['concrete_kg_co2e'], 
-                    item['nodes'])
+                    item['mean_distance_km'], item['nodes'])
         
         lca_trans = fb.lca_transportation(item['mean_distance_km'], 
                                           item['fuel_efficiency'], 
@@ -113,16 +119,28 @@ def run_uq_processing_emission():
         lca_ops = fb.lca_operations(item['fiber_point_pwr_kwh'], 
                                     item['electricity_kg_co2e'], item['nodes'])
 
-        lca_eolts = fb.lca_eolt(item['pcb_kg'], item['pvc_kg'], 
-                    item['aluminium_kg'], item['router'], 
-                    item['plastics_factor_kgco2e'], 
-                    item['metals_factor_kgco2e'], item['nodes'])
+        lca_eolts = fb.lca_eolt(item['fiber_cable_kg_per_km'], item['pcb_kg'], 
+                    item['pvc_kg'], item['aluminium_kg'], item['router'], 
+                    item['glass_eolt_kg_co2e'], item['plastics_factor_kgco2e'], 
+                    item['metals_factor_kgco2e'], item['mean_distance_km'], 
+                    item['nodes'])
         
         total_emissions_ghg_kg = (lca_mfg + lca_trans + lca_constr + lca_ops 
                                   + lca_eolts) 
         
+        user_emissions_kg_per_user = (total_emissions_ghg_kg / 
+                                      item['total_population'])
+        
+        annualized_per_user_emissions = (user_emissions_kg_per_user / 
+                                         item['assessment_years'])
+        
         social_carbon_cost = fb.social_carbon_cost(total_emissions_ghg_kg, 
                                             item['social_carbon_cost_usd'])
+        
+        per_user_scc_usd = (social_carbon_cost / item['total_population'])
+        
+        per_user_annualized_scc_usd = (per_user_scc_usd / 
+                                       item['assessment_years'])
         
         results.append({
             'lca_mfg_kg' : lca_mfg,
@@ -133,7 +151,10 @@ def run_uq_processing_emission():
             'total_emissions_ghg_kg' : total_emissions_ghg_kg,
             'total_population' : item['total_population'],
             'social_carbon_cost_usd' : social_carbon_cost,
-            'assessment_years' : item['assessment_years'],
+            'user_emissions_kg_per_user' : user_emissions_kg_per_user,
+            'annualized_per_user_emissions' : annualized_per_user_emissions,
+            'per_user_scc_usd' : per_user_scc_usd,
+            'per_user_annualized_scc_usd' : per_user_annualized_scc_usd,
             'decile' : item['decile'],
             'strategy' : item['strategy'],
             'algorithm' : item['algorithm']
@@ -141,13 +162,12 @@ def run_uq_processing_emission():
 
         df = pd.DataFrame.from_dict(results)
 
-        filename = 'fiber_emission_results.csv'
-        
-        if not os.path.exists(RESULTS):
+        filename = 'SSA_fiber_emission_results.csv'
+        if not os.path.exists(SSA_RESULTS):
 
-            os.makedirs(RESULTS)
+            os.makedirs(SSA_RESULTS)
 
-        path_out = os.path.join(RESULTS, filename)
+        path_out = os.path.join(SSA_RESULTS, filename)
         df.to_csv(path_out, index = False)
 
 
@@ -156,8 +176,8 @@ def run_uq_processing_emission():
 
 if __name__ == '__main__':
 
-    #print('Running fiber broadband cost model')
-    #run_uq_processing_cost()
+    print('Running fiber broadband cost model')
+    run_uq_processing_cost()
 
     print('Running fiber broadband emissions model')
     run_uq_processing_emission()
