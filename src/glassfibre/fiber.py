@@ -128,15 +128,18 @@ def total_cost_ownership(total_capex, total_opex, discount_rate,
 ######## EMISSIONS MODEL ########
 #################################
 
-def lca_manufacturing(pcb_kg, pvc_kg, aluminium_kg, concrete_kg, router,
-                      pcb_carbon_factor, alu_carbon_factor,
-                      pvc_carbon_factor, concrete_carbon_factor, nodes):
+def lca_manufacturing(fiber_cable_kg_per_km, pcb_kg, pvc_kg, aluminium_kg, 
+                      concrete_kg, router, glass_kg_co2e, pcb_carbon_factor, 
+                      alu_carbon_factor, pvc_carbon_factor, 
+                      concrete_carbon_factor, length_km, nodes):
     """
     This function calculates the total GHG emissions in the manufacturing 
     phase LCA of fiber broadband using carbon emission factors.
 
     Parameters
     ----------
+    fiber_cable_kg_per_km : float.
+        Mass of fiber optic cable per km.
     pcb_kg : float.
         Mass of printed circuit board.
     pvc_kg : float.
@@ -147,10 +150,12 @@ def lca_manufacturing(pcb_kg, pvc_kg, aluminium_kg, concrete_kg, router,
         Mass of concrete used in building machine room.
     router : float.
         Mass of router for every terminal node.
+    length_km : float.
+        Total length fiber optic cable.
     nodes : int.
         Total number of fiber terminal nodes.
 
-    pcb_carbon_factor, alu_carbon_factor, pvc_carbon_factor, 
+    glass_kg_co2e, pcb_carbon_factor, alu_carbon_factor, pvc_carbon_factor, 
     concrete_carbon_factor : float.
         Carbon emission factors sof PCB, alumnium, PVC, and concrete respectively.
 
@@ -160,6 +165,7 @@ def lca_manufacturing(pcb_kg, pvc_kg, aluminium_kg, concrete_kg, router,
         Manufacturing GHG emissions.
 
     """
+    glass_ghg = (fiber_cable_kg_per_km * length_km * glass_kg_co2e)
 
     pcb_ghg = (pcb_kg * pcb_carbon_factor)
     
@@ -167,10 +173,11 @@ def lca_manufacturing(pcb_kg, pvc_kg, aluminium_kg, concrete_kg, router,
     
     concrete_ghg = (concrete_kg * concrete_carbon_factor)
     
-    pvc_ghg = (pvc_kg * pvc_carbon_factor)
+    pvc_ghg = ((pvc_kg + router) * pvc_carbon_factor)
 
 
-    mfg_emissions = (alu_ghg + concrete_ghg + pcb_ghg + pvc_ghg) * nodes
+    mfg_emissions = (((alu_ghg + concrete_ghg + pcb_ghg + pvc_ghg) * nodes) 
+                     + glass_ghg)
 
 
     return mfg_emissions
@@ -262,14 +269,17 @@ def lca_operations(fiber_point_pwr_kwh, electricity_kg_co2e, nodes):
     return operations_emissions
 
 
-def lca_eolt(pcb_kg, pvc_kg, aluminium_kg, router, plastics_factor_kgco2e, 
-             metals_factor_kgco2e, nodes):
+def lca_eolt(fiber_cable_kg_per_km, pcb_kg, pvc_kg, aluminium_kg, router, 
+             glass_eolt_kg_co2e, plastics_factor_kgco2e, metals_factor_kgco2e, 
+             length_km, nodes):
     """
     This function calculates the total GHG emissions in the end-of-life treatment 
     phase LCA of fiber broadband using carbon emission factors.
 
     Parameters
     ----------
+    fiber_cable_kg_per_km : float.
+        Mass of fiber optic cable per km.
     pcb_kg : float.
         Mass of printed circuit board.
     pvc_kg : float.
@@ -282,6 +292,8 @@ def lca_eolt(pcb_kg, pvc_kg, aluminium_kg, router, plastics_factor_kgco2e,
         Carbon emissions factor of plastics.
     metals_factor_kgco2e : float.
         Carbon emissions factor of metals.
+    length_km : float.
+        Total length fiber optic cable.
     nodes : int.
         Total number of fiber terminal nodes.
 
@@ -291,12 +303,13 @@ def lca_eolt(pcb_kg, pvc_kg, aluminium_kg, router, plastics_factor_kgco2e,
         Dictionary containing GHG emissions by type.
 
     """
+    glass_ghg = (fiber_cable_kg_per_km * length_km * glass_eolt_kg_co2e)
 
     plastics_ghg = ((pcb_kg + pvc_kg + router) * plastics_factor_kgco2e)
 
     alu_ghg = (aluminium_kg * metals_factor_kgco2e)
 
-    eolt_emissions = (alu_ghg + plastics_ghg) * nodes
+    eolt_emissions = ((alu_ghg + plastics_ghg) * nodes) + glass_ghg
 
 
     return eolt_emissions

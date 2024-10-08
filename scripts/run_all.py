@@ -6,9 +6,6 @@ from glassfibre.preprocessing import (ProcessCountry, ProcessRegions,
                                       ProcessPopulation)
 
 from glassfibre.fiber_process import FiberProcess
-from glassfibre.strategies import (baseline_cost_emissions, 
-    local_prims_cost_emissions, regional_prims_cost_emissions, 
-    local_pcsf_cost_emissions, regional_pcsf_cost_emissions)
 from glassfibre.netPlanning import(process_regional_settlement_tifs, 
     process_access_settlement_tifs, generate_access_settlement_lut, 
     generate_regional_settlement_lut, generate_agglomeration_lut,
@@ -52,7 +49,7 @@ for idx, country in countries.iterrows():
 
     regions = ProcessRegions(countries['iso3'].loc[idx], 
                              countries['lowest'].loc[idx])
-    regions.process_regions()
+    #regions.process_regions()
     #regions.process_sub_region_boundaries()
 
     populations = ProcessPopulation(path, countries['iso3'].loc[idx], 
