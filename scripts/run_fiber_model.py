@@ -101,10 +101,9 @@ def run_uq_processing_emission():
     for item in tqdm(df, desc = "Processing uncertainty fiber results"):
 
         lca_mfg = fb.lca_manufacturing(item['fiber_cable_kg_per_km'], 
-                    item['pcb_kg'], item['pvc_kg'], item['aluminium_kg'], 
-                    item['concrete_kg'], item['router'], item['glass_kg_co2e'],
-                    item['pcb_kg_co2e'], item['aluminium_kg_co2e'], 
-                    item['pvc_kg_co2e'], item['concrete_kg_co2e'], 
+                    item['pcb_kg'], item['pvc_kg'], item['steel_kg'], 
+                    item['router'], item['glass_kg_co2e'], item['pcb_kg_co2e'], 
+                    item['steel_kg_co2e'], item['pvc_kg_co2e'], 
                     item['mean_distance_km'], item['nodes'])
         
         lca_trans = fb.lca_transportation(item['mean_distance_km'], 
@@ -120,7 +119,7 @@ def run_uq_processing_emission():
                                     item['electricity_kg_co2e'], item['nodes'])
 
         lca_eolts = fb.lca_eolt(item['fiber_cable_kg_per_km'], item['pcb_kg'], 
-                    item['pvc_kg'], item['aluminium_kg'], item['router'], 
+                    item['pvc_kg'], item['steel_kg'], item['router'], 
                     item['glass_eolt_kg_co2e'], item['plastics_factor_kgco2e'], 
                     item['metals_factor_kgco2e'], item['mean_distance_km'], 
                     item['nodes'])
@@ -177,7 +176,7 @@ def run_uq_processing_emission():
 if __name__ == '__main__':
 
     print('Running fiber broadband cost model')
-    run_uq_processing_cost()
+    #run_uq_processing_cost()
 
     print('Running fiber broadband emissions model')
     run_uq_processing_emission()
