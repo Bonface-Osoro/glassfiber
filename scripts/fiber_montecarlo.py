@@ -176,14 +176,11 @@ def multinetwork_fiber_emissions(i, fiber_params):
         pcb_kg = random.uniform(fiber_params['pcb_low_kg'], 
             fiber_params['pcb_high_kg'])
         
-        pvc_kg = random.uniform(fiber_params['pvc_low_kg'], 
+        pvc_kg = random.randint(fiber_params['pvc_low_kg'], 
             fiber_params['pvc_high_kg'])
         
-        aluminium_kg = random.uniform(fiber_params['aluminium_low_kg'], 
-            fiber_params['aluminium_high_kg'])
-        
-        concrete_kg = random.randint(fiber_params['concrete_low_kg'], 
-            fiber_params['concrete_high_kg'])
+        steel_kg = random.randint(fiber_params['steel_low_kg'], 
+            fiber_params['steel_high_kg'])
         
         router = random.randint(fiber_params['low_router'], 
             fiber_params['high_router'])
@@ -201,14 +198,12 @@ def multinetwork_fiber_emissions(i, fiber_params):
             'fiber_cable_kg_per_km' : fiber_cable_kg_per_km,
             'pcb_kg' : pcb_kg,
             'pvc_kg' : pvc_kg,
-            'aluminium_kg' : aluminium_kg,
-            'concrete_kg' : concrete_kg,
+            'steel_kg' : steel_kg,
             'router' : router,
             'glass_kg_co2e' : fiber_params['glass_kg_co2e'],
             'pcb_kg_co2e' : fiber_params['pcb_kg_co2e'],
-            'aluminium_kg_co2e' : fiber_params['aluminium_kg_co2e'],
+            'steel_kg_co2e' : fiber_params['steel_kg_co2e'],
             'pvc_kg_co2e' : fiber_params['pvc_kg_co2e'],
-            'concrete_kg_co2e' : fiber_params['concrete_kg_co2e'],
             'router_kg_co2e' : fiber_params['olnu_kg_co2e'],
             'electricity_kg_co2e' : fiber_params['electricity_kg_co2e'],
             'glass_eolt_kg_co2e' : fiber_params['glass_eolt_kg_co2e'],
@@ -275,7 +270,7 @@ if __name__ == '__main__':
     random.seed(10)
 
     print('Running uq_cost_inputs_generator()')
-    uq_inputs_costs(parameters)
+    #uq_inputs_costs(parameters)
 
     print('Running uq_inputs_emissions_generator()')
-    #uq_inputs_emissions(parameters)
+    uq_inputs_emissions(parameters)

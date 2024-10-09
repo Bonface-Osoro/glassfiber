@@ -128,10 +128,9 @@ def total_cost_ownership(total_capex, total_opex, discount_rate,
 ######## EMISSIONS MODEL ########
 #################################
 
-def lca_manufacturing(fiber_cable_kg_per_km, pcb_kg, pvc_kg, aluminium_kg, 
-                      concrete_kg, router, glass_kg_co2e, pcb_carbon_factor, 
-                      alu_carbon_factor, pvc_carbon_factor, 
-                      concrete_carbon_factor, length_km, nodes):
+def lca_manufacturing(fiber_cable_kg_per_km, pcb_kg, pvc_kg, steel_kg, 
+                      router, glass_kg_co2e, pcb_carbon_factor, 
+                      steel_kg_co2e, pvc_carbon_factor, length_km, nodes):
     """
     This function calculates the total GHG emissions in the manufacturing 
     phase LCA of fiber broadband using carbon emission factors.
@@ -144,10 +143,8 @@ def lca_manufacturing(fiber_cable_kg_per_km, pcb_kg, pvc_kg, aluminium_kg,
         Mass of printed circuit board.
     pvc_kg : float.
         Mass of PVC material used in building node components.
-    aluminium_kg : float.
-        Mass of aluminium metal used in building node componentsa.
-    concrete_kg : float.
-        Mass of concrete used in building machine room.
+    steel_kg : float.
+        Mass of steel metal used in building node componentsa.
     router : float.
         Mass of router for every terminal node.
     length_km : float.
@@ -155,8 +152,7 @@ def lca_manufacturing(fiber_cable_kg_per_km, pcb_kg, pvc_kg, aluminium_kg,
     nodes : int.
         Total number of fiber terminal nodes.
 
-    glass_kg_co2e, pcb_carbon_factor, alu_carbon_factor, pvc_carbon_factor, 
-    concrete_carbon_factor : float.
+    glass_kg_co2e, pcb_carbon_factor, steel_kg_co2e, pvc_carbon_factor : float.
         Carbon emission factors sof PCB, alumnium, PVC, and concrete respectively.
 
     Returns
@@ -169,15 +165,11 @@ def lca_manufacturing(fiber_cable_kg_per_km, pcb_kg, pvc_kg, aluminium_kg,
 
     pcb_ghg = (pcb_kg * pcb_carbon_factor)
     
-    alu_ghg = (aluminium_kg * alu_carbon_factor)
-    
-    concrete_ghg = (concrete_kg * concrete_carbon_factor)
+    steel_ghg = (steel_kg * steel_kg_co2e)
     
     pvc_ghg = ((pvc_kg + router) * pvc_carbon_factor)
 
-
-    mfg_emissions = (((alu_ghg + concrete_ghg + pcb_ghg + pvc_ghg) * nodes) 
-                     + glass_ghg)
+    mfg_emissions = (((steel_ghg + pcb_ghg + pvc_ghg) * nodes) + glass_ghg)
 
 
     return mfg_emissions
@@ -269,7 +261,7 @@ def lca_operations(fiber_point_pwr_kwh, electricity_kg_co2e, nodes):
     return operations_emissions
 
 
-def lca_eolt(fiber_cable_kg_per_km, pcb_kg, pvc_kg, aluminium_kg, router, 
+def lca_eolt(fiber_cable_kg_per_km, pcb_kg, pvc_kg, steel_kg, router, 
              glass_eolt_kg_co2e, plastics_factor_kgco2e, metals_factor_kgco2e, 
              length_km, nodes):
     """
@@ -284,8 +276,8 @@ def lca_eolt(fiber_cable_kg_per_km, pcb_kg, pvc_kg, aluminium_kg, router,
         Mass of printed circuit board.
     pvc_kg : float.
         Mass of PVC material used in building node components.
-    aluminium_kg : float.
-        Mass of aluminium metal used in building node componentsa.
+    steel_kg : float.
+        Mass of steel metal used in building node componentsa.
     router : float.
         Mass of router for every terminal node.
     plastics_factor_kgco2e : float.
@@ -307,9 +299,9 @@ def lca_eolt(fiber_cable_kg_per_km, pcb_kg, pvc_kg, aluminium_kg, router,
 
     plastics_ghg = ((pcb_kg + pvc_kg + router) * plastics_factor_kgco2e)
 
-    alu_ghg = (aluminium_kg * metals_factor_kgco2e)
+    steel_ghg = (steel_kg * metals_factor_kgco2e)
 
-    eolt_emissions = ((alu_ghg + plastics_ghg) * nodes) + glass_ghg
+    eolt_emissions = ((steel_ghg + plastics_ghg) * nodes) + glass_ghg
 
 
     return eolt_emissions
