@@ -270,7 +270,7 @@ if __name__ == '__main__':
     random.seed(10)
 
     print('Running uq_cost_inputs_generator()')
-    #uq_inputs_costs(parameters)
+    uq_inputs_costs(parameters)
 
     print('Running uq_inputs_emissions_generator()')
     uq_inputs_emissions(parameters)
