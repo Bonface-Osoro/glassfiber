@@ -163,11 +163,11 @@ def lca_manufacturing(fiber_cable_kg_per_km, pcb_kg, pvc_kg, steel_kg,
     """
     glass_ghg = (fiber_cable_kg_per_km * length_km * glass_kg_co2e)
 
-    pcb_ghg = (pcb_kg * pcb_carbon_factor)
+    pcb_ghg = (pcb_kg * pcb_carbon_factor) * length_km
     
-    steel_ghg = (steel_kg * steel_kg_co2e)
+    steel_ghg = (steel_kg * steel_kg_co2e) * length_km
     
-    pvc_ghg = ((pvc_kg + router) * pvc_carbon_factor)
+    pvc_ghg = (pvc_kg * pvc_carbon_factor) * length_km
 
     mfg_emissions = (((steel_ghg + pcb_ghg + pvc_ghg) * nodes) + glass_ghg)
 
@@ -297,11 +297,11 @@ def lca_eolt(fiber_cable_kg_per_km, pcb_kg, pvc_kg, steel_kg, router,
     """
     glass_ghg = (fiber_cable_kg_per_km * length_km * glass_eolt_kg_co2e)
 
-    plastics_ghg = ((pcb_kg + pvc_kg + router) * plastics_factor_kgco2e)
+    plastics_ghg = ((pcb_kg + pvc_kg) * plastics_factor_kgco2e) * length_km
 
-    steel_ghg = (steel_kg * metals_factor_kgco2e)
+    steel_ghg = (steel_kg * metals_factor_kgco2e) * length_km
 
-    eolt_emissions = ((steel_ghg + plastics_ghg) * nodes) + glass_ghg
+    eolt_emissions =  plastics_ghg + glass_ghg + steel_ghg
 
 
     return eolt_emissions

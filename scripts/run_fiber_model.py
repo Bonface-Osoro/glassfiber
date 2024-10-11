@@ -55,6 +55,8 @@ def run_uq_processing_cost():
         per_user_tco = (total_cost_ownership / item['total_population'])
 
         per_user_annualized_usd = (per_user_tco / item['assessment_years'])
+
+        per_monthly_tco_usd = per_user_annualized_usd / 12
         
         
         results.append({
@@ -64,6 +66,7 @@ def run_uq_processing_cost():
             'mean_connected' : item['total_population'],
             'per_user_tco' : per_user_tco,
             'per_user_annualized_usd' : per_user_annualized_usd,
+            'per_monthly_tco_usd' : per_monthly_tco_usd,
             'algorithm' : item['algorithm'],
             'strategy' : item['strategy'],
             'decile' : item['decile']
@@ -176,7 +179,7 @@ def run_uq_processing_emission():
 if __name__ == '__main__':
 
     print('Running fiber broadband cost model')
-    #run_uq_processing_cost()
+    run_uq_processing_cost()
 
     print('Running fiber broadband emissions model')
     run_uq_processing_emission()

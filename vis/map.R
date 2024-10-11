@@ -5,6 +5,7 @@ library(ggtext)
 library(sf)
 library(readr)
 library(RColorBrewer)
+library(ggspatial)
 
 suppressMessages(library(tidyverse))
 folder <- dirname(rstudioapi::getSourceEditorContext()$path)
@@ -62,127 +63,6 @@ create_sf_plot <-
       coord_sf()
     return(plot)
   }
-
-########
-##TCO ##
-########
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_regional_tco_results.csv'))
-data = data %>%
-  distinct(iso3, tco, .keep_all = TRUE) %>%
-  group_by(iso3) %>%
-  summarize(tco = (tco)/ 1e6)
-
-merged_data <- merge(africa_shp, data, by = "iso3")
-
-brewer_color_ramp <- colorRampPalette(brewer.pal(11, "Spectral"))
-num_colors <- length(unique(merged_data$tco))
-
-tco_country <- create_sf_plot(
-  data = merged_data,
-  merged_data,
-  fill_variable = "tco",
-  legend_title = "Amount (US$ millions)",
-  plot_title = "(A) Total Cost of Ownership (TCO).",
-  plot_subtitle = 'Average TCO for Individual Countries.'
-)
-
-#####################
-##SSA TCO Per User ##
-#####################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_regional_tco_results.csv'))
-
-data = data %>%
-  distinct(iso3, tco_per_user, .keep_all = TRUE) %>%
-  group_by(iso3) %>%
-  summarize(tco_user = (tco_per_user)/ 1e6)
-
-merged_data <- merge(africa_shp, data, by = "iso3")
-
-brewer_color_ramp <- colorRampPalette(brewer.pal(11, "Spectral"))
-num_colors <- length(unique(merged_data$tco_user))
-
-tco_per_user <- create_sf_plot(
-  data = merged_data,
-  merged_data,
-  fill_variable = "tco_user",
-  legend_title = "Amount (US$ millions)",
-  plot_title = "(B) Average TCO per Subscriber",
-  plot_subtitle = 'Average TCO per subcriber for Individual Countries.'
-)
-
-###########################
-##SSA Total GHG Emission ##
-###########################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission.csv'))
-data <- data[data$strategy == "regional", ]
-
-data = data %>%
-  distinct(iso3, total_ghg_emissions_kg, .keep_all = TRUE) %>%
-  group_by(iso3) %>%
-  summarize(total_ghgs = (total_ghg_emissions_kg)/ 1e9)
-
-merged_data <- merge(africa_shp, data, by = "iso3")
-
-brewer_color_ramp <- colorRampPalette(brewer.pal(11, "Spectral"))
-num_colors <- length(unique(merged_data$total_ghgs))
-
-country_total_ghg <- create_sf_plot(
-  data = merged_data,
-  merged_data,
-  fill_variable = "total_ghgs",
-  legend_title = ylab("GHG Emissions (Mt of Carbondioxide equivalent)"),
-  plot_title = "(A) Total Greenhouse Gas (GHG) Emissions.",
-  plot_subtitle = 'GHG emissions for each country due to construction of regional fiber network.'
-)
-
-###################################
-##SSA GHG Emission per subscriber##
-##################################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_emission.csv'))
-data <- data[data$strategy == "regional", ]
-
-data = data %>%
-  distinct(iso3, emissions_kg_per_subscriber, .keep_all = TRUE) %>%
-  group_by(iso3) %>%
-  summarize(ghg_per_user = (emissions_kg_per_subscriber)/ 1e6)
-
-merged_data <- merge(africa_shp, data, by = "iso3")
-
-brewer_color_ramp <- colorRampPalette(brewer.pal(11, "Spectral"))
-num_colors <- length(unique(merged_data$ghg_per_user))
-
-country_avg_ghg_per_user <- create_sf_plot(
-  data = merged_data,
-  merged_data,
-  fill_variable = "ghg_per_user",
-  legend_title = ylab("GHG Emissions (kt of Carbondioxide equivalent)"),
-  plot_title = "(B) Average GHG Emissions per Subscriber.",
-  plot_subtitle = 'GHG emissions per user for each country due to construction of regional fiber network.'
-)
-
-#####################
-##PANEL PLOTS COSTS##
-#####################
-cost_panel <- ggarrange(tco_country, tco_per_user, 
-              ncol = 2, nrow = 1, align = c('hv'),
-              common.legend = FALSE, legend='bottom')
-
-path = file.path(folder, 'figures', 'tco_maps.png')
-png(path, units = "in", width = 10, height = 6, res = 300)
-print(cost_panel)
-dev.off()
-
-#########################
-##PANEL PLOTS EMISSIONS##
-#########################
-emission_panel <- ggarrange(country_total_ghg, country_avg_ghg_per_user, 
-              ncol = 2, nrow = 1, align = c('hv'),
-              common.legend = FALSE, legend='bottom')
-
-path = file.path(folder, 'figures', 'emissions_maps.png')
-png(path, units = "in", width = 10, height = 6, res = 300)
-print(emission_panel)
-dev.off()
 
 
 ###################################
@@ -424,7 +304,7 @@ below_20000 <- ggplot() +
   geom_sf(data = data_20, aes(color = population_bin), 
           size = 0.1) +
   labs(title = "(b) Below 20,000 people.",
-       subtitle = "For all settlement points with less than 20,000 people.",
+       subtitle = "For all settlement with less than 20,000 people.",
        color = NULL) +
   scale_color_brewer(palette = "Dark2") +
   theme_void() +
@@ -469,7 +349,7 @@ above_20000 <- ggplot() +
   geom_sf(data = data_50, aes(color = population_bin), 
           size = 0.1) +
   labs(title = "(c) Between 20,000 - 50,000 people",
-       subtitle = "For all settlement points with 20,000 - 50,000 people.",
+       subtitle = "For all settlement with 20,000 - 50,000 people.",
        color = NULL) +
   scale_color_brewer(palette = "Dark2") +
   theme_void() +
@@ -514,7 +394,7 @@ above_50000 <- ggplot() +
   geom_sf(data = data_half, aes(color = population_bin), 
           size = 0.1) +
   labs(title = "(d) Above 50,000 people",
-       subtitle = "For all settlement points with over 50,000 people.",
+       subtitle = "For all settlement with over 50,000 people.",
        color = NULL) +
   scale_color_brewer(palette = "Dark2") +
   theme_void() +
@@ -558,10 +438,143 @@ png(path, units = "in", width = 7.2, height = 7, res = 300)
 print(demand_point_panel)
 dev.off()
 
+############################
+##FIBER INFRASTRUCTURE MAP##
+############################
+africa_data <- st_read(file.path(folder, '..', 'data', 'raw', 
+                                 'Africa_Boundaries', 'SSA_combined_shapefile.shp'))
 
+#################################
+##CORE FIBER INFRASTRUCTURE MAP##
+#################################
+core_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                'SSA_core_nodes_existing.shp'))
+core_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                'SSA_core_edges_existing.shp'))
+core_nodes$Type <- 'Core Nodes'
+core_edges$Type <- 'Core Fiber'
 
+core_fiber <- ggplot() +
+  geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
+  geom_sf(data = core_nodes, color = "tomato", size = 0.5, aes(fill = Type)) + 
+  geom_sf(data = core_edges, color = "green4", linewidth = 0.3) + 
+  labs(title = "(e) Existing fiber infrastructure in SSA", 
+       subtitle = "Only live fiber lines with core nodes are mapped", 
+       fill = NULL) + 
+  theme_void() +
+  theme(
+    strip.text.x = element_blank(),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title.y = element_text(size = 6),
+    legend.position = 'bottom',
+    axis.title = element_text(size = 8),
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    legend.key.size = unit(0.6, "lines"),
+    plot.subtitle = element_text(size = 10),
+    plot.title = element_text(size = 10, face = "bold")
+  ) +   annotation_scale(location = "bl", width_hint = 0.5) + 
+  coord_sf(crs = 4326) + 
+  ggspatial::annotation_north_arrow(
+    location = "tr", which_north = "true",
+    pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
+    style = ggspatial::north_arrow_nautical(
+      fill = c("grey40", "white"),
+      line_col = "grey20",
+      text_family = "ArcherPro Book"
+    )
+  ) 
 
+####################################
+##PRIM'S FIBER INFRASTRUCTURE MAP ##
+####################################
+access_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                  'SSA_combined_access_nodes.shp'))
+access_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                  'SSA_combined_access_edges.shp'))
+access_nodes$Type <- 'Access Nodes'
+access_edges$Type <- 'Access Fiber'
 
+access_prims_fiber <- ggplot() +
+  geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
+  geom_sf(data = access_nodes, color = "gray35", size = 0.002, aes(fill = Type)) + 
+  geom_sf(data = access_edges, color = "coral", size = 0.3, linewidth = 0.5) + 
+  labs(title = "Fixed fiber network design using Prim's algorithm.", 
+       subtitle = "Designed for all sub-regions across SSA.", fill = NULL) + 
+  theme(
+    axis.title.y = element_text(size = 6),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(size = 9),
+    axis.text.y = element_text(size = 9),
+    plot.subtitle = element_text(size = 12),
+    plot.title = element_text(size = 13, face = "bold")
+  ) + annotation_scale(location = "bl", width_hint = 0.5) + 
+  coord_sf(crs = 4326) + 
+  ggspatial::annotation_north_arrow(
+    location = "tr", which_north = "true",
+    pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
+    style = ggspatial::north_arrow_nautical(
+      fill = c("grey40", "white"),
+      line_col = "grey20",
+      text_family = "ArcherPro Book")) 
 
+#################################
+##PCST FIBER INFRASTRUCTURE MAP##
+#################################
+access_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                  'SSA_combined_pcsf_access_nodes.shp'))
+access_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+                                  'SSA_combined_pcsf_access_edges.shp'))
+access_nodes$Type <- 'Access Nodes'
+access_edges$Type <- 'Access Fiber'
+
+access_pcsf_fiber <- ggplot() +
+  geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
+  geom_sf(data = access_nodes, color = "darkorange", size = 0.002, aes(fill = Type)) + 
+  geom_sf(data = access_edges, color = "aquamarine4", size = 0.3, linewidth = 0.5) + 
+  labs(title = "Fixed fiber network design using PCST algorithm.", 
+       subtitle = "Designed for all sub-regions across SSA.", fill = NULL) + 
+  theme(
+    axis.title.y = element_text(size = 6),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(size = 9),
+    axis.text.y = element_text(size = 9),
+    plot.subtitle = element_text(size = 12),
+    plot.title = element_text(size = 13, face = "bold")
+  ) + annotation_scale(location = "bl", width_hint = 0.5) + 
+  coord_sf(crs = 4326) + 
+  ggspatial::annotation_north_arrow(
+    location = "tr", which_north = "true",
+    pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
+    style = ggspatial::north_arrow_nautical(
+      fill = c("grey40", "white"),
+      line_col = "grey20",
+      text_family = "ArcherPro Book")) 
+
+#######################
+##PANEL FIBER DESIGN ##
+#######################
+fiber_design <- ggarrange(
+  access_prims_fiber, 
+  access_pcsf_fiber, 
+  legend = 'none',
+  ncol = 2)
+
+path = file.path(folder, 'figures', 'fiber_network_design.png')
+png(path, units = "in", width = 13, height = 13, res = 300)
+print(fiber_design)
+dev.off()
+
+path = file.path(folder, 'figures', 'prims_fiber_network_design.png')
+png(path, units = "in", width = 13, height = 13, res = 300)
+print(access_prims_fiber)
+dev.off()
+
+path = file.path(folder, 'figures', 'pcst_fiber_network_design.png')
+png(path, units = "in", width = 13, height = 13, res = 300)
+print(access_pcsf_fiber)
+dev.off()
 
 
