@@ -139,6 +139,6 @@ vis/*/*
 cache/*/* 
 data/*/*
 results/*
-!results/results/SSA/
+!results/SSA/
 figures/*
 sankey/*debug.log
