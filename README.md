@@ -29,7 +29,7 @@ Results
 In `Figure 3`, the quantitative emission results for different fiber network design approach is presented.
 #### Figure 3 Emission Results.
 <p align="center">
-  <img src = "/docs/aggregate_emissions.png" />
+  <img src = "/docs/emissions.png" />
 </p>
 
 
