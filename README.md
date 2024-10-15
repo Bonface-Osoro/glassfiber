@@ -9,13 +9,15 @@ Even though fiber has been deployed in most parts of SSA, its installation is on
 
 Methodology
 ==============
-The method (see `Figure 1`) ..... 
+A general theoretical model for providing Fiber-to-the-Neighborhood (FTTnb) is now defined, consisting of demand, supply, and emissions components. 
+In this model, we quantify the environmental carbon emissions and costs incurred in building a fiber network access node to the local area (neighborhood). 
+An overview of the model is visualized in (see `Figure 1`). 
 
 ## Method Box
 
 #### Figure 1 Proposed Method.
 <p align="center">
-  <img src="/docs/method_box.png" />
+  <img src="/docs/method_box.jpg" />
 </p>
 
 Results
