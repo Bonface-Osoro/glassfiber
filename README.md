@@ -16,6 +16,7 @@ An overview of the model is visualized in (see `Figure 1`).
 ## Method Box
 
 #### Figure 1 Proposed Method.
+![Alt Text](https://github.com/Bonface-Osoro/glassfiber/blob/model_revise/docs/method_box.tiff)
 <p align="center">
   <img src="/docs/method_box.jpg" />
 </p>
