@@ -18,53 +18,6 @@ africa_shp <- africa_data %>%
 new_names <- c('iso3', 'country', 'gid_1', 'GID_2', 'geometry')
 colnames(africa_shp) <- new_names
 
-create_sf_plot <-
-  function(data, data_2, fill_variable, legend_title, plot_title,
-           plot_subtitle) {
-    # Get unique values
-    unique_values <- unique(data[[fill_variable]])
-    # Create a Brewer color palette
-    num_colors <- length(unique_values) - 1
-    colors <- brewer_color_ramp(num_colors)
-    # Create a color gradient, including grey for zero
-    gradient_colors <- c("grey", colors)
-    gradient_breaks <- c(0, sort(unique_values[unique_values != 0]))
-    plot_title <- paste0(plot_title, "\n")
-    plot <-
-      ggplot(data) + geom_sf(
-        data = data_2,
-        fill = NA,
-        color = "dodgerblue",
-        linewidth = 0.1,
-        alpha = 1
-      ) +
-      geom_sf(
-        aes(fill = .data[[fill_variable]]),
-        linewidth = 0.01,
-        alpha = 0.8,
-        color = "white"
-      ) +
-      theme_transparent() + scale_fill_gradientn(
-        colors = gradient_colors,
-        values = scales::rescale(gradient_breaks),
-        name = legend_title
-      ) +
-      labs(title = plot_title, subtitle = plot_subtitle) + theme(
-        text = element_text(color = "#22211d", family = "Arial"),
-        panel.background = element_rect(fill = "transparent", color = NA),
-        plot.title = element_text(size = 12, face = 'bold', hjust = 0),
-        plot.subtitle = element_text(size = 9),
-        legend.position = 'bottom',
-        legend.key.width = unit(0.05, "npc"),
-        legend.text = element_text(size = 9),
-        legend.title = element_text(size = 8)
-      ) +
-      guides(fill = guide_colourbar(title.position = 'top', direction = "horizontal")) +
-      coord_sf()
-    return(plot)
-  }
-
-
 ###################################
 ##POPULATION DENSITY DISTRIBUTION##
 ###################################
@@ -447,9 +400,9 @@ africa_data <- st_read(file.path(folder, '..', 'data', 'raw',
 #################################
 ##CORE FIBER INFRASTRUCTURE MAP##
 #################################
-core_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+core_nodes <- st_read(file.path(folder, '..', 'results', 'design_shapefiles', 
                                 'SSA_core_nodes_existing.shp'))
-core_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+core_edges <- st_read(file.path(folder, '..', 'results', 'design_shapefiles', 
                                 'SSA_core_edges_existing.shp'))
 core_nodes$Type <- 'Core Nodes'
 core_edges$Type <- 'Core Fiber'
@@ -490,83 +443,77 @@ core_fiber <- ggplot() +
 ####################################
 ##PRIM'S FIBER INFRASTRUCTURE MAP ##
 ####################################
-access_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+access_nodes <- st_read(file.path(folder, '..', 'results', 'design_shapefiles',
                                   'SSA_combined_access_nodes.shp'))
-access_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+access_edges <- st_read(file.path(folder, '..', 'results', 'design_shapefiles', 
                                   'SSA_combined_access_edges.shp'))
-access_nodes$Type <- 'Access Nodes'
-access_edges$Type <- 'Access Fiber'
+core_edges <- st_read(file.path(folder, '..', 'results', 'design_shapefiles', 
+                                'SSA_core_edges_existing.shp'))
+core_edges$Type <- 'Existing Fiber Line'
+access_edges$Type <- 'Designed Fiber Access Lines'
 
 access_prims_fiber <- ggplot() +
   geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
-  geom_sf(data = access_nodes, color = "gray35", size = 0.002, aes(fill = Type)) + 
-  geom_sf(data = access_edges, color = "coral", size = 0.3, linewidth = 0.5) + 
-  labs(title = "Fixed fiber network design using Prim's algorithm.", 
-       subtitle = "Designed for all sub-regions across SSA.", fill = NULL) + 
+  geom_sf(data = access_nodes, size = 0.05) + 
+  geom_sf(data = access_edges, aes(color = Type), size = 0.3, linewidth = 0.5, show.legend = TRUE) + 
+  geom_sf(data = core_edges, aes(color = Type), linewidth = 0.3, show.legend = TRUE) +
+  labs(title = "Fixed fiber network design using Minimum Spanning Tree (MST) Prim's algorithm", 
+       subtitle = "Designed for all sub-regions across SSA.", color = "Network Level") + 
+  scale_color_manual(values = c("Existing Fiber Line" = "green4", 
+         "Designed Fiber Access Lines" = "darkorange")) +
   theme(
     axis.title.y = element_text(size = 6),
     axis.title = element_text(size = 12),
     axis.text.x = element_text(size = 9),
     axis.text.y = element_text(size = 9),
-    plot.subtitle = element_text(size = 12),
-    plot.title = element_text(size = 13, face = "bold")
+    plot.subtitle = element_text(size = 14),
+    plot.title = element_text(size = 16, face = "bold"),
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12)
   ) + annotation_scale(location = "bl", width_hint = 0.5) + 
-  coord_sf(crs = 4326) + 
-  ggspatial::annotation_north_arrow(
-    location = "tr", which_north = "true",
-    pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
-    style = ggspatial::north_arrow_nautical(
-      fill = c("grey40", "white"),
-      line_col = "grey20",
-      text_family = "ArcherPro Book")) 
+  coord_sf(crs = 4326) 
 
 #################################
 ##PCST FIBER INFRASTRUCTURE MAP##
 #################################
-access_nodes <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+access_nodes <- st_read(file.path(folder, '..', 'results', 'design_shapefiles',
                                   'SSA_combined_pcsf_access_nodes.shp'))
-access_edges <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+access_edges <- st_read(file.path(folder, '..', 'results', 'design_shapefiles', 
                                   'SSA_combined_pcsf_access_edges.shp'))
-access_nodes$Type <- 'Access Nodes'
-access_edges$Type <- 'Access Fiber'
+core_edges <- st_read(file.path(folder, '..', 'results', 'design_shapefiles', 
+                                'SSA_core_edges_existing.shp'))
+
+core_edges$Type <- 'Existing Fiber Line'
+access_edges$Type <- 'Designed Fiber Access Lines'
 
 access_pcsf_fiber <- ggplot() +
   geom_sf(data = africa_data, fill = "gray96", color = "black", linewidth = 0.05) +
-  geom_sf(data = access_nodes, color = "darkorange", size = 0.002, aes(fill = Type)) + 
-  geom_sf(data = access_edges, color = "aquamarine4", size = 0.3, linewidth = 0.5) + 
-  labs(title = "Fixed fiber network design using PCST algorithm.", 
-       subtitle = "Designed for all sub-regions across SSA.", fill = NULL) + 
+  geom_sf(data = access_nodes, size = 0.05) + 
+  geom_sf(data = access_edges, aes(color = Type), size = 0.3, linewidth = 0.5, show.legend = TRUE) + 
+  geom_sf(data = core_edges, aes(color = Type), linewidth = 0.3, show.legend = TRUE) + 
+  labs(title = "Fixed fiber network design using Prize Collecting Steiner Tree (PCST) algorithm", 
+       subtitle = "Designed for all sub-regions across SSA.", color = "Network Level") + 
+  scale_color_manual(values = c("Existing Fiber Line" = "green4", 
+        "Designed Fiber Access Lines" = "darkorange")) +
   theme(
     axis.title.y = element_text(size = 6),
     axis.title = element_text(size = 12),
     axis.text.x = element_text(size = 9),
     axis.text.y = element_text(size = 9),
-    plot.subtitle = element_text(size = 12),
-    plot.title = element_text(size = 13, face = "bold")
+    plot.subtitle = element_text(size = 14),
+    plot.title = element_text(size = 16, face = "bold"),
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12)
   ) + annotation_scale(location = "bl", width_hint = 0.5) + 
-  coord_sf(crs = 4326) + 
-  ggspatial::annotation_north_arrow(
-    location = "tr", which_north = "true",
-    pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
-    style = ggspatial::north_arrow_nautical(
-      fill = c("grey40", "white"),
-      line_col = "grey20",
-      text_family = "ArcherPro Book")) 
+  coord_sf(crs = 4326) 
 
 #######################
 ##PANEL FIBER DESIGN ##
 #######################
-fiber_design <- ggarrange(
-  access_prims_fiber, 
-  access_pcsf_fiber, 
-  legend = 'none',
-  ncol = 2)
-
-path = file.path(folder, 'figures', 'fiber_network_design.png')
-png(path, units = "in", width = 13, height = 13, res = 300)
-print(fiber_design)
-dev.off()
-
 path = file.path(folder, 'figures', 'prims_fiber_network_design.png')
 png(path, units = "in", width = 13, height = 13, res = 300)
 print(access_prims_fiber)
