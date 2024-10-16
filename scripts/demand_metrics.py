@@ -20,18 +20,6 @@ DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
 DATA_AFRICA = os.path.join(BASE_PATH, '..', 'results', 'SSA')
 path = os.path.join(DATA_RAW, 'countries.csv')
 countries = pd.read_csv(path, encoding = 'utf-8-sig')
-southern = ['AGO', 'ZMB', 'ZWE', 'NAM', 'BWA', 'ZAF', 'LSO', 
-            'SWZ', 'MOZ', 'MWI']
-
-central = ['CMR', 'CAF', 'TCD', 'COD', 'GNQ', 'GAB', 'STP', 'COG']
-
-eastern = ['BDI', 'COM', 'DJI', 'ERI', 'ETH', 'SWZ', 'MDG', 
-           'KEN', 'MUS', 'SDN', 'SYC', 'SOM', 'SSD', 'UGA', 
-           'TZA']
-
-west = ['BEN', 'BFA', 'CPV', 'CIV', 'GMB', 'GHA', 'GIN', 
-        'GNB', 'LBR', 'MLI', 'MRT', 'NER', 'NGA', 'SEN', 
-        'SLE', 'TGO']
 
 def demand(iso3):
     """
