@@ -37,7 +37,7 @@ In `Figure 3`, the quantitative emission results for different fiber network des
 
 ## Install
 ```
-conda craete -n "glass" python=3.11
+conda create -n "glass" python=3.11
 conda activate glass
 python setup.py develop
 ```
