@@ -60,7 +60,7 @@ per_user_emissions <-
        y = bquote("Average emissions (kg CO"["2"] ~ " eq. per user)")) +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 11, angle = 0),
+    axis.text.x = element_text(size = 11),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 14, face = "bold"),
     plot.subtitle = element_text(size = 14),
@@ -114,7 +114,7 @@ annualized_per_user_emissions <-
        y = bquote("Annualized per user emissions (kg CO"["2"] ~ " eq. per user)")) +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 11, angle = 0),
+    axis.text.x = element_text(size = 11),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 14, face = "bold"),
     plot.subtitle = element_text(size = 14),
@@ -159,18 +159,19 @@ label_totals <- df2 %>%
 
 per_user_scc_costs <- ggplot(df2, aes(x = decile, y = mean, fill = strategy)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
-  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .2,
-                position = position_dodge(.9), color = 'black',size = 0.2) +
-  geom_text(aes(label = formatC(signif(after_stat(y), 2),
-     digits = 2, format = "fg", flag = "#")), color = 'black', size = 3.5, position =
-     position_dodge(0.9), vjust = -0.1, hjust = 1.1) +
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
+                position = position_dodge(.9), color = 'red',size = 0.5) + 
+  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+                                digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
+              position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") +
-  labs(colour = NULL, title = "Fiber Broadband Social Carbon Cost (SCC)",
-       subtitle = "(a) Per user SCC grouped by network level and spatial optimization algorithm.",
-       x = NULL, y = bquote("Average SCC per user ($US/User)")) +
+  labs(colour = NULL, title = "(A) Fiber Broadband Social Carbon Cost (SCC) Reported Per User",
+       subtitle = "Per user SCC categorized by deciles, grouped by network level and spatial optimization algorithm.",
+       x = "Population Density Decile (Population per km²)", 
+       y = bquote("Average SCC per user ($US/User)")) +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 11, angle = 5),
+    axis.text.x = element_text(size = 11),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 14, face = "bold"),
     plot.subtitle = element_text(size = 14),
@@ -178,9 +179,9 @@ per_user_scc_costs <- ggplot(df2, aes(x = decile, y = mean, fill = strategy)) +
     axis.title.y = element_text(size = 12),
     legend.title = element_text(size = 12),
     legend.text = element_text(size = 12),
-    axis.title.x = element_text(size = 10)
+    axis.title.x = element_text(size = 11)
   ) + expand_limits(y = 0) +
-  guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
+  guides(fill = guide_legend(ncol = 3, title = 'Network level')) +
   scale_y_continuous(expand = c(0, 0),
     labels = function(y)format(y, scientific = FALSE), limit = c(0, 24)) +
   facet_wrap( ~ algorithm, nrow = 2) + theme(strip.text = element_text(size = 14))
@@ -201,18 +202,19 @@ label_totals <- df3 %>%
 
 anualized_per_user_scc_costs <- ggplot(df3, aes(x = decile, y = mean, fill = strategy)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
-  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .2,
-                position = position_dodge(.9), color = 'black',size = 0.2) +
-  geom_text(aes(label = formatC(signif(after_stat(y), 1),
-     digits = 2, format = "fg", flag = "#")), color = 'black', size = 3.5, position =
-     position_dodge(0.9), vjust = -0.1, hjust = 1.1) +
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
+                position = position_dodge(.9), color = 'red',size = 0.5) + 
+  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+       digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
+              position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") +
-  labs(colour = NULL, title = " ",
-       subtitle = "(b) Annualized per user SCC grouped by network level and spatial optimization algorithm.",
-       x = NULL, y = bquote("Annualized average SCC per user ($US/User)")) +
+  labs(colour = NULL, title = "(B) Fiber Broadband Social Carbon Cost (SCC) Reported Per User",
+       subtitle = "Annualized per user SCC categorized by deciles, grouped by network level and spatial optimization algorithm.",
+       x = "Population Density Decile (Population per km²)", 
+       y = bquote("Annualized average SCC per user ($US/User)")) +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 11, angle = 5),
+    axis.text.x = element_text(size = 11),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 14, face = "bold"),
     plot.subtitle = element_text(size = 14),
@@ -220,9 +222,9 @@ anualized_per_user_scc_costs <- ggplot(df3, aes(x = decile, y = mean, fill = str
     axis.title.y = element_text(size = 12),
     legend.title = element_text(size = 12),
     legend.text = element_text(size = 12),
-    axis.title.x = element_text(size = 10)
+    axis.title.x = element_text(size = 11)
   ) + expand_limits(y = 0) +
-  guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
+  guides(fill = guide_legend(ncol = 3, title = 'Network level')) +
   scale_y_continuous(expand = c(0, 0),
      labels = function(y)format(y, scientific = FALSE), limit = c(0, 0.84)) +
   facet_wrap( ~ algorithm, nrow = 2) + theme(strip.text = element_text(size = 14))
@@ -235,7 +237,7 @@ aggregate_SCC <- ggarrange(
   align = c('hv'), common.legend = TRUE, legend='bottom')
 
 path = file.path(folder, 'figures', 'aggregate_SCC.png')
-png(path, units="in", width=14, height=14, res=300)
+png(path, units="in", width=12, height=14, res=300)
 print(aggregate_SCC)
 dev.off()
 
@@ -245,14 +247,14 @@ dev.off()
 data1 <- read.csv(file.path(folder, '..', 'results', 'SSA',
                            'SSA_fiber_cost_results.csv'))
 
-data1$decile = factor(data1$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3',
-   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9',
-   'Decile 10'), labels = c('Decile 1 \n(>958 per km²)',
-   'Decile 2 \n(456 - 957 per km²)', 'Decile 3 \n(273 - 455 per km²)',
-   'Decile 4 \n(172 - 272 per km²)', 'Decile 5 \n(107 - 171 per km²)',
-   'Decile 6 \n(64 - 106 per km²)', 'Decile 7 \n(40 - 63 per km²)',
-   'Decile 8 \n(22 - 39 per km²)', 'Decile 9 \n(10 - 21 per km²)',
-   'Decile 10 \n(<9 per km²)'))
+data1$decile = factor(data1$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
+     'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
+     'Decile 10'), labels = c('Decile 1 \n(>958 km²)', 
+     'Decile 2 \n(<957 km²)', 'Decile 3 \n(<455 km²)', 
+     'Decile 4 \n(<272 km²)', 'Decile 5 \n(<171 km²)', 
+     'Decile 6 \n(<106 km²)', 'Decile 7 \n(<63 km²)', 
+     'Decile 8 \n(<39 km²)', 'Decile 9 \n(<21 km²)', 
+     'Decile 10 \n(<9 km²)'))
 
 data1$strategy <- factor(data1$strategy,
     levels = c('regional', 'access'),
@@ -279,18 +281,19 @@ label_totals <- df4 %>%
 
 annualized_per_user_tco <- ggplot(df4, aes(x = decile, y = mean, fill = strategy)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
-  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .2,
-                position = position_dodge(.9), color = 'black',size = 0.2) +
-  geom_text(aes(label = formatC(signif(after_stat(y), 2),
-     digits = 2, format = "fg", flag = "#")), color = 'black', size = 3.5, position =
-     position_dodge(0.9), vjust = -0.1, hjust = 1.1) +
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
+                position = position_dodge(.9), color = 'red',size = 0.5) + 
+  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+      digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
+              position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") +
-  labs(colour = NULL, title = "Fiber Broadband Total Cost of Ownership (TCO)",
-       subtitle = "(a) Annualized average TCO per user grouped by network level and spatial optimization algorithm.",
-       x = NULL, y = bquote("Annualized average TCO per user ($US/User)")) +
+  labs(colour = NULL, title = "(A) Fiber Broadband Total Cost of Ownership (TCO) Reported Per User",
+       subtitle = "Annualized average TCO per user categorized by deciles, grouped by network level and spatial optimization algorithm.",
+       x = "Population Density Decile (Population per km²)", 
+       y = bquote("Annualized average TCO per user ($US/User)")) +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 11, angle = 5),
+    axis.text.x = element_text(size = 11),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 14, face = "bold"),
     plot.subtitle = element_text(size = 14),
@@ -298,9 +301,9 @@ annualized_per_user_tco <- ggplot(df4, aes(x = decile, y = mean, fill = strategy
     axis.title.y = element_text(size = 12),
     legend.title = element_text(size = 12),
     legend.text = element_text(size = 12),
-    axis.title.x = element_text(size = 10)
+    axis.title.x = element_text(size = 11)
   ) + expand_limits(y = 0) +
-  guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
+  guides(fill = guide_legend(ncol = 3, title = 'Network level')) +
   scale_y_continuous(expand = c(0, 0),
      labels = function(y)format(y, scientific = FALSE), limit = c(0, 38)) +
   facet_wrap( ~ algorithm, nrow = 2) + theme(strip.text = element_text(size = 14))
@@ -321,18 +324,19 @@ label_totals <- df5 %>%
 
 monthly_per_user_tco <- ggplot(df5, aes(x = decile, y = mean, fill = strategy)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
-  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .2,
-                position = position_dodge(.9), color = 'black',size = 0.2) +
-  geom_text(aes(label = formatC(signif(after_stat(y), 2),
-     digits = 2, format = "fg", flag = "#")), color = 'black', size = 3.5, position =
-      position_dodge(0.9), vjust = -0.1, hjust = 1.1) +
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
+                position = position_dodge(.9), color = 'red',size = 0.5) + 
+  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+       digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
+              position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") +
-  labs(colour = NULL, title = " ",
-       subtitle = "(b) Monthly TCO per user grouped by network level and spatial optimization algorithm.",
-       x = NULL, y = bquote("Monthly TCO per user ($US/User)")) +
+  labs(colour = NULL, title = "(B) Fiber Broadband Total Cost of Ownership (TCO) Reported Per User",
+       subtitle = "Monthly TCO per user categorized by deciles, grouped by network level and spatial optimization algorithm.",
+       x = "Population Density Decile (Population per km²)", 
+       y = bquote("Monthly TCO per user ($US/User)")) +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 11, angle = 5),
+    axis.text.x = element_text(size = 11),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 14, face = "bold"),
     plot.subtitle = element_text(size = 14),
@@ -340,9 +344,9 @@ monthly_per_user_tco <- ggplot(df5, aes(x = decile, y = mean, fill = strategy)) 
     axis.title.y = element_text(size = 12),
     legend.title = element_text(size = 12),
     legend.text = element_text(size = 12),
-    axis.title.x = element_text(size = 10)
+    axis.title.x = element_text(size = 11)
   ) + expand_limits(y = 0) +
-  guides(fill = guide_legend(ncol = 6, title = 'Network level')) +
+  guides(fill = guide_legend(ncol = 3, title = 'Network level')) +
   scale_y_continuous(expand = c(0, 0),
      labels = function(y)format(y, scientific = FALSE), limit = c(0, 3.4)) +
   facet_wrap( ~ algorithm, nrow = 2) + theme(strip.text = element_text(size = 14))
@@ -355,7 +359,7 @@ aggregate_tco <- ggarrange(annualized_per_user_tco, monthly_per_user_tco,
      common.legend = TRUE, legend='bottom')
 
 path = file.path(folder, 'figures', 'aggregate_TCO.png')
-png(path, units="in", width=14, height=14, res=300)
+png(path, units="in", width=12, height=14, res=300)
 print(aggregate_tco)
 dev.off()
 
