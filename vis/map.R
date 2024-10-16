@@ -42,7 +42,7 @@ data = data %>% group_by(GID_2, area, iso3) %>%
 pop_density <- ggplot(data, aes(x = pop_density_sqkm)) +
   geom_histogram(bins = 50, binwidth = 4,  color = "black", linewidth = 0.05, 
   aes(fill = iso3)) + scale_fill_brewer(palette = "Set3") +
-  labs(title = "(a) Population density distribution of SSA countries.", 
+  labs(title = "(A) Population density distribution of SSA countries.", 
   subtitle = 'Grouped by the top 10 most populated countries.',
        x = "Population density (persons per km²)", y = "Frequency", fill = NULL) +
   scale_y_continuous(limits = c(0, 3999), labels = function(y)
@@ -68,169 +68,10 @@ pop_density <- ggplot(data, aes(x = pop_density_sqkm)) +
       guides(fill = guide_legend(ncol = 11, nrow = 1))
 
 
-#########################################
-##SETTLEMENT DISTRIBUTION (ABOVE 1000)##
-#########################################
-data <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
-                          'SSA_gid_2_demand_metrics.shp'))
-data <- data[!duplicated(data$population), ]
-
-data = data %>% group_by(GID_2) %>%
-  summarise(population = sum(population))
-
-data_20 <- data[data$population >= 500, ]
-
-pop_bins <- c(-Inf, 20000, 50000, 100000, 500000, 750000, 1000000, 
-              1250000, Inf)
-data_20$population_bin <- cut(data_20$population, breaks = pop_bins, labels = 
-    c("1 - 20k", "20001 - 50k", "50001 - 100k", "100001 - 500k", 
-      "500001 - 750k", "750001 - 1 Million", "1.1 - 1.25 Million", 
-      "Above 1.25 Million"))
-
-above_50000 <- ggplot() + 
-  geom_sf(data = africa_data, fill = "white", color = "black", linewidth = 0.02) +
-  geom_sf(data = data_20, aes(fill = population_bin), 
-  linewidth = 0.001,) +
-  scale_fill_brewer(palette = "Set3") +
-  labs(title = "(B) Above 1,000 people.",
-       subtitle = "Summed for all GID 2 sub-regions for each country.",
-       fill = "Range") +
-  theme_void() +
-  theme(
-    strip.text.x = element_blank(),
-    panel.border = element_blank(),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.title.y = element_text(size = 6),
-    legend.position = 'bottom',
-    axis.title = element_text(size = 8),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 6),
-    legend.key.size = unit(0.6, "lines"),
-    plot.subtitle = element_text(size = 6),
-    plot.title = element_text(size = 7, face = "bold")) + 
-  guides(fill = guide_legend(nrow = 2))
-
-
-##########################################
-##SETTLEMENT DISTRIBUTION (ABOVE 100000)##
-##########################################
-data_50 <- data[data$population >= 100000, ]
-
-pop_bins <- c(-Inf, 20000, 50000, 100000, 500000, 750000, 1000000, 
-              1250000, Inf)
-data_50$population_bin <- cut(data_50$population, breaks = pop_bins, labels = 
-  c("Below 20k", "20001 - 50k", "50001 - 100k", "100001 - 500k", "500001 - 750k", 
-    "750001 - 1 Million", "1.1 - 1.25 Million", "Above 1.25 Million"))
-
-data_50 <- data_50[, c("population", "population_bin", "geometry")]
-lon <- c(6.2, 6.2, 6.2) 
-lat <- c(6.2, 6.2, 6.2)
-df <- data.frame(population_bin = c("Below 20k", "20001 - 50k", 
-      "50001 - 100k"), population = c(0, 0, 0), lat, lon)
-df <- st_as_sf(df, coords = c("lon", "lat"), crs = 4326) 
-
-data_50 <- rbind(data_50, df)
-
-
-above_100000 <- ggplot() + 
-  geom_sf(data = africa_data, fill = "white", color = "black", linewidth = 0.02) +
-  geom_sf(data = data_50, aes(fill = population_bin), 
-           linewidth = 0.001,color = 'white') +
-  scale_fill_brewer(palette = "Set3") +
-  labs(title = "(C) Above 100,000 people.", 
-       subtitle = "Summed for all GID 2 sub-regions for each country.", 
-       fill = "Range") +
-  theme_void() +
-  theme(
-    strip.text.x = element_blank(),
-    panel.border = element_blank(),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.title.y = element_text(size = 6),
-    legend.position = 'bottom',
-    axis.title = element_text(size = 8),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 6),
-    legend.key.size = unit(0.6, "lines"),
-    plot.subtitle = element_text(size = 6),
-    plot.title = element_text(size = 7, face = "bold")) + 
-  guides(fill = guide_legend(nrow = 2))
-
-###########################################
-##SETTLEMENT DISTRIBUTION (ABOVE 500,000)##
-###########################################
-data_half <- data[data$population >= 500000, ]
-
-pop_bins <- c(-Inf, 20000, 50000, 100000, 500000, 750000, 1000000, 
-              1250000, Inf)
-data_half$population_bin <- cut(data_half$population, breaks = pop_bins, labels = 
-  c("Below 20k", "20001 - 50k", "50001 - 100k", "100001 - 500k", "500001 - 750k", 
-    "750001 - 1 Million", "1.1 - 1.25 Million", "Above 1.25 Million"))
-
-data_half <- data_half[, c("population", "population_bin", "geometry")]
-lon <- c(6.2, 6.2, 6.2, 6.2) 
-lat <- c(6.2, 6.2, 6.2, 6.2)
-df <- data.frame(population_bin = c("Below 20k", "20001 - 50k", "50001 - 100k", 
-      "100001 - 500k"), population = c(0, 0, 0, 0), lat, lon)
-df <- st_as_sf(df, coords = c("lon", "lat"), crs = 4326) 
-
-data_half <- rbind(data_half, df)
-
-above_half <- ggplot() + 
-  geom_sf(data = africa_data, fill = "white", color = "black", linewidth = 0.02) +
-  geom_sf(data = data_half, aes(fill = population_bin), 
-     linewidth = 0.001, color = 'white') +
-  scale_fill_brewer(palette = "Set3") +
-  labs(title = "(D) Above 500,000 people.",
-       subtitle = "Summed for all GID 2 sub-regions for each country.",
-       fill = "Range") +
-  theme_void() +
-  theme(
-    strip.text.x = element_blank(),
-    panel.border = element_blank(),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.title.y = element_text(size = 6),
-    legend.position = 'bottom',
-    axis.title = element_text(size = 8),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 6),
-    legend.key.size = unit(0.6, "lines"),
-    plot.subtitle = element_text(size = 6),
-    plot.title = element_text(size = 7, face = "bold")) + 
-  guides(fill = guide_legend(nrow = 2))
-
-
-########################
-##PANEL DEMAND METRICS##
-########################
-pop_den_panel <- ggarrange(
-  pop_density, legend = 'bottom',
-  ncol = 1)
-
-settlement_panel <- ggarrange(
-  above_50000, 
-  above_100000,align = c('hv'),
-  above_half, common.legend = TRUE,
-  ncol = 3, nrow = 1, legend = 'bottom')
-
-demand_panel <- ggarrange(
-  pop_den_panel, 
-  settlement_panel,
-  ncol = 1, nrow = 2, 
-  common.legend = TRUE, legend='none')
-
-path = file.path(folder, 'figures', 'population_demand_metrics.png')
-png(path, units = "in", width = 7.2, height = 7, res = 300)
-print(demand_panel)
-dev.off()
-
-
 ###############################################
 ##POINT SETTLEMENT DISTRIBUTION (ABOVE 20000)##
 ###############################################
-data <- st_read(file.path(folder, '..', 'results', 'SSA', 'shapefiles', 
+data <- st_read(file.path(folder, '..', 'results', 'design_shapefiles', 
                           'SSA_demand_metrics.shp'))
 data <- data[!duplicated(data$population), ]
 
@@ -256,7 +97,7 @@ below_20000 <- ggplot() +
   geom_sf(data = africa_data,linewidth = 0.02, fill = "gray96") +
   geom_sf(data = data_20, aes(color = population_bin), 
           size = 0.1) +
-  labs(title = "(b) Below 20,000 people.",
+  labs(title = "(B) Below 20,000 people.",
        subtitle = "For all settlement with less than 20,000 people.",
        color = NULL) +
   scale_color_brewer(palette = "Dark2") +
@@ -301,7 +142,7 @@ above_20000 <- ggplot() +
   geom_sf(data = africa_data, linewidth = 0.02, fill = "gray96") +
   geom_sf(data = data_50, aes(color = population_bin), 
           size = 0.1) +
-  labs(title = "(c) Between 20,000 - 50,000 people",
+  labs(title = "(C) Between 20,000 - 50,000 people",
        subtitle = "For all settlement with 20,000 - 50,000 people.",
        color = NULL) +
   scale_color_brewer(palette = "Dark2") +
@@ -346,7 +187,7 @@ above_50000 <- ggplot() +
   geom_sf(data = africa_data, linewidth = 0.02, fill = "gray96") + 
   geom_sf(data = data_half, aes(color = population_bin), 
           size = 0.1) +
-  labs(title = "(d) Above 50,000 people",
+  labs(title = "(D) Above 50,000 people",
        subtitle = "For all settlement with over 50,000 people.",
        color = NULL) +
   scale_color_brewer(palette = "Dark2") +

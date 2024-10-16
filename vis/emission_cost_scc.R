@@ -81,14 +81,6 @@ per_user_emissions <-
 df1 <- data %>% 
   select(annualized_per_user_emissions, strategy, decile, algorithm)
 
-data$decile = factor(data$decile, levels = c('Decile 1', 'Decile 2', 'Decile 3', 
-   'Decile 4', 'Decile 5', 'Decile 6', 'Decile 7', 'Decile 8', 'Decile 9', 
-   'Decile 10'), labels = c('Decile 1 \n(>958 km²)', 
-   'Decile 2 \n(<957 km²)', 'Decile 3 \n(<455 km²)', 
-   'Decile 4 \n(<272 km²)', 'Decile 5 \n(<171 km²)', 
-   'Decile 6 \n(<106 km²)', 'Decile 7 \n(<63 km²)', 
-   'Decile 8 \n(<39 km²)', 'Decile 9 \n(<21 km²)', 
-   'Decile 10 \n(<9 km²)'))
 df1 = df1 %>%
   group_by(strategy, decile, algorithm) %>%
   summarize(mean = mean(annualized_per_user_emissions),
@@ -108,7 +100,7 @@ annualized_per_user_emissions <-
      position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") + 
   labs(colour = NULL, 
-       title = "(B) Fiber Broadband Greenhouse Gas (GHG) Emissions Per User", 
+       title = "(B) Fiber Broadband Greenhouse Gas (GHG) Emissions Reported Per User", 
        subtitle = "Annualized per user emissions grouped by network level and spatial optimization algorithm.", 
        x = "Population Density Decile (Population per km²)", 
        y = bquote("Annualized per user emissions (kg CO"["2"] ~ " eq. per user)")) +
