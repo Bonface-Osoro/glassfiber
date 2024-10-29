@@ -519,4 +519,4 @@ combine_existing_fiber_shapefiles('core_edges_existing')'''
 #generate_population_decile()
 #combine_pcsf_fiber_lines()
 #combine_pcsf_fiber_nodes()
-combine_shapefiles()
+#combine_shapefiles()
