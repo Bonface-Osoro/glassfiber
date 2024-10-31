@@ -27,11 +27,16 @@ def run_uq_processing_cost():
     
     """
     path = os.path.join(RESULTS, 'uq_parameters_cost.csv') 
+    ssa = os.path.join(SSA_RESULTS, 'SSA_decile_summary_stats.csv')
 
     if not os.path.exists(path):
         print('Cannot locate uq_parameters_cost.csv')
 
     df = pd.read_csv(path)
+    df1 = pd.read_csv(ssa)
+    df1 = df1.drop(columns = ['total_poor_unconnected'])
+    df1 = df1.rename(columns = {'total_population': 'population'})
+    df = pd.merge(df, df1, on = 'decile', how = 'inner')
     df = df.to_dict('records')
 
     results = []
@@ -54,6 +59,8 @@ def run_uq_processing_cost():
         
         per_user_tco = (total_cost_ownership / item['total_population'])
 
+        total_ssa_tco_usd = per_user_tco * item['population']
+
         per_user_annualized_usd = (per_user_tco / item['assessment_years'])
 
         per_monthly_tco_usd = per_user_annualized_usd / 12
@@ -65,6 +72,7 @@ def run_uq_processing_cost():
             'total_cost_ownership' : total_cost_ownership,
             'mean_connected' : item['total_population'],
             'per_user_tco' : per_user_tco,
+            'total_ssa_tco_usd' : total_ssa_tco_usd,
             'per_user_annualized_usd' : per_user_annualized_usd,
             'per_monthly_tco_usd' : per_monthly_tco_usd,
             'algorithm' : item['algorithm'],
@@ -92,11 +100,16 @@ def run_uq_processing_emission():
     
     """
     path = os.path.join(RESULTS, 'uq_parameters_emission.csv') 
+    ssa = os.path.join(SSA_RESULTS, 'SSA_decile_summary_stats.csv')
 
     if not os.path.exists(path):
         print('Cannot locate uq_parameters_emission.csv')
 
     df = pd.read_csv(path)
+    df1 = pd.read_csv(ssa)
+    df1 = df1.drop(columns = ['total_poor_unconnected'])
+    df1 = df1.rename(columns = {'total_population': 'population'})
+    df = pd.merge(df, df1, on = 'decile', how = 'inner')
     df = df.to_dict('records')
 
     results = []
@@ -133,6 +146,8 @@ def run_uq_processing_emission():
         user_emissions_kg_per_user = (total_emissions_ghg_kg / 
                                       item['total_population'])
         
+        total_emissions_ssa_kg = user_emissions_kg_per_user * item['population']
+        
         annualized_per_user_emissions = (user_emissions_kg_per_user / 
                                          item['assessment_years'])
         
@@ -140,6 +155,8 @@ def run_uq_processing_emission():
                                             item['social_carbon_cost_usd'])
         
         per_user_scc_usd = (social_carbon_cost / item['total_population'])
+
+        total_ssa_scc_usd = per_user_scc_usd * item['population']
         
         per_user_annualized_scc_usd = (per_user_scc_usd / 
                                        item['assessment_years'])
@@ -151,11 +168,13 @@ def run_uq_processing_emission():
             'lca_ops_kg' : lca_ops,
             'lca_eolts_kg' : lca_eolts,
             'total_emissions_ghg_kg' : total_emissions_ghg_kg,
+            'total_emissions_ssa_kg' : total_emissions_ssa_kg,
             'total_population' : item['total_population'],
             'social_carbon_cost_usd' : social_carbon_cost,
             'user_emissions_kg_per_user' : user_emissions_kg_per_user,
             'annualized_per_user_emissions' : annualized_per_user_emissions,
             'per_user_scc_usd' : per_user_scc_usd,
+            'total_ssa_scc_usd' : total_ssa_scc_usd, 
             'per_user_annualized_scc_usd' : per_user_annualized_scc_usd,
             'decile' : item['decile'],
             'strategy' : item['strategy'],
@@ -182,4 +201,4 @@ if __name__ == '__main__':
     run_uq_processing_cost()
 
     print('Running fiber broadband emissions model')
-    run_uq_processing_emission()
+    #run_uq_processing_emission()
