@@ -50,7 +50,7 @@ per_user_emissions <-
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
                 position = position_dodge(.9), color = 'red',size = 0.5) + 
-  geom_text(aes(label = formatC(signif(after_stat(y), 2), 
+  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
        digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
        position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") + 
@@ -121,6 +121,53 @@ annualized_per_user_emissions <-
   labels = function(y)format(y, scientific = FALSE), limit = c(0, 11)) +
   facet_wrap( ~ algorithm, nrow = 2) + 
   theme(strip.text = element_text(size = 14)) 
+
+#############################
+###### TOTAL EMISSIONS ######
+#############################
+df7 <- data %>% 
+  select(total_emissions_ssa_kg, strategy, decile, algorithm)
+
+df7 = df7 %>%
+  group_by(strategy, decile, algorithm) %>%
+  summarize(mean = mean(total_emissions_ssa_kg/1e9),
+            sd = sd(total_emissions_ssa_kg/1e9))
+
+label_totals <- df7 %>%
+  group_by(decile, strategy) %>%
+  summarize(mean_value = sum(mean))
+
+total_ssa_emissions <- 
+  ggplot(df7, aes(x = decile, y = mean, fill = strategy)) +
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
+                position = position_dodge(.9), color = 'red',size = 0.5) + 
+  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+       digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
+       position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
+  scale_fill_brewer(palette = "Dark2") + 
+  labs(colour = NULL, 
+       title = "(A) Fiber Broadband Total Greenhouse Gas (GHG) Emissions for SSA", 
+       subtitle = "Total emissions grouped by network level and spatial optimization algorithm.", 
+       x = "Population Density Decile (Population per km²)", 
+       y = bquote("Total emissions (mt CO"["2"] ~ " eq.)")) +
+  theme(
+    legend.position = 'bottom',
+    axis.text.x = element_text(size = 11),
+    panel.spacing = unit(0.6, "lines"),
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 14),
+    axis.text.y = element_text(size = 10),
+    axis.title.y = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 12),
+    axis.title.x = element_text(size = 11)
+  ) + expand_limits(y = 0) +
+  guides(fill = guide_legend(ncol = 3, title = 'Network level')) +
+  scale_y_continuous(expand = c(0, 0),
+     labels = function(y)format(y, scientific = FALSE), limit = c(0, 30)) +
+  facet_wrap( ~ algorithm, nrow = 2) + 
+  theme(strip.text = element_text(size = 14))
 
 ########################
 ##PANEL USER EMISSIONS##
@@ -221,6 +268,50 @@ anualized_per_user_scc_costs <- ggplot(df3, aes(x = decile, y = mean, fill = str
      labels = function(y)format(y, scientific = FALSE), limit = c(0, 0.84)) +
   facet_wrap( ~ algorithm, nrow = 2) + theme(strip.text = element_text(size = 14))
 
+###########################
+###### TOTAL SSA SCC ######
+###########################
+df8 <- data %>% 
+  select(total_ssa_scc_usd, strategy, decile, algorithm)
+
+df8 = df8 %>%
+  group_by(strategy, decile, algorithm) %>%
+  summarize(mean = mean(total_ssa_scc_usd/1e9),
+            sd = sd(total_ssa_scc_usd/1e9))
+
+label_totals <- df8 %>%
+  group_by(decile, strategy) %>%
+  summarize(mean_value = sum(mean))
+
+total_ssa_scc <- ggplot(df8, aes(x = decile, y = mean, fill = strategy)) +
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
+                position = position_dodge(.9), color = 'red',size = 0.5) + 
+  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+      digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
+      position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
+  scale_fill_brewer(palette = "Dark2") +
+  labs(colour = NULL, title = "(B) Fiber Broadband Total Social Carbon Cost (SCC) for SSA",
+       subtitle = "Total SCC categorized by deciles, grouped by network level and spatial optimization algorithm.",
+       x = "Population Density Decile (Population per km²)", 
+       y = bquote("Total SCC ($US billions)")) +
+  theme(
+    legend.position = 'bottom',
+    axis.text.x = element_text(size = 11),
+    panel.spacing = unit(0.6, "lines"),
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 14),
+    axis.text.y = element_text(size = 10),
+    axis.title.y = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 12),
+    axis.title.x = element_text(size = 11)
+  ) + expand_limits(y = 0) +
+  guides(fill = guide_legend(ncol = 3, title = 'Network level')) +
+  scale_y_continuous(expand = c(0, 0),
+      labels = function(y)format(y, scientific = FALSE), limit = c(0, 2)) +
+  facet_wrap( ~ algorithm, nrow = 2) + theme(strip.text = element_text(size = 14))
+
 ##############
 ##PANEL SCC ##
 ##############
@@ -231,6 +322,15 @@ aggregate_SCC <- ggarrange(
 path = file.path(folder, 'figures', 'aggregate_SCC.png')
 png(path, units="in", width=12, height=14, res=300)
 print(aggregate_SCC)
+dev.off()
+
+SSA_total_emissions <- ggarrange(
+  total_ssa_emissions, total_ssa_scc, ncol = 1, nrow = 2,
+  align = c('hv'), common.legend = TRUE, legend='bottom')
+
+path = file.path(folder, 'figures', 'SSA_total_emissions.png')
+png(path, units="in", width=12, height=14, res=300)
+print(SSA_total_emissions)
 dev.off()
 
 ##############################################
@@ -300,6 +400,50 @@ annualized_per_user_tco <- ggplot(df4, aes(x = decile, y = mean, fill = strategy
      labels = function(y)format(y, scientific = FALSE), limit = c(0, 38)) +
   facet_wrap( ~ algorithm, nrow = 2) + theme(strip.text = element_text(size = 14))
 
+####################
+## TOTAL SSA TCO ###
+####################
+df6 <- data1 %>% select(total_ssa_tco_usd, strategy, decile, algorithm)
+
+df6 = df6 %>%
+  group_by(strategy, decile, algorithm) %>%
+  summarize(mean = mean(total_ssa_tco_usd/1e9),
+            sd = sd(total_ssa_tco_usd/1e9))
+
+label_totals <- df6 %>%
+  group_by(decile, strategy) %>%
+  summarize(mean_value = sum(mean))
+
+total_ssa_tco <- ggplot(df6, aes(x = decile, y = mean, fill = strategy)) +
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
+                position = position_dodge(.9), color = 'red',size = 0.5) + 
+  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+      digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
+      position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
+  scale_fill_brewer(palette = "Dark2") +
+  labs(colour = NULL, title = "(A) Fiber Broadband Total Cost of Ownership (TCO) for SSA",
+       subtitle = "Total TCO categorized by deciles, grouped by network level and spatial optimization algorithm.",
+       x = "Population Density Decile (Population per km²)", 
+       y = bquote("Total TCO ($US billions)")) +
+  theme(
+    legend.position = 'bottom',
+    axis.text.x = element_text(size = 11),
+    panel.spacing = unit(0.6, "lines"),
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 14),
+    axis.text.y = element_text(size = 10),
+    axis.title.y = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 12),
+    axis.title.x = element_text(size = 11)
+  ) + expand_limits(y = 0) +
+  guides(fill = guide_legend(ncol = 3, title = 'Network level')) +
+  scale_y_continuous(expand = c(0, 0),
+      labels = function(y)format(y, scientific = FALSE), limit = c(0, 135)) +
+  facet_wrap( ~ algorithm, nrow = 2) + theme(strip.text = element_text(size = 14))
+
+
 ###########################
 ## MONTHLY TCO PER USER ###
 ###########################
@@ -354,5 +498,25 @@ path = file.path(folder, 'figures', 'aggregate_TCO.png')
 png(path, units="in", width=12, height=14, res=300)
 print(aggregate_tco)
 dev.off()
+
+path = file.path(folder, 'figures', 'total_ssa_tco.png')
+png(path, units="in", width=12, height=9, res=300)
+print(total_ssa_tco)
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
