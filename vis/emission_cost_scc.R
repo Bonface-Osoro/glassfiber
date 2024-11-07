@@ -50,7 +50,7 @@ per_user_emissions <-
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
                 position = position_dodge(.9), color = 'red',size = 0.5) + 
-  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+  geom_text(aes(label = formatC(signif(after_stat(y), 4), 
        digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
        position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") + 
@@ -95,12 +95,12 @@ annualized_per_user_emissions <-
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
                 position = position_dodge(.9), color = 'red',size = 0.5) + 
-  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+  geom_text(aes(label = formatC(signif(after_stat(y), 4), 
      digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
      position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") + 
   labs(colour = NULL, 
-       title = "(B) Fiber Broadband Greenhouse Gas (GHG) Emissions Reported Per User", 
+       title = "(B) Fiber Broadband GHG Emissions Reported Per User", 
        subtitle = "Annualized per user emissions grouped by network level and spatial optimization algorithm.", 
        x = "Population Density Decile (Population per km²)", 
        y = bquote("Annualized per user emissions (kg CO"["2"] ~ " eq. per user)")) +
@@ -142,7 +142,7 @@ total_ssa_emissions <-
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
                 position = position_dodge(.9), color = 'red',size = 0.5) + 
-  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+  geom_text(aes(label = formatC(signif(after_stat(y), 4), 
        digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
        position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") + 
@@ -150,7 +150,7 @@ total_ssa_emissions <-
        title = "(A) Fiber Broadband Total Greenhouse Gas (GHG) Emissions for SSA", 
        subtitle = "Total emissions grouped by network level and spatial optimization algorithm.", 
        x = "Population Density Decile (Population per km²)", 
-       y = bquote("Total emissions (mt CO"["2"] ~ " eq.)")) +
+       y = bquote("Total emissions (Mt CO"["2"] ~ " eq.)")) +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 11),
@@ -200,7 +200,7 @@ per_user_scc_costs <- ggplot(df2, aes(x = decile, y = mean, fill = strategy)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
                 position = position_dodge(.9), color = 'red',size = 0.5) + 
-  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+  geom_text(aes(label = formatC(signif(after_stat(y), 4), 
                                 digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
               position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") +
@@ -243,11 +243,11 @@ anualized_per_user_scc_costs <- ggplot(df3, aes(x = decile, y = mean, fill = str
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
                 position = position_dodge(.9), color = 'red',size = 0.5) + 
-  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+  geom_text(aes(label = formatC(signif(after_stat(y), 4), 
        digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
               position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") +
-  labs(colour = NULL, title = "(B) Fiber Broadband Social Carbon Cost (SCC) Reported Per User",
+  labs(colour = NULL, title = "(B) Fiber Broadband SCC Reported Per User",
        subtitle = "Annualized per user SCC categorized by deciles, grouped by network level and spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
        y = bquote("Annualized average SCC per user ($US/User)")) +
@@ -287,7 +287,7 @@ total_ssa_scc <- ggplot(df8, aes(x = decile, y = mean, fill = strategy)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
                 position = position_dodge(.9), color = 'red',size = 0.5) + 
-  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+  geom_text(aes(label = formatC(signif(after_stat(y), 4), 
       digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
       position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") +
@@ -375,7 +375,7 @@ annualized_per_user_tco <- ggplot(df4, aes(x = decile, y = mean, fill = strategy
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
                 position = position_dodge(.9), color = 'red',size = 0.5) + 
-  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+  geom_text(aes(label = formatC(signif(after_stat(y), 4), 
       digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
               position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") +
@@ -418,7 +418,7 @@ total_ssa_tco <- ggplot(df6, aes(x = decile, y = mean, fill = strategy)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
                 position = position_dodge(.9), color = 'red',size = 0.5) + 
-  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+  geom_text(aes(label = formatC(signif(after_stat(y), 4), 
       digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
       position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") +
@@ -462,11 +462,11 @@ monthly_per_user_tco <- ggplot(df5, aes(x = decile, y = mean, fill = strategy)) 
   geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1,
                 position = position_dodge(.9), color = 'red',size = 0.5) + 
-  geom_text(aes(label = formatC(signif(after_stat(y), 1), 
+  geom_text(aes(label = formatC(signif(after_stat(y), 4), 
        digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
               position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_brewer(palette = "Dark2") +
-  labs(colour = NULL, title = "(B) Fiber Broadband Total Cost of Ownership (TCO) Reported Per User",
+  labs(colour = NULL, title = "(B) Fiber Broadband TCO Reported Per User",
        subtitle = "Monthly TCO per user categorized by deciles, grouped by network level and spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
        y = bquote("Monthly TCO per user ($US/User)")) +
