@@ -396,11 +396,11 @@ ZAF_access_pcsf_fiber <- ggplot() +
 country_plots <- ggarrange(
   NGA_access_prims_fiber, NGA_access_pcsf_fiber,
   ETH_access_prims_fiber, ETH_access_pcsf_fiber,
-  DRC_access_prims_fiber, DRC_access_pcsf_fiber,
+  #DRC_access_prims_fiber, DRC_access_pcsf_fiber,
   #TZA_access_prims_fiber, TZA_access_pcsf_fiber,
   #ZAF_access_prims_fiber, ZAF_access_pcsf_fiber,
   common.legend = TRUE, align = c('hv'),
-  ncol = 2, nrow = 3, legend = 'bottom') 
+  ncol = 2, nrow = 2, legend = 'bottom') 
 
 path = file.path(folder, 'figures', 'country_plots.png')
 png(path, units = "in", width = 13, height = 13, res = 300)
