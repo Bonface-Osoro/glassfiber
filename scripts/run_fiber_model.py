@@ -81,6 +81,7 @@ def run_uq_processing_cost():
         })
 
         df = pd.DataFrame.from_dict(results)
+        df['technology'] = 'fiber'
 
         filename = 'SSA_fiber_cost_results.csv' 
         if not os.path.exists(SSA_RESULTS):
@@ -182,6 +183,7 @@ def run_uq_processing_emission():
         })
 
         df = pd.DataFrame.from_dict(results)
+        df['technology'] = 'fiber'
 
         filename = 'SSA_fiber_emission_results.csv'
         if not os.path.exists(SSA_RESULTS):
@@ -201,4 +203,4 @@ if __name__ == '__main__':
     run_uq_processing_cost()
 
     print('Running fiber broadband emissions model')
-    #run_uq_processing_emission()
+    run_uq_processing_emission()
