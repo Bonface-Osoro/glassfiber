@@ -53,7 +53,7 @@ per_user_emissions <-
   geom_text(aes(label = formatC(signif(after_stat(y), 4), 
        digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
        position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
-  scale_fill_brewer(palette = "Dark2") + 
+  scale_fill_viridis_d(direction = 1) + 
   labs(colour = NULL, title = "(A) Fiber Broadband Greenhouse Gas (GHG) Emissions Reported Per User", 
        subtitle = "Per user emissions categorized by deciles, grouped by network level and spatial optimization algorithm.", 
        x = "Population Density Decile (Population per km²)", 
@@ -98,7 +98,7 @@ annualized_per_user_emissions <-
   geom_text(aes(label = formatC(signif(after_stat(y), 4), 
      digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
      position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
-  scale_fill_brewer(palette = "Dark2") + 
+  scale_fill_viridis_d(direction = 1) + 
   labs(colour = NULL, 
        title = "(B) Fiber Broadband GHG Emissions Reported Per User", 
        subtitle = "Annualized per user emissions grouped by network level and spatial optimization algorithm.", 
@@ -145,7 +145,7 @@ total_ssa_emissions <-
   geom_text(aes(label = formatC(signif(after_stat(y), 4), 
        digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
        position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
-  scale_fill_brewer(palette = "Dark2") + 
+  scale_fill_viridis_d(direction = 1) + 
   labs(colour = NULL, 
        title = "(A) Fiber Broadband Total Greenhouse Gas (GHG) Emissions for SSA", 
        subtitle = "Total emissions grouped by network level and spatial optimization algorithm.", 
@@ -203,11 +203,11 @@ per_user_scc_costs <- ggplot(df2, aes(x = decile, y = mean, fill = strategy)) +
   geom_text(aes(label = formatC(signif(after_stat(y), 4), 
                                 digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
               position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
-  scale_fill_brewer(palette = "Dark2") +
+  scale_fill_viridis_d(direction = 1) +
   labs(colour = NULL, title = "(A) Fiber Broadband Social Carbon Cost (SCC) Reported Per User",
        subtitle = "Per user SCC categorized by deciles, grouped by network level and spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
-       y = bquote("Average SCC per user ($US/User)")) +
+       y = bquote("Average SCC per user (US$/User)")) +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 11),
@@ -246,11 +246,11 @@ anualized_per_user_scc_costs <- ggplot(df3, aes(x = decile, y = mean, fill = str
   geom_text(aes(label = formatC(signif(after_stat(y), 4), 
        digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
               position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
-  scale_fill_brewer(palette = "Dark2") +
+  scale_fill_viridis_d(direction = 1) +
   labs(colour = NULL, title = "(B) Fiber Broadband SCC Reported Per User",
        subtitle = "Annualized per user SCC categorized by deciles, grouped by network level and spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
-       y = bquote("Annualized average SCC per user ($US/User)")) +
+       y = bquote("Annualized average SCC per user (US$/User)")) +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 11),
@@ -290,11 +290,11 @@ total_ssa_scc <- ggplot(df8, aes(x = decile, y = mean, fill = strategy)) +
   geom_text(aes(label = formatC(signif(after_stat(y), 4), 
       digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
       position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
-  scale_fill_brewer(palette = "Dark2") +
+  scale_fill_viridis_d(direction = 1) +
   labs(colour = NULL, title = "(B) Fiber Broadband Total Social Carbon Cost (SCC) for SSA",
        subtitle = "Total SCC categorized by deciles, grouped by network level and spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
-       y = bquote("Total SCC ($US billions)")) +
+       y = bquote("Total SCC (US$ billions)")) +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 11),
@@ -378,11 +378,11 @@ annualized_per_user_tco <- ggplot(df4, aes(x = decile, y = mean, fill = strategy
   geom_text(aes(label = formatC(signif(after_stat(y), 4), 
       digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
               position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
-  scale_fill_brewer(palette = "Dark2") +
+  scale_fill_viridis_d(direction = 1) +
   labs(colour = NULL, title = "(A) Fiber Broadband Total Cost of Ownership (TCO) Reported Per User",
        subtitle = "Annualized average TCO per user categorized by deciles, grouped by network level and spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
-       y = bquote("Annualized average TCO per user ($US/User)")) +
+       y = bquote("Annualized average TCO per user (US$/User)")) +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 11),
@@ -421,11 +421,11 @@ total_ssa_tco <- ggplot(df6, aes(x = decile, y = mean, fill = strategy)) +
   geom_text(aes(label = formatC(signif(after_stat(y), 4), 
       digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
       position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
-  scale_fill_brewer(palette = "Dark2") +
+  scale_fill_viridis_d(direction = 1) +
   labs(colour = NULL, title = "(A) Fiber Broadband Total Cost of Ownership (TCO) for SSA",
        subtitle = "Total TCO categorized by deciles, grouped by network level and spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
-       y = bquote("Total TCO ($US billions)")) +
+       y = bquote("Total TCO (US$ billions)")) +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 11),
@@ -465,11 +465,11 @@ monthly_per_user_tco <- ggplot(df5, aes(x = decile, y = mean, fill = strategy)) 
   geom_text(aes(label = formatC(signif(after_stat(y), 4), 
        digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
               position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
-  scale_fill_brewer(palette = "Dark2") +
+  scale_fill_viridis_d(direction = 1) +
   labs(colour = NULL, title = "(B) Fiber Broadband TCO Reported Per User",
        subtitle = "Monthly TCO per user categorized by deciles, grouped by network level and spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
-       y = bquote("Monthly TCO per user ($US/User)")) +
+       y = bquote("Monthly TCO per user (US$/User)")) +
   theme(
     legend.position = 'bottom',
     axis.text.x = element_text(size = 11),

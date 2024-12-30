@@ -20,6 +20,7 @@ CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
 RESULTS = os.path.join(BASE_PATH, '..', 'results', 'fiber')
 SSA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'SSA')
+VALID = os.path.join(BASE_PATH, '..', '..', 'geosafi-consav', 'results', 'SSA')
 
 def run_uq_processing_cost():
     """
@@ -28,15 +29,20 @@ def run_uq_processing_cost():
     """
     path = os.path.join(RESULTS, 'uq_parameters_cost.csv') 
     ssa = os.path.join(SSA_RESULTS, 'SSA_decile_summary_stats.csv')
+    gni_data = os.path.join(VALID, 'SSA_decile_summary_stats.csv')
 
     if not os.path.exists(path):
         print('Cannot locate uq_parameters_cost.csv')
 
     df = pd.read_csv(path)
     df1 = pd.read_csv(ssa)
+    gni = pd.read_csv(gni_data)
+    gni = gni[['decile', 'gni']]
+
     df1 = df1.drop(columns = ['total_poor_unconnected'])
     df1 = df1.rename(columns = {'total_population': 'population'})
     df = pd.merge(df, df1, on = 'decile', how = 'inner')
+    df = pd.merge(df, gni, on = 'decile')
     df = df.to_dict('records')
 
     results = []
@@ -64,7 +70,8 @@ def run_uq_processing_cost():
         per_user_annualized_usd = (per_user_tco / item['assessment_years'])
 
         per_monthly_tco_usd = per_user_annualized_usd / 12
-        
+
+        affordability_ratio = per_monthly_tco_usd / item['gni']
         
         results.append({
             'capex_cost_usd' : capex_cost_usd,
@@ -75,6 +82,8 @@ def run_uq_processing_cost():
             'total_ssa_tco_usd' : total_ssa_tco_usd,
             'per_user_annualized_usd' : per_user_annualized_usd,
             'per_monthly_tco_usd' : per_monthly_tco_usd,
+            'gni_usd' : item['gni'],
+            'affordability_ratio' : affordability_ratio,
             'algorithm' : item['algorithm'],
             'strategy' : item['strategy'],
             'decile' : item['decile']
@@ -203,4 +212,4 @@ if __name__ == '__main__':
     run_uq_processing_cost()
 
     print('Running fiber broadband emissions model')
-    run_uq_processing_emission()
+    #run_uq_processing_emission()
