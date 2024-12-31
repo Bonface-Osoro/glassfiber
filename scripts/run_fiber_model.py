@@ -64,11 +64,11 @@ def run_uq_processing_cost():
         total_cost_ownership = fb.total_cost_ownership(capex_cost_usd, 
                 opex_cost_usd, item['discount_rate'], item['assessment_years'])
         
-        per_user_tco = ((total_cost_ownership / item['total_population']) 
-        * item['adoption_rate_perc'])
+        per_user_tco = ((total_cost_ownership / (item['total_population'] 
+        * (item['adoption_rate_perc'] / 100))))
 
-        total_ssa_tco_usd = ((per_user_tco * item['population']) / 
-        item['adoption_rate_perc'])
+        total_ssa_tco_usd = (((per_user_tco * item['population'])) 
+        * (item['adoption_rate_perc'] / 100))
 
         per_user_annualized_usd = (per_user_tco / item['assessment_years'])
 

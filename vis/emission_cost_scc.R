@@ -397,7 +397,7 @@ annualized_per_user_tco <- ggplot(df4, aes(x = decile, y = mean, fill = strategy
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 3, title = 'Network level')) +
   scale_y_continuous(expand = c(0, 0),
-     labels = function(y)format(y, scientific = FALSE), limit = c(0, 2498)) +
+     labels = function(y)format(y, scientific = FALSE), limit = c(0, 64)) +
   facet_wrap( ~ algorithm, nrow = 2) + theme(strip.text = element_text(size = 14))
 
 ####################
@@ -484,7 +484,7 @@ monthly_per_user_tco <- ggplot(df5, aes(x = decile, y = mean, fill = strategy)) 
   ) + expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 3, title = 'Network level')) +
   scale_y_continuous(expand = c(0, 0),
-     labels = function(y)format(y, scientific = FALSE), limit = c(0, 204)) +
+     labels = function(y)format(y, scientific = FALSE), limit = c(0, 5.4)) +
   facet_wrap( ~ algorithm, nrow = 2) + theme(strip.text = element_text(size = 14))
 
 ###################
