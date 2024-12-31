@@ -37,7 +37,8 @@ def run_uq_processing_cost():
     df = pd.read_csv(path)
     df1 = pd.read_csv(ssa)
     gni = pd.read_csv(gni_data)
-    gni = gni[['decile', 'gni']]
+    gni = gni[['decile', 'cost_per_1GB_usd', 'monthly_income_usd', 
+               'cost_per_month_usd', 'adoption_rate_perc', 'arpu_usd']]
 
     df1 = df1.drop(columns = ['total_poor_unconnected'])
     df1 = df1.rename(columns = {'total_population': 'population'})
@@ -63,15 +64,17 @@ def run_uq_processing_cost():
         total_cost_ownership = fb.total_cost_ownership(capex_cost_usd, 
                 opex_cost_usd, item['discount_rate'], item['assessment_years'])
         
-        per_user_tco = (total_cost_ownership / item['total_population'])
+        per_user_tco = ((total_cost_ownership / item['total_population']) 
+        * item['adoption_rate_perc'])
 
-        total_ssa_tco_usd = per_user_tco * item['population']
+        total_ssa_tco_usd = ((per_user_tco * item['population']) / 
+        item['adoption_rate_perc'])
 
         per_user_annualized_usd = (per_user_tco / item['assessment_years'])
 
         per_monthly_tco_usd = per_user_annualized_usd / 12
 
-        affordability_ratio = per_monthly_tco_usd / item['gni']
+        percent_gni = per_monthly_tco_usd / item['monthly_income_usd'] * 100
         
         results.append({
             'capex_cost_usd' : capex_cost_usd,
@@ -82,8 +85,12 @@ def run_uq_processing_cost():
             'total_ssa_tco_usd' : total_ssa_tco_usd,
             'per_user_annualized_usd' : per_user_annualized_usd,
             'per_monthly_tco_usd' : per_monthly_tco_usd,
-            'gni_usd' : item['gni'],
-            'affordability_ratio' : affordability_ratio,
+            'monthly_income_usd' : item['monthly_income_usd'],
+            'cost_per_1GB_usd' : item['cost_per_1GB_usd'],
+            'cost_per_month_usd' : item['cost_per_month_usd'],
+            'adoption_rate_perc' : item['adoption_rate_perc'],
+            'arpu_usd' : item['arpu_usd'],
+            'percent_gni' : percent_gni,
             'algorithm' : item['algorithm'],
             'strategy' : item['strategy'],
             'decile' : item['decile']
