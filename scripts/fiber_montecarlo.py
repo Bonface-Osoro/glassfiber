@@ -81,6 +81,13 @@ def multinetwork_fiber_costs(i, fiber_params):
         
         other_costs_usd = random.randint(fiber_params['other_low_costs_usd'], 
                                 fiber_params['other_high_costs_usd'])
+
+        fiber_speed_gbps = random.randint(fiber_params['min_fiber_speed_gbps'], 
+            fiber_params['max_fiber_speed_gbps'])
+        
+        node_pwr_low_kWh_per_km_gbps = random.uniform(
+            fiber_params['node_pwr_low_kWh_per_km_gbps'], 
+            fiber_params['node_pwr_high_kWh_per_km_gbps'])
         
         output.append({
             'olt_usd' : olt_usd,
@@ -94,6 +101,8 @@ def multinetwork_fiber_costs(i, fiber_params):
             'power_usd' : power_usd,
             'regulatory_usd' : regulatory_usd,
             'customer_usd' : customer_usd,
+            'fiber_speed_gbps' : fiber_speed_gbps,
+            'node_power_kWh_per_km_gbps' : node_pwr_low_kWh_per_km_gbps,
             'other_costs_usd' : other_costs_usd,
             'assessment_years' : fiber_params['assessment_period_year'],
             'discount_rate' : fiber_params['discount_rate_percent'],
@@ -176,6 +185,9 @@ def multinetwork_fiber_emissions(i, fiber_params):
         pcb_kg = random.uniform(fiber_params['pcb_low_kg'], 
             fiber_params['pcb_high_kg'])
         
+        concrete_kg = random.uniform(fiber_params['machine_concrete_low_kg'], 
+            fiber_params['machine_concrete_high_kg'])
+        
         pvc_kg = random.randint(fiber_params['pvc_low_kg'], 
             fiber_params['pvc_high_kg'])
         
@@ -191,18 +203,24 @@ def multinetwork_fiber_emissions(i, fiber_params):
         hours_per_km = random.randint(fiber_params['hours_low_per_km'], 
             fiber_params['hours_high_per_km'])
         
-        fiber_point_pwr_kwh = random.randint(fiber_params['fiber_point_pwr_low_kwh'], 
-            fiber_params['fiber_point_pwr_high_kwh'])
+        fiber_speed_gbps = random.randint(fiber_params['min_fiber_speed_gbps'], 
+            fiber_params['max_fiber_speed_gbps'])
+        
+        node_power_kWh_per_km_gbps = random.uniform(
+            fiber_params['node_pwr_low_kWh_per_km_gbps'], 
+            fiber_params['node_pwr_high_kWh_per_km_gbps'])
         
         output.append({
             'fiber_cable_kg_per_km' : fiber_cable_kg_per_km,
             'pcb_kg' : pcb_kg,
             'pvc_kg' : pvc_kg,
             'steel_kg' : steel_kg,
+            'concrete_kg' : concrete_kg,
             'router' : router,
             'glass_kg_co2e' : fiber_params['glass_kg_co2e'],
             'pcb_kg_co2e' : fiber_params['pcb_kg_co2e'],
             'steel_kg_co2e' : fiber_params['steel_kg_co2e'],
+            'concrete_kg_co2e' : fiber_params['concrete_kg_co2e'],
             'pvc_kg_co2e' : fiber_params['pvc_kg_co2e'],
             'router_kg_co2e' : fiber_params['olnu_kg_co2e'],
             'electricity_kg_co2e' : fiber_params['electricity_kg_co2e'],
@@ -210,9 +228,11 @@ def multinetwork_fiber_emissions(i, fiber_params):
             'plastics_factor_kgco2e' : fiber_params['plastics_factor_kgco2'],
             'metals_factor_kgco2e' : fiber_params['metals_factor_kgco2'],
             'diesel_factor_kgco2e' : fiber_params['diesel_factor_kgco2e'],
+            'container_ship_kgco2e' : fiber_params['container_ship_kgco2e'],
             'fuel_efficiency' : fuel_efficiency,
             'hours_per_km' : hours_per_km,
-            'fiber_point_pwr_kwh' : fiber_point_pwr_kwh,
+            'fiber_speed_gbps' : fiber_speed_gbps,
+            'node_power_kWh_per_km_gbps' : node_power_kWh_per_km_gbps,
             'assessment_years' : fiber_params['assessment_period_year'],
             'social_carbon_cost_usd' : fiber_params['social_carbon_cost_usd'],
             'decile' : decile,
@@ -273,4 +293,4 @@ if __name__ == '__main__':
     uq_inputs_costs(parameters)
 
     print('Running uq_inputs_emissions_generator()')
-    #uq_inputs_emissions(parameters)
+    uq_inputs_emissions(parameters)

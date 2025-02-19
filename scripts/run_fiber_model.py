@@ -13,6 +13,7 @@ import time
 import pandas as pd
 import glassfibre.fiber as fb
 from tqdm import tqdm
+from inputs import maritime, electricity_costs
 pd.options.mode.chained_assignment = None 
 
 CONFIG = configparser.ConfigParser()
@@ -21,6 +22,39 @@ BASE_PATH = CONFIG['file_locations']['base_path']
 RESULTS = os.path.join(BASE_PATH, '..', 'results', 'fiber')
 SSA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'SSA')
 VALID = os.path.join(BASE_PATH, '..', '..', 'geosafi-consav', 'results', 'SSA')
+
+
+def generate_ssa_costs():
+    """
+    This function generates the data on the maritime distance of shipping 
+    components by sea from the port of China to the port of the SSA country. It 
+    also reads and stores the cost of electricity in US$ per kWh in each SSA 
+    country.
+
+    Returns
+    -------
+    df : dataframe
+        Dataframe containing the mean maritime distance of the SSA country deciles.
+    """
+    ssa = os.path.join(SSA_RESULTS, 'SSA_subregional_population_deciles.csv')
+    df = pd.read_csv(ssa)
+    df[['maritime_km', 'cost_kWh']] = ''
+
+    for i in range(len(df)):
+
+        df.loc[i, 'maritime_km'] = fb.maritime_distance(df.loc[i, 'iso3'], 
+                                                        maritime)
+        
+        df.loc[i, 'cost_kWh'] = fb.electricity_cost(df.loc[i, 'iso3'], 
+                                                    electricity_costs)
+
+    df = df.groupby(['decile']).agg(maritime_km = ('maritime_km', 'mean'),
+                                    cost_kWh = ('cost_kWh', 'mean')
+                                    ).reset_index()
+    
+
+    return df
+
 
 def run_uq_processing_cost():
     """
@@ -44,6 +78,8 @@ def run_uq_processing_cost():
     df1 = df1.rename(columns = {'total_population': 'population'})
     df = pd.merge(df, df1, on = 'decile', how = 'inner')
     df = pd.merge(df, gni, on = 'decile')
+    electricity_cost = generate_ssa_costs()
+    df = pd.merge(df, electricity_cost, on = 'decile', how = 'inner')
     df = df.to_dict('records')
 
     results = []
@@ -57,9 +93,11 @@ def run_uq_processing_cost():
                         item['mean_distance_km'], item['nodes'])
         
         opex_cost_usd = fb.opex_cost(item['rent_usd'], item['staff_usd'], 
-                        item['power_usd'], item['regulatory_usd'], 
+                        item['cost_kWh'], item['regulatory_usd'], 
                         item['customer_usd'], item['other_costs_usd'], 
-                        item['nodes'])
+                        item['nodes'], item['assessment_years'], 
+                        item['node_power_kWh_per_km_gbps'], 
+                        item['fiber_speed_gbps'], item['mean_distance_km'])
         
         total_cost_ownership = fb.total_cost_ownership(capex_cost_usd, 
                 opex_cost_usd, item['discount_rate'], item['assessment_years'])
@@ -127,6 +165,9 @@ def run_uq_processing_emission():
     df1 = df1.drop(columns = ['total_poor_unconnected'])
     df1 = df1.rename(columns = {'total_population': 'population'})
     df = pd.merge(df, df1, on = 'decile', how = 'inner')
+    maritime_distance_results = generate_ssa_costs()
+    df = pd.merge(df, maritime_distance_results, on = 'decile', how = 'inner')
+ 
     df = df.to_dict('records')
 
     results = []
@@ -135,21 +176,28 @@ def run_uq_processing_emission():
 
         lca_mfg = fb.lca_manufacturing(item['fiber_cable_kg_per_km'], 
                     item['pcb_kg'], item['pvc_kg'], item['steel_kg'], 
-                    item['router'], item['glass_kg_co2e'], item['pcb_kg_co2e'], 
-                    item['steel_kg_co2e'], item['pvc_kg_co2e'], 
+                    item['concrete_kg'], item['glass_kg_co2e'], 
+                    item['pcb_kg_co2e'], item['steel_kg_co2e'], 
+                    item['concrete_kg_co2e'], item['pvc_kg_co2e'], 
                     item['mean_distance_km'], item['nodes'])
         
         lca_trans = fb.lca_transportation(item['mean_distance_km'], 
                                           item['fuel_efficiency'], 
-                                          item['diesel_factor_kgco2e'])
+                                          item['diesel_factor_kgco2e'],
+                                          item['maritime_km'],
+                                          item['container_ship_kgco2e'])
 
         lca_constr = fb.lca_construction(item['fuel_efficiency'], 
                                          item['hours_per_km'], 
                                          item['diesel_factor_kgco2e'], 
                                          item['nodes'])
 
-        lca_ops = fb.lca_operations(item['fiber_point_pwr_kwh'], 
-                                    item['electricity_kg_co2e'], item['nodes'])
+        lca_ops = fb.lca_operations(item['node_power_kWh_per_km_gbps'], 
+                                    item['fiber_speed_gbps'],
+                                    item['cost_kWh'],
+                                    item['assessment_years'],
+                                    item['electricity_kg_co2e'], 
+                                    item['mean_distance_km'])
 
         lca_eolts = fb.lca_eolt(item['fiber_cable_kg_per_km'], item['pcb_kg'], 
                     item['pvc_kg'], item['steel_kg'], item['router'], 
@@ -216,7 +264,7 @@ def run_uq_processing_emission():
 if __name__ == '__main__':
 
     print('Running fiber broadband cost model')
-    run_uq_processing_cost()
+    #run_uq_processing_cost()
 
     print('Running fiber broadband emissions model')
-    #run_uq_processing_emission()
+    run_uq_processing_emission()

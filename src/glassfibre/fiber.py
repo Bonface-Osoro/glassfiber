@@ -53,8 +53,9 @@ def capex_cost(olt_usd, civil_usd, transportation_usd, installation_usd,
     return capex_costs
 
 
-def opex_cost(rent_usd, staff_usd, power_usd, regulatory_usd,
-              customer_usd, other_costs_usd, nodes):
+def opex_cost(rent_usd, staff_usd, cost_kWh, regulatory_usd,
+              customer_usd, other_costs_usd, nodes, assessment_years, 
+              node_power_kWh_per_km_gbps, fiber_speed_gbps, length_km):
     """
     This function calculates operating expenditures
 
@@ -64,6 +65,8 @@ def opex_cost(rent_usd, staff_usd, power_usd, regulatory_usd,
         Annual land rental cost.
     staff_usd : int.
         Total staff costs.
+    cost_kWh : int.
+        Cost of electricity in USD per kWh.
     power_usd : int.
         Total power cost.
     regulatory_usd : int.
@@ -74,6 +77,14 @@ def opex_cost(rent_usd, staff_usd, power_usd, regulatory_usd,
         All other costs.
     nodes : int.
         Total number of fiber terminal nodes.
+    length_km : float.
+        Total length fiber optic cable.
+    assessment_years : int.
+        assessment period of the infrastructure.
+    node_power_kWh_per_km_gbps : float.
+        Power consumption per Gbps per km.
+    fiber_speed_gbps : float
+        Speed of the fiber broadband
 
     Returns
     -------
@@ -81,8 +92,11 @@ def opex_cost(rent_usd, staff_usd, power_usd, regulatory_usd,
             The operating expenditure costs annually.
 
     """
-    annual_opex = (((rent_usd + staff_usd + power_usd + other_costs_usd) * nodes) 
-                 + regulatory_usd + customer_usd)
+    power_cost = (cost_kWh * fiber_speed_gbps * assessment_years 
+                  * node_power_kWh_per_km_gbps * length_km
+                  * 24 * 365) # 24 hours in a day # 365 days a year
+    annual_opex = (((rent_usd + staff_usd + other_costs_usd) * nodes) 
+                 + regulatory_usd + customer_usd) + power_cost
     
 
     return annual_opex
@@ -129,8 +143,9 @@ def total_cost_ownership(total_capex, total_opex, discount_rate,
 #################################
 
 def lca_manufacturing(fiber_cable_kg_per_km, pcb_kg, pvc_kg, steel_kg, 
-                      router, glass_kg_co2e, pcb_carbon_factor, 
-                      steel_kg_co2e, pvc_carbon_factor, length_km, nodes):
+                      concrete_kg, glass_kg_co2e, pcb_carbon_factor, 
+                      steel_kg_co2e, concrete_kg_co2e, pvc_carbon_factor, 
+                      length_km, nodes):
     """
     This function calculates the total GHG emissions in the manufacturing 
     phase LCA of fiber broadband using carbon emission factors.
@@ -145,8 +160,8 @@ def lca_manufacturing(fiber_cable_kg_per_km, pcb_kg, pvc_kg, steel_kg,
         Mass of PVC material used in building node components.
     steel_kg : float.
         Mass of steel metal used in building node componentsa.
-    router : float.
-        Mass of router for every terminal node.
+    concrete_kg : float.
+        Mass of concrete for every terminal node.
     length_km : float.
         Total length fiber optic cable.
     nodes : int.
@@ -166,28 +181,36 @@ def lca_manufacturing(fiber_cable_kg_per_km, pcb_kg, pvc_kg, steel_kg,
     pcb_ghg = (pcb_kg * pcb_carbon_factor) * length_km
     
     steel_ghg = (steel_kg * steel_kg_co2e) * length_km
+
+    concrete_ghg = (concrete_kg * concrete_kg_co2e)
     
     pvc_ghg = (pvc_kg * pvc_carbon_factor) * length_km
 
-    mfg_emissions = (((steel_ghg + pcb_ghg + pvc_ghg) * nodes) + glass_ghg)
+    mfg_emissions = (((steel_ghg + concrete_ghg + pcb_ghg + pvc_ghg) * nodes) + 
+                     glass_ghg)
 
 
     return mfg_emissions
 
 
-def lca_transportation(length_km, fuel_efficiency, diesel_factor_kgco2e):
+def lca_transportation(distance_km, consumption_lt_per_km, diesel_factor_kgco2e,
+                       maritime_km, container_ship_kgco2e):
     """
     This function calculates the total GHG emissions in the transportation 
     LCA phase of fiber broadband deployment.
 
     Parameters
     ----------
-    length_km : float.
+    distance_km : float.
         Distance travelled by the vehicle.
-    fuel_efficiency : float.
-        Fuel consumption of the vehicle per kilometer.
+    consumption_lt_per_km : float.
+        Fuel consumption of the vehicle per distance.
     diesel_factor_kgco2e : float.
         Carbon emission factor of diesel fuel.
+    maritime_km : float
+        Distance between the port of China and SSA country.
+    container_ship_kgco2e : float
+        Carbon emission factor of a container ship.
 
     Returns
     -------
@@ -195,12 +218,35 @@ def lca_transportation(length_km, fuel_efficiency, diesel_factor_kgco2e):
         Transportation GHG emissions.
     """
 
-    trans_ghg = (length_km * fuel_efficiency * diesel_factor_kgco2e)
+    maritime_ghg = maritime_km * container_ship_kgco2e
 
-    trans_emissions = trans_ghg
+    road_ghg = (distance_km * consumption_lt_per_km * diesel_factor_kgco2e)
+
+    trans_emissions = maritime_ghg + road_ghg
 
 
     return trans_emissions
+
+
+def maritime_distance(iso3, maritime_dict):
+    """
+    This function calculates the distance between the origin Port of China and 
+    any SSA country
+
+    Parameters
+    ----------
+    iso3 : string.
+        Country ISO3.
+    maritime_dict : dict
+        Dictionary containing ISO3 codes as keys and distances as values.
+
+    Returns
+    -------
+    distance_km : float
+        Distance between the two ports
+    """
+
+    return maritime_dict.get(iso3, None)
 
 
 def lca_construction(fuel_efficiency, machine_operating_hours, 
@@ -233,7 +279,28 @@ def lca_construction(fuel_efficiency, machine_operating_hours,
     return construction_emissions
 
 
-def lca_operations(fiber_point_pwr_kwh, electricity_kg_co2e, nodes):
+def electricity_cost(iso3, electricity_dict):
+    """
+    This function calculates the cost of electricity in each SSA country
+
+    Parameters
+    ----------
+    iso3 : string.
+        Country ISO3.
+    electricity_dict : dict
+        Dictionary containing ISO3 codes as keys and distances as values.
+
+    Returns
+    -------
+    cost_kWh : float
+        Cost of electricity
+    """
+
+    return electricity_dict.get(iso3, None)
+
+
+def lca_operations(node_power_kWh_per_km_gbps, fiber_speed_gbps, cost_kWh, 
+                   assessment_years, electricity_kg_co2e, length_km):
     """
     This function calculates the total GHG emissions due to operation of the 
     fiber broadband
@@ -244,8 +311,14 @@ def lca_operations(fiber_point_pwr_kwh, electricity_kg_co2e, nodes):
         Total power consumption of fiber node station.
     electricity_kg_co2e : float.
         Carbon emission factor of electricity.
-    nodes : int.
-        Total number of fiber terminal nodes.
+    length_km : float.
+        Total length fiber optic cable.
+    assessment_years : int.
+        assessment period of the infrastructure.
+    node_power_kWh_per_km_gbps : float.
+        Power consumption per Gbps per km.
+    fiber_speed_gbps : float
+        Speed of the fiber broadband
 
     Returns
     -------
@@ -253,9 +326,11 @@ def lca_operations(fiber_point_pwr_kwh, electricity_kg_co2e, nodes):
         Operations GHG emissions.
     """
 
-    operations_ghg_kg = (fiber_point_pwr_kwh * electricity_kg_co2e)
+    operations_ghg_kg = (node_power_kWh_per_km_gbps * fiber_speed_gbps * 
+                         assessment_years * cost_kWh * 24 * 365 * 
+                         electricity_kg_co2e)
 
-    operations_emissions = operations_ghg_kg * nodes
+    operations_emissions = operations_ghg_kg * length_km
 
 
     return operations_emissions
