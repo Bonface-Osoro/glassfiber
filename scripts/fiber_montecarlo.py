@@ -210,6 +210,14 @@ def multinetwork_fiber_emissions(i, fiber_params):
             fiber_params['node_pwr_low_kWh_per_km_gbps'], 
             fiber_params['node_pwr_high_kWh_per_km_gbps'])
         
+        truck_fuel_efficiency = random.uniform(
+            fiber_params['truck_fuel_efficiency_low'], 
+            fiber_params['truck_fuel_efficiency_high'])
+        
+        trench_percent = random.uniform(
+            fiber_params['trench_low_percent'], 
+            fiber_params['trench_high_percent'])
+        
         output.append({
             'fiber_cable_kg_per_km' : fiber_cable_kg_per_km,
             'pcb_kg' : pcb_kg,
@@ -230,6 +238,8 @@ def multinetwork_fiber_emissions(i, fiber_params):
             'diesel_factor_kgco2e' : fiber_params['diesel_factor_kgco2e'],
             'container_ship_kgco2e' : fiber_params['container_ship_kgco2e'],
             'fuel_efficiency' : fuel_efficiency,
+            'truck_fuel_efficiency' : truck_fuel_efficiency,
+            'trench_percent' : trench_percent,
             'hours_per_km' : hours_per_km,
             'fiber_speed_gbps' : fiber_speed_gbps,
             'node_power_kWh_per_km_gbps' : node_power_kWh_per_km_gbps,
@@ -290,7 +300,7 @@ if __name__ == '__main__':
     random.seed(10)
 
     print('Running uq_cost_inputs_generator()')
-    uq_inputs_costs(parameters)
+    #uq_inputs_costs(parameters)
 
     print('Running uq_inputs_emissions_generator()')
     uq_inputs_emissions(parameters)
