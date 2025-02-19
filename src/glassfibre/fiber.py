@@ -249,22 +249,24 @@ def maritime_distance(iso3, maritime_dict):
     return maritime_dict.get(iso3, None)
 
 
-def lca_construction(fuel_efficiency, machine_operating_hours, 
-                     diesel_factor_kgco2e, nodes):
+def lca_construction(distance_km, trench_percent, hours_per_km, 
+                     machine_fuel_efficiency, diesel_factor_kgco2e):
     """
     This function calculates the total GHG emissions in the construction 
     LCA phase of fiber broadband deployment.
 
     Parameters
     ----------
-    fuel_efficiency : float.
-        Fuel efficiency of the machine.
-    machine_operating_hours : float.
-        Number of hours the machine operated.
+    distance_km : float.
+        Distance to be trenched in km.
+    trench_percent : float.
+        Percentage of distance trenched.
+    hours_per_km : float
+        Hours taken to trench a km. 
+    machine_fuel_efficiency : float.
+        Amount of fuel in liters per hour.
     diesel_factor_kgco2e : float.
         Carbon emission factor of diesel fuel.
-    nodes : int.
-        Total number of fiber terminal nodes.
 
     Returns
     -------
@@ -272,8 +274,8 @@ def lca_construction(fuel_efficiency, machine_operating_hours,
         Construction GHG emissions.
     """
 
-    construction_emissions = (fuel_efficiency * machine_operating_hours 
-                     * diesel_factor_kgco2e) * nodes
+    construction_emissions = (distance_km * trench_percent * hours_per_km
+                     * machine_fuel_efficiency * diesel_factor_kgco2e)
 
 
     return construction_emissions

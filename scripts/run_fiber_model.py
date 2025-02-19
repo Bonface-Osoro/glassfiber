@@ -182,15 +182,16 @@ def run_uq_processing_emission():
                     item['mean_distance_km'], item['nodes'])
         
         lca_trans = fb.lca_transportation(item['mean_distance_km'], 
-                                          item['fuel_efficiency'], 
+                                          item['truck_fuel_efficiency'], 
                                           item['diesel_factor_kgco2e'],
                                           item['maritime_km'],
                                           item['container_ship_kgco2e'])
 
-        lca_constr = fb.lca_construction(item['fuel_efficiency'], 
-                                         item['hours_per_km'], 
-                                         item['diesel_factor_kgco2e'], 
-                                         item['nodes'])
+        lca_constr = fb.lca_construction(item['mean_distance_km'], 
+                                         item['trench_percent'],
+                                         item['hours_per_km'],
+                                         item['fuel_efficiency'], 
+                                         item['diesel_factor_kgco2e'])
 
         lca_ops = fb.lca_operations(item['node_power_kWh_per_km_gbps'], 
                                     item['fiber_speed_gbps'],
