@@ -49,23 +49,20 @@ def multinetwork_fiber_costs(i, fiber_params):
         olt_usd = random.randint(fiber_params['olt_low_usd'], 
                                 fiber_params['olt_high_usd'])
         
-        civil_usd = random.randint(fiber_params['civil_low_usd'], 
-                                fiber_params['civil_high_usd'])
+        otc_usd = random.randint(fiber_params['otc_low_usd'], 
+                                fiber_params['otc_high_usd'])
         
-        transportation_usd = random.randint(fiber_params['transportation_low_usd'], 
-                                fiber_params['transportation_high_usd'])
+        wan_unit_usd = random.randint(fiber_params['wan_unit_low_usd'], 
+                                fiber_params['wan_unit_high_usd'])
 
         installation_usd = random.randint(fiber_params['installation_low_usd'], 
                                 fiber_params['installation_high_usd'])
         
-        rpu_usd = random.randint(fiber_params['rpu_low_usd'], 
-                                fiber_params['rpu_high_usd'])
+        wdm_usd = random.randint(fiber_params['wdm_low_usd'], 
+                                fiber_params['wdm_high_usd'])
         
-        odf_unit_usd = random.randint(fiber_params['odf_unit_low_usd'], 
-                                fiber_params['odf_unit_high_usd'])
-        
-        rent_usd = random.randint(fiber_params['rent_low_usd'], 
-                                fiber_params['rent_high_usd'])
+        other_usd = random.randint(fiber_params['other_low_usd'], 
+                                fiber_params['other_high_usd'])
         
         staff_usd = random.randint(fiber_params['staff_low_usd'], 
                                 fiber_params['staff_high_usd'])
@@ -91,12 +88,11 @@ def multinetwork_fiber_costs(i, fiber_params):
         
         output.append({
             'olt_usd' : olt_usd,
-            'civil_usd' : civil_usd,
-            'transportation_usd' : transportation_usd,
+            'otc_usd' : otc_usd,
+            'wan_unit_usd' : wan_unit_usd,
             'installation_usd' : installation_usd,
-            'rpu_usd' : rpu_usd,
-            'odf_unit_usd' : odf_unit_usd,
-            'rent_usd' : rent_usd,
+            'wdm_usd' : wdm_usd,
+            'other_usd' : other_usd,
             'staff_usd' : staff_usd,
             'power_usd' : power_usd,
             'regulatory_usd' : regulatory_usd,

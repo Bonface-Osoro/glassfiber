@@ -87,12 +87,11 @@ def run_uq_processing_cost():
     for item in tqdm(df, desc = "Processing uncertainty fiber cost results"):
         
 
-        capex_cost_usd = fb.capex_cost(item['olt_usd'], item['civil_usd'], 
-                        item['transportation_usd'], item['installation_usd'], 
-                        item['rpu_usd'], item['odf_unit_usd'], 
-                        item['mean_distance_km'], item['nodes'])
+        capex_cost_usd = fb.capex_cost(item['olt_usd'], item['installation_usd'], 
+                        item['otc_usd'], item['wan_unit_usd'], 
+                        item['wdm_usd'], item['mean_distance_km'], item['nodes'])
         
-        opex_cost_usd = fb.opex_cost(item['rent_usd'], item['staff_usd'], 
+        opex_cost_usd = fb.opex_cost(item['staff_usd'], 
                         item['cost_kWh'], item['regulatory_usd'], 
                         item['customer_usd'], item['other_costs_usd'], 
                         item['nodes'], item['assessment_years'], 
