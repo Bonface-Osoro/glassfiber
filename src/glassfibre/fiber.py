@@ -14,8 +14,8 @@ import numpy as np
 ############################
 ######## COST MODEL ########
 ############################
-def capex_cost(olt_usd, civil_usd, transportation_usd, installation_usd, 
-               rpu_usd, odf_unit_usd, length_km, nodes):
+def capex_cost(olt_usd, installation_usd, otc_usd, wan_unit_usd, 
+               wdm_usd, length_km, nodes):
     """
     This function calculates capital expenditures
 
@@ -23,16 +23,18 @@ def capex_cost(olt_usd, civil_usd, transportation_usd, installation_usd,
     ----------
     olt_usd : int.
         Cost of Optical Line Terminal.
-    civil_usd : int.
-        Total civil construction costs.
-    transportation_usd : int.
-        Cost of transporting equipment and staff during construction.
     installation_usd : int.
-        Total cost of installing the macro base station.
-    rpu_usd : int.
-        Total cost of Remote Power Unit.
-    odf_unit_usd : int.
-        Total cost of Optical Distribution Frame.
+        Total cost of installing fiber deployment.
+    otc_usd : int.
+        Total cost of optical terminal chassis Unit.
+    wan_unit_usd : int.
+        Total cost of Wide Area Network (WAN) amplifier and dispersion 
+        compensation.
+    wdm_usd : float.
+        Total cost of Wavelength Division Multiplexing (WDM) amplifier and 
+        dispersion compensation device.
+    other_usd : float.
+        Total cost of other electronics.
     length_km : float.
         Total length of fiber optic cable.
     nodes : int.
@@ -44,16 +46,16 @@ def capex_cost(olt_usd, civil_usd, transportation_usd, installation_usd,
             The capital expenditure costs.
 
     """
-    unit_costs = ((olt_usd + civil_usd + installation_usd + rpu_usd + 
-                   odf_unit_usd) * nodes) 
-    transportation_cost = (transportation_usd * length_km) 
-    capex_costs = (unit_costs + transportation_cost)
+    unit_costs = ((olt_usd + installation_usd + otc_usd + wan_unit_usd 
+                   + wdm_usd) * nodes) 
+    installation_cost = (installation_usd * length_km) 
+    capex_costs = (unit_costs + installation_cost)
 
 
     return capex_costs
 
 
-def opex_cost(rent_usd, staff_usd, cost_kWh, regulatory_usd,
+def opex_cost(staff_usd, cost_kWh, regulatory_usd,
               customer_usd, other_costs_usd, nodes, assessment_years, 
               node_power_kWh_per_km_gbps, fiber_speed_gbps, length_km):
     """
@@ -95,7 +97,7 @@ def opex_cost(rent_usd, staff_usd, cost_kWh, regulatory_usd,
     power_cost = (cost_kWh * fiber_speed_gbps * assessment_years 
                   * node_power_kWh_per_km_gbps * length_km
                   * 24 * 365) # 24 hours in a day # 365 days a year
-    annual_opex = (((rent_usd + staff_usd + other_costs_usd) * nodes) 
+    annual_opex = (((staff_usd + other_costs_usd) * nodes) 
                  + regulatory_usd + customer_usd) + power_cost
     
 
