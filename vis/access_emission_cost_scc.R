@@ -53,7 +53,7 @@ per_user_emissions <-
        digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
        position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_viridis_d(direction = -1) + 
-  labs(colour = NULL, title = "(A) Fiber Broadband Greenhouse Gas (GHG) Emissions Reported Per User", 
+  labs(colour = NULL, title = "(B) Fiber Broadband Greenhouse Gas (GHG) Emissions Reported Per User", 
        subtitle = "Per user emissions categorized by deciles and grouped by spatial optimization algorithm.", 
        x = "Population Density Decile (Population per km²)", 
        y = bquote("Average emissions (kg CO"["2"] ~ " e)")) +
@@ -100,7 +100,7 @@ annualized_per_user_emissions <-
      position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_viridis_d(direction = -1) + 
   labs(colour = NULL, 
-       title = "(B) Fiber Broadband GHG Emissions Reported Per User", 
+       title = "(C) Fiber Broadband GHG Emissions Reported Per User", 
        subtitle = "Annualized per user emissions grouped by deciles and spatial optimization algorithm.", 
        x = "Population Density Decile (Population per km²)", 
        y = bquote("Annualized per user emissions (kg CO"["2"] ~ " e)")) +
@@ -170,13 +170,13 @@ total_ssa_emissions <-
 ########################
 ##PANEL USER EMISSIONS##
 ########################
-aggregate_emissions <- ggarrange(per_user_emissions, 
-  annualized_per_user_emissions, ncol = 1, nrow = 2, align = c('hv'),
+aggregate_emissions <- ggarrange(total_ssa_emissions, per_user_emissions, 
+  annualized_per_user_emissions, ncol = 1, nrow = 3, align = c('hv'),
   common.legend = TRUE, legend='bottom') 
 
 dir.create(file.path(folder, 'figures'), showWarnings = FALSE)
 path = file.path(folder, 'figures', 'aggregate_emissions.png')
-png(path, units="in", width=10, height=10, res=300)
+png(path, units="in", width=12, height=14, res=300)
 print(aggregate_emissions)
 dev.off()
 
@@ -202,7 +202,7 @@ per_user_scc_costs <- ggplot(df2, aes(x = decile, y = mean, fill = algorithm)) +
                                 digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
               position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_viridis_d(direction = -1) +
-  labs(colour = NULL, title = "(A) Fiber Broadband Social Carbon Cost (SCC) Reported Per User",
+  labs(colour = NULL, title = "(B) Fiber Broadband Social Carbon Cost (SCC) Reported Per User",
        subtitle = "Per user SCC categorized by deciles and spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
        y = bquote("Average SCC per user (US$)")) +
@@ -245,7 +245,7 @@ anualized_per_user_scc_costs <- ggplot(df3, aes(x = decile, y = mean, fill = alg
        digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
               position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_viridis_d(direction = -1) +
-  labs(colour = NULL, title = "(B) Fiber Broadband SCC Reported Per User",
+  labs(colour = NULL, title = "(C) Fiber Broadband SCC Reported Per User",
        subtitle = "Annualized per user SCC categorized by deciles and spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
        y = bquote("Annualized average SCC per user (US$)")) +
@@ -289,7 +289,7 @@ total_ssa_scc <- ggplot(df8, aes(x = decile, y = mean, fill = algorithm)) +
       digits = 2, format = "fg", flag = "#")), color = 'black', size = 3, position = 
       position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_viridis_d(direction = -1) +
-  labs(colour = NULL, title = "(B) Fiber Broadband Total Social Carbon Cost (SCC) for SSA",
+  labs(colour = NULL, title = "(A) Fiber Broadband Total Social Carbon Cost (SCC) for SSA",
        subtitle = "Total SCC categorized by deciles and spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
        y = bquote("Total SCC (US$ billions)")) +
@@ -313,23 +313,15 @@ total_ssa_scc <- ggplot(df8, aes(x = decile, y = mean, fill = algorithm)) +
 ##############
 ##PANEL SCC ##
 ##############
-aggregate_SCC <- ggarrange(
-  per_user_scc_costs, anualized_per_user_scc_costs, ncol = 1, nrow = 2,
+aggregate_SCC <- ggarrange(total_ssa_scc,
+  per_user_scc_costs, anualized_per_user_scc_costs, ncol = 1, nrow = 3,
   align = c('hv'), common.legend = TRUE, legend='bottom')
 
 path = file.path(folder, 'figures', 'aggregate_SCC.png')
-png(path, units="in", width=10, height=10, res=300)
+png(path, units="in", width=12, height=14, res=300)
 print(aggregate_SCC)
 dev.off()
 
-SSA_total_emissions <- ggarrange(
-  total_ssa_emissions, total_ssa_scc, ncol = 1, nrow = 2,
-  align = c('hv'), common.legend = TRUE, legend='bottom')
-
-path = file.path(folder, 'figures', 'SSA_total_emissions.png')
-png(path, units="in", width=10, height=10, res=300)
-print(SSA_total_emissions)
-dev.off()
 
 ##############################################
 ## FIBER BROADBAND TOTAL COST OF OWNERSHIP ###
@@ -421,7 +413,7 @@ total_ssa_tco <- ggplot(df6, aes(x = decile, y = mean, fill = algorithm)) +
       position_dodge(0.9), vjust = -0.2, hjust = 1.2) +
   scale_fill_viridis_d(direction = -1) +
   labs(colour = NULL, title = "(A) Fiber Broadband Total Cost of Ownership (TCO) for SSA",
-       subtitle = "Total TCO categorized by deciles, grouped by spatial optimization algorithm.",
+       subtitle = "Total TCO categorized by deciles and grouped by spatial optimization algorithm.",
        x = "Population Density Decile (Population per km²)", 
        y = bquote("Total TCO (US$ billions)")) +
   theme(
