@@ -299,4 +299,4 @@ if __name__ == '__main__':
     #uq_inputs_costs(parameters)
 
     print('Running uq_inputs_emissions_generator()')
-    uq_inputs_emissions(parameters)
+    #uq_inputs_emissions(parameters)
