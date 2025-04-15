@@ -50,9 +50,9 @@ python src/glassfibre/pcst.py
 
 
 ## Required Data
-[1]	“Open Spatial Demographic Data and Research,” WorldPop. https://www.worldpop.org/ (accessed May 08, 2023).
+[1]	Population Data. “Open Spatial Demographic Data and Research,” WorldPop. https://www.worldpop.org/ (accessed May 08, 2023).
 
-[2]	GADM, “Global Administrative Areas Boundaries.” https://gadm.org/download_world.html (accessed Sep. 14, 2022).
+[2]	Statistical Areas Data. GADM, “Global Administrative Areas Boundaries.” https://gadm.org/download_world.html (accessed Sep. 14, 2022).
 
 [3] Country metadafile. Contained in `/data/countries.csv`
 
