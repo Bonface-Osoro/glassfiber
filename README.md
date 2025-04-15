@@ -28,10 +28,10 @@ Results
   <img src="/docs/population_point_demand_metrics.png" />
 </p>
 
-In `Figure 3`, the quantitative emission results for different fiber network design approach is presented.
-#### Figure 3 Emission Results.
+In `Figure 3`, a least-cost network design using Prize Collecting Steiner Tree (PCST) algorithm for routing fiber closer to settlement areas in SSA is shown.
+#### Figure 3 Designed Least-Cost Network.
 <p align="center">
-  <img src = "/docs/emissions.png" />
+  <img src = "/docs/pcst_fiber_network_design.png" />
 </p>
 
 
@@ -55,3 +55,13 @@ python src/glassfibre/pcst.py
 [2]	GADM, “Global Administrative Areas Boundaries.” https://gadm.org/download_world.html (accessed Sep. 14, 2022).
 
 [3] Country metadafile. Contained in `/data/countries.csv`
+
+[4] Sub-Saharan Africa roads data.  Overture Maps Foundation, “Overture 2024-02-15-alpha.0 Release Notes,” 2024. Accessed: Apr. 17, 2024. [Online]. Available: https://overturemaps.org/download/ 
+
+[5] Mobile Subscriber data. The World Bank Group, “Mobile Cellular Subscriptions,” World Bank Open Data. Accessed: Jan. 29, 2024. [Online]. Available: https://data.worldbank.org/indicator/IT.CEL.SETS
+
+[6] Existing Fiber Networks Data for Sub-Saharan Africa. S. Song, “African Terrestrial Fibre Optic Cable Mapping Project,” Many Possibilities. Accessed: Feb. 11, 2024. [Online]. Available: https://manypossibilities.net/afterfibre/
+
+[7] Cost of Electricity Data. “Household electricity prices worldwide in June 2024, by country,” Statista. Accessed: Feb. 21, 2025. [Online]. Available: https://www.statista.com/statistics/263492/electricity-prices-in-selected-countries/
+
+[8] LCA Carbon Emission Factors. United Kingdom Government, “Government conversion factors for company reporting of greenhouse gas emissions,” Department of Business, Energy and Industrial Strategy, London, Jun. 2023. Accessed: Feb. 07, 2024. [Online]. Available: https://www.gov.uk/government/collections/government-conversion-factors-for-company-reporting
