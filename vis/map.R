@@ -42,13 +42,15 @@ data = data %>% group_by(GID_2, area, iso3) %>%
 pop_density <- ggplot(data, aes(x = pop_density_sqkm)) +
   geom_histogram(bins = 50, binwidth = 4,  color = "black", linewidth = 0.05, 
   aes(fill = iso3)) + scale_fill_brewer(palette = "Set3") +
-  labs(title = "A", 
+  labs(title = "(A) Population density distribution of some SSA countries.",
+       subtitle = "Grouped by the top 10 most populated countries",
        x = "Population density (persons per km²)", y = "Frequency", fill = NULL) +
   scale_y_continuous(limits = c(0, 3999), labels = function(y)
       format(y, scientific = FALSE), expand = c(0, 0)) +
   scale_x_continuous(limits = c(1, 250), labels = function(x)
     format(x, scientific = FALSE), expand = c(0, 0)) + theme_minimal() +
-    theme(
+    theme(plot.title = element_text(size = 9, face = "bold"),
+      plot.subtitle = element_text(size = 8),
       axis.title.y = element_text(size = 9),
       axis.title.x = element_text(size = 9),
       strip.text.x = element_blank(),
@@ -61,10 +63,7 @@ pop_density <- ggplot(data, aes(x = pop_density_sqkm)) +
       axis.line.y  = element_line(size = 0.15),
       legend.title = element_text(size = 9),
       legend.text = element_text(size = 8),
-      legend.position = 'bottom',
-      axis.title = element_text(size = 6),
-      plot.subtitle = element_text(size = 6),
-      plot.title = element_text(size = 9, face = "bold")) +
+      legend.position = 'bottom') +
       guides(fill = guide_legend(ncol = 6, nrow = 2))
 
 
@@ -97,7 +96,8 @@ below_20000 <- ggplot() +
   geom_sf(data = africa_data,linewidth = 0.02, fill = "gray96") +
   geom_sf(data = data_20, aes(color = population_bin), 
           size = 0.1) +
-  labs(title = "B",
+  labs(title = "(B) Below 20,000 people.",
+       subtitle = "For all settlement with less than 20,000 people.",
        color = NULL) +
   scale_color_brewer(palette = "Dark2") +
   theme_void() +
@@ -112,7 +112,7 @@ below_20000 <- ggplot() +
     legend.title = element_text(size = 9),
     legend.text = element_text(size = 8),
     legend.key.size = unit(0.9, "lines"),
-    plot.subtitle = element_text(size = 6),
+    plot.subtitle = element_text(size = 7),
     plot.title = element_text(size = 9, face = "bold")) + 
   guides(color = guide_legend(ncol = 4, nrow = 2))
 
@@ -141,7 +141,8 @@ above_20000 <- ggplot() +
   geom_sf(data = africa_data, linewidth = 0.02, fill = "gray96") +
   geom_sf(data = data_50, aes(color = population_bin), 
           size = 0.1) +
-  labs(title = "C",
+  labs(title = "(C) Between 20,000 - 50,000 people",
+       subtitle = "For all settlement with 20,000 - 50,000 people.",
        color = NULL) +
   scale_color_brewer(palette = "Dark2") +
   theme_void() +
@@ -156,7 +157,7 @@ above_20000 <- ggplot() +
     legend.title = element_text(size = 9),
     legend.text = element_text(size = 8),
     legend.key.size = unit(0.9, "lines"),
-    plot.subtitle = element_text(size = 6),
+    plot.subtitle = element_text(size = 7),
     plot.title = element_text(size = 9, face = "bold")) + 
   guides(color = guide_legend(ncol = 4, nrow = 2))
 
@@ -185,7 +186,8 @@ above_50000 <- ggplot() +
   geom_sf(data = africa_data, linewidth = 0.02, fill = "gray96") + 
   geom_sf(data = data_half, aes(color = population_bin), 
           size = 0.1) +
-  labs(title = "D",
+  labs(title = "(D) Above 50,000 people.",
+       subtitle = "For all settlement with over 50,000 people.",
        color = NULL) +
   scale_color_brewer(palette = "Dark2") +
   theme_void() +
@@ -200,7 +202,7 @@ above_50000 <- ggplot() +
     legend.title = element_text(size = 9),
     legend.text = element_text(size = 8),
     legend.key.size = unit(0.9, "lines"),
-    plot.subtitle = element_text(size = 6),
+    plot.subtitle = element_text(size = 7),
     plot.title = element_text(size = 9, face = "bold")) + 
   guides(color = guide_legend(ncol = 4, nrow = 2))
 
@@ -330,7 +332,9 @@ access_pcsf_fiber <- ggplot() +
   geom_sf(data = access_nodes, size = 0.05) + 
   geom_sf(data = access_edges, aes(color = Type), size = 0.3, linewidth = 0.5, show.legend = TRUE) + 
   geom_sf(data = core_edges, aes(color = Type), linewidth = 0.3, show.legend = TRUE) + 
-  labs(color = "Network Level") + 
+  labs(title = "Fixed fiber network design using Prize Collecting Steiner Tree (PCST) algorithm.",
+    subtitle = "Designed for all sub-regions across SSA.",
+    color = "Network Level") + 
   scale_color_manual(values = c("Existing Fiber Line" = "green4", 
         "Designed Fiber Access Lines" = "darkorange")) +
   theme(
@@ -356,7 +360,7 @@ print(access_prims_fiber)
 dev.off()
 
 path = file.path(folder, 'figures', 'pcst_fiber_network_design.png')
-png(path, units = "in", width = 7, height = 7, res = 300)
+png(path, units = "in", width = 10, height = 9, res = 300)
 print(access_pcsf_fiber)
 dev.off()
 
