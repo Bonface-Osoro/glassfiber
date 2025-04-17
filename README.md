@@ -1,4 +1,9 @@
 # A global assessment of fixed broadband infrastructure (glassfibre)
+
+## Paper Citation
+
+Osoro, O. B., Oughton, E. J., & Kauker, F. (2024). Geospatial sustainability assessment of universal Fiber-To-The-Neighborhood (FTTnb) broadband infrastructure strategies for Sub-Saharan Africa. arXiv preprint arXiv:2411.18633. 
+
 Even though fiber has been deployed in most parts of SSA, its installation is only justified in densely populated areas due to the high drilling and trenching costs. Notably, there are emerging innovative efforts to connect rural SSA but majority of the studies focuses on the technical aspects such as capacity. However, the deployment of innovative fiber broadband in SSA need to integrate the geographic location, population density of the targeted uncovered areas as a function of the cost and environmental impacts. A series of spatial optimization techniques can be used to optimally connect the unconnected rural population while reducing fixed, operational costs and carbon footprints. Against this background, we set to answer three important research questions as follows.
 
   1)	What is the best way to model fixed broadband networks to estimate their design and cost under different scenarios, using a globally generalizable method? 
